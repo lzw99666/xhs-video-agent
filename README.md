@@ -1,356 +1,356 @@
 # xhs-video-agent
 
-**把一篇文章变成一条可发布的小红书 3:4 短视频：调研 → 口播稿 → 网页演示 → 配音 → 录屏 → 三道闸门 → 发布 → T+3 天复盘。**
+**Turn an article into a publishable 3:4 Xiaohongshu short video: research → narration script → web presentation → voice-over → screen recording → three gates → publish → T+3 day retro.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Platform: Windows](https://img.shields.io/badge/platform-Windows-0078d4.svg)](#已知限制)
-[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](#环境依赖)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows-0078d4.svg)](#11-known-limitations)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](#41-prerequisites)
 
 ---
 
-## 目录
+## Table of Contents
 
-- [1. 这是什么](#1-这是什么)
-- [2. 示例成品](#2-示例成品)
-- [3. 工作流总览](#3-工作流总览)
-- [4. 快速开始](#4-快速开始)
-- [5. cheat 校准回路](#5-cheat-校准回路)
-- [6. 三道闸门](#6-三道闸门)
-- [7. 可选：无人值守心跳](#7-可选无人值守心跳)
-- [8. 目录结构](#8-目录结构)
-- [9. 示例导览](#9-示例导览)
+- [1. What This Is](#1-what-this-is)
+- [2. Sample Output](#2-sample-output)
+- [3. Workflow Overview](#3-workflow-overview)
+- [4. Quick Start](#4-quick-start)
+- [5. The Cheat Calibration Loop](#5-the-cheat-calibration-loop)
+- [6. The Three Gates](#6-the-three-gates)
+- [7. Optional: Unattended Heartbeat](#7-optional-unattended-heartbeat)
+- [8. Repository Layout](#8-repository-layout)
+- [9. Example Walkthrough](#9-example-walkthrough)
 - [10. FAQ](#10-faq)
-- [11. 已知限制](#11-已知限制)
-- [12. 依赖与致谢](#12-依赖与致谢)
+- [11. Known Limitations](#11-known-limitations)
+- [12. Dependencies & Credits](#12-dependencies--credits)
 - [13. License](#13-license)
 
 ---
 
-## 1. 这是什么
+## 1. What This Is
 
-这是一套**给 AI agent 用的视频生产流水线**：agent 负责调研、写稿、写网页、配音、录屏；脚本负责机械校验；人只在三个硬节点做判断。
+This is a **video production pipeline built for an AI agent**: the agent researches, writes the script, builds the web page, generates the voice-over, and records the screen. Scripts do the mechanical validation. The human only makes decisions at three hard checkpoints.
 
-它不是"AI 一键生成视频"。它的核心是**把不可控的创作过程拆成可控工序**，每一步都有产物、有契约、有闸门。
+It is not "one-click AI video generation." Its core idea is **turning an uncontrollable creative process into a controlled set of steps** — every step has an artifact, a contract, and a gate.
 
-### 适合谁
+### Who it is for
 
-- 做知识 / 科普 / 产品解读类短视频，想要**稳定产出**而不是碰运气的人
-- 已经用 Claude Code、CodeBuddy、Trae 等支持 skill 的 agent，愿意让 agent 写代码而不是只写文案的人
-- 能接受"先写稿、再打分、再发布"这套慢流程，换取可复盘、可迭代的人
-- Windows 用户（当前脚本以 PowerShell + Chrome 为主）
+- People making knowledge, explainer, or product-breakdown short videos who want **reliable output** instead of luck
+- People already using an agent that supports skills (Claude Code, CodeBuddy, Trae, etc.) and are willing to let the agent write code, not just copy
+- People who accept a slow flow — write the script first, score it, then publish — in exchange for something that can be reviewed and iterated
+- Windows users (the current scripts are PowerShell + Chrome)
 
-### 不适合谁
+### Who it is not for
 
-- 想要"输入标题、输出成片"的一键工具的人
-- 纯口播、不想要网页动画的人（这套流程的画面是网页，不是素材剪辑）
-- 完全不想碰命令行、Python、Node 的人
-- 需要开箱即用的 SaaS 的人（这里没有服务器、没有账号系统）
+- People who want a "type a title, get a finished video" tool
+- People doing pure talking-head videos with no web animation (the visuals here are web pages, not edited footage)
+- People who do not want to touch a command line, Python, or Node
+- People who need a turnkey SaaS (there is no server and no account system here)
 
 ---
 
-## 2. 示例成品
+## 2. Sample Output
 
-示例片《同一个问题，AI 为什么每次答得不一样》成片 2 分 33 秒，13 拍，1080×1440 竖版。下面 5 张是从成片里按时间抽的帧（不是设计稿）：
+The sample video *"Why does AI answer the same question differently every time?"* runs 2:33, with 13 beats at 1080×1440 portrait. The five images below are frames extracted from the final video (not design mockups):
 
-| 0.6s · 钩子：三份答案 | 12s · 采样 = 掷骰子 |
+| 0.6s · Hook: three different answers | 12s · Sampling = rolling dice |
 |---|---|
-| <img src="examples/shots/01-hook.png" width="320" alt="首帧：同一问题三份不同答案"> | <img src="examples/shots/02-sampling.png" width="320" alt="采样比喻：环形箭头与掷骰子"> |
+| <img src="examples/shots/01-hook.png" width="320" alt="First frame: three different answers to the same question"> | <img src="examples/shots/02-sampling.png" width="320" alt="Sampling metaphor: circular arrows and dice"> |
 
-| 30s · 下一个词的概率表 | 80s · top-p：只留九成 |
+| 30s · Probability table for the next token | 80s · top-p: keep only 90% |
 |---|---|
-| <img src="examples/shots/03-probability.png" width="320" alt="下一个词的概率条形图"> | <img src="examples/shots/04-top-p.png" width="320" alt="top-p 截断示意"> |
+| <img src="examples/shots/03-probability.png" width="320" alt="Bar chart of next-token probabilities"> | <img src="examples/shots/04-top-p.png" width="320" alt="top-p truncation illustration"> |
 
-| 150s · 结尾回收钩子 |
+| 150s · Ending pays off the hook |
 |---|
-| <img src="examples/shots/05-ending.png" width="320" alt="结尾：选择权在你"> |
+| <img src="examples/shots/05-ending.png" width="320" alt="Ending: the choice is yours"> |
 
-> **首帧即封面。** 本流程从 2026-10-27 起不单独做封面图，平台取视频首帧作为信息流里的封面。因此第 1 拍必须自带大标题 + 钩子 + 一条能看懂的信息，而不是"欢迎来到我的频道"。`tools/cover/` 里的封面渲染工具仍然保留，需要时可用，但默认不进入交付清单。
+> **The first frame is the cover.** Since 2026-10-27 this flow no longer produces a separate cover image — the platform uses the first frame as the cover in the feed. That means beat 1 must carry a large title, the hook, and one immediately understandable piece of information, rather than "welcome to my channel." The cover renderer in `tools/cover/` is still available if needed, but it is not part of the default delivery checklist.
 
-完整的示例文本资产（调研卡 / 设计意图 / 口播稿 / 分镜大纲 / 自检）在 [`examples/ep11-sampling/`](examples/ep11-sampling/)，逐文件说明见 [`examples/README.md`](examples/README.md)。
-
----
-
-## 3. 工作流总览
-
-```
-Phase 0  调研        article.md + 公网多源  →  facts.md（信源清单 + 关键数据 + 视觉比喻 + 教学设计）
-   │                  ▲ 闸门：check.ps1 -Gate pre-script（facts 未定稿不许写稿）
-Phase 1  文稿        facts.md → script.md（口播稿）+ outline.md（分镜大纲）+ beats.json
-   │                  + design-intent.md（创作前三问）+ script-selfcheck.md（四层自检）
-   │                  ▲ 闸门：check.ps1 -Gate pre-code（步数一致 / 开场三要素 / 时长估算）
-   │                  ▲ 检查点 1：人一次对齐 6 件事（调研卡 / 稿子 / 大纲 / 主题 / 素材 / 开发模式）
-Phase 2  网页开发    scaffold → 3:4 Vite+React 页面，逐章开发（第 1 章必须人工验收）
-   │                  ▲ 检查点 2：第 1 章视觉 / 节奏 / AI 味验收
-Phase 3  音频        extract-narrations → edge-tts 批量合成 → public/audio/
-   │                  ▲ 检查点 3：是否合成音频
-   │                  ▲ 闸门：check.ps1 -Gate pre-render（数量守恒 + 音频非空）
-Phase 4  录屏        ?auto=1 一镜到底 → raw-vertical/video.webm + marks.json
-   │                  → build_master.py 按实测切换时刻拼音频 → 成片 mp4
-   │                  → verify_sync.py 音画同步互相关校验
-   │                  ▲ 闸门：check.ps1 -Gate delivery
-   │                  ▲ 目检：shots-review.ps1 逐拍抽帧
-Phase 5  发布闸门    validate.ps1（9 项合规）+ 人工确认
-Phase 6  发布        xiaohongshu-mcp publish_with_video（写操作，必须人工点确认）
-Phase 7  复盘        T+3d pull.ps1 抓数据 → 预测 vs 实际 → 一行教训写回 docs/LESSONS.md
-```
-
-四份"外部记忆"文件决定了整条链路的质量，**不要跳过**：
-
-| 文件 | 作用 | 谁写 |
-|---|---|---|
-| `facts.md` | 信源清单、关键数字（带出处）、抽象概念→视觉比喻、教学设计、论证链 | 调研阶段，agent + 人确认 |
-| `script.md` | 口播稿，以 `---` 分拍；一拍 = 一屏 = 一段音频 | Phase 1，agent 写 + 人改 |
-| `outline.md` | 章节 / 步数 / 每步画面元素 / 转场 / 阅读保护时长 | Phase 1，agent 写 + 人确认 |
-| `beats.json` | 毫秒级节拍表（step_id / chapter / start_ms / dur_ms / text） | 定稿后生成，出片后以 `marks.json` 为准 |
-
-**唯一真相源**：每章 `src/chapters/*/narrations.ts` 的数组长度 = 该章 step 数 = 音频文件数。改了 step 数，必须同步 bump `src/hooks/useStepper.ts` 里的 `STORAGE_KEY`，否则浏览器记住的游标会错位（详见 [docs/WORKFLOW.md](docs/WORKFLOW.md) §3）。
+The full set of sample text assets (research card / design intent / narration script / shot outline / self-check) lives in [`examples/ep11-sampling/`](examples/ep11-sampling/); see [`examples/README.md`](examples/README.md) for a per-file walkthrough.
 
 ---
 
-## 4. 快速开始
+## 3. Workflow Overview
 
-下面假设你在一台干净的 Windows 10/11 上，从零跑通第一条竖版视频。
+```
+Phase 0  Research     article.md + multiple public sources  →  facts.md (sources + key data + visual metaphors + teaching design)
+   │                  ▲ Gate: check.ps1 -Gate pre-script (no script until facts are final)
+Phase 1  Script       facts.md → script.md (narration) + outline.md (shot outline) + beats.json
+   │                  + design-intent.md (three pre-writing questions) + script-selfcheck.md (four-layer self-check)
+   │                  ▲ Gate: check.ps1 -Gate pre-code (beat count / opening three elements / duration estimate)
+   │                  ▲ Checkpoint 1: the human aligns on 6 things at once (research card / script / outline / theme / assets / build mode)
+Phase 2  Web build    scaffold → 3:4 Vite + React pages, built chapter by chapter (chapter 1 must pass human review)
+   │                  ▲ Checkpoint 2: chapter 1 visual / pacing / AI-flavor review
+Phase 3  Audio        extract-narrations → batch edge-tts synthesis → public/audio/
+   │                  ▲ Checkpoint 3: whether to synthesize audio
+   │                  ▲ Gate: check.ps1 -Gate pre-render (count conservation + non-empty audio)
+Phase 4  Recording    ?auto=1 one-take → raw-vertical/video.webm + marks.json
+   │                  → build_master.py places audio at measured switch times → final mp4
+   │                  → verify_sync.py cross-correlation A/V sync check
+   │                  ▲ Gate: check.ps1 -Gate delivery
+   │                  ▲ Visual review: shots-review.ps1 extracts one frame per beat
+Phase 5  Publish gate validate.ps1 (9 compliance checks) + human confirmation
+Phase 6  Publish      xiaohongshu-mcp publish_with_video (write operation, human must confirm)
+Phase 7  Retro        T+3d pull.ps1 fetches metrics → prediction vs actual → one-line lesson written back to docs/LESSONS.md
+```
 
-### 4.1 环境依赖
+Four "external memory" files decide the quality of the whole chain. **Do not skip them:**
 
-| 组件 | 要求 | 验证命令 |
+| File | Purpose | Who writes it |
 |---|---|---|
-| 操作系统 | Windows 10/11（PowerShell 5.1） | `$PSVersionTable.PSVersion` |
-| Node.js | ≥ 18，**Windows 原生版**，不要用 WSL 里的 node | `node -v` / `npm -v` |
+| `facts.md` | Source list, key numbers with citations, abstract concept → visual metaphor, teaching design, argument chain | Research phase, agent + human confirmation |
+| `script.md` | Narration script, beats separated by `---`; one beat = one screen = one audio file | Phase 1, agent writes + human edits |
+| `outline.md` | Chapters / beat count / visual element per step / transitions / reading-protection duration | Phase 1, agent writes + human confirms |
+| `beats.json` | Millisecond beat table (step_id / chapter / start_ms / dur_ms / text) | Generated after the script is final; `marks.json` wins after recording |
+
+**Single source of truth**: the array length in each chapter's `src/chapters/*/narrations.ts` = the number of steps in that chapter = the number of audio files. If you change the step count, you must bump `STORAGE_KEY` in `src/hooks/useStepper.ts`, or the browser-remembered cursor will be misaligned (see [docs/WORKFLOW.md](docs/WORKFLOW.md) §3).
+
+---
+
+## 4. Quick Start
+
+The following assumes a clean Windows 10/11 machine and walks you through producing your first portrait video from scratch.
+
+### 4.1 Prerequisites
+
+| Component | Requirement | Check command |
+|---|---|---|
+| OS | Windows 10/11 (PowerShell 5.1) | `$PSVersionTable.PSVersion` |
+| Node.js | ≥ 18, **native Windows build**, not the node inside WSL | `node -v` / `npm -v` |
 | Python | ≥ 3.10 | `python --version` |
-| Git for Windows | 需要它自带的 **Git Bash** 执行 `scaffold.sh` | `git --version` / `bash --version` |
-| Google Chrome | Playwright 直接驱动本机 Chrome（不下载 Chromium） | `"C:\Program Files\Google\Chrome\Application\chrome.exe"` 存在 |
-| ffmpeg | 可独立安装；也可用 `tools/record` 里的 `@ffmpeg-installer` | `ffmpeg -version` |
-| edge-tts | 免费 TTS，无需 API key | `pip install edge-tts` → `edge-tts --version` |
-| Agent | 支持 skill 的 CLI（Claude Code / CodeBuddy / Trae 等） | 能读取本仓库的 skill 目录 |
+| Git for Windows | Needed for the bundled **Git Bash** to run `scaffold.sh` | `git --version` / `bash --version` |
+| Google Chrome | Playwright drives your local Chrome directly (no Chromium download) | `"C:\Program Files\Google\Chrome\Application\chrome.exe"` exists |
+| ffmpeg | Install separately, or use `@ffmpeg-installer` under `tools/record` | `ffmpeg -version` |
+| edge-tts | Free TTS, no API key | `pip install edge-tts` → `edge-tts --version` |
+| Agent | A skill-capable CLI (Claude Code / CodeBuddy / Trae, etc.) | Can read this repo's skill directory |
 
-> **bash 必须用 Git Bash。** 在 Windows 上直接敲 `bash` 可能进 WSL（`C:\Windows\system32\bash.exe`），在挂载盘里跑会极慢且 node 环境是另一套。装 Git for Windows 后从开始菜单打开 "Git Bash"。
+> **You must use Git Bash.** Typing `bash` directly on Windows may land in WSL (`C:\Windows\system32\bash.exe`), which is extremely slow on mounted drives and uses a different node environment. After installing Git for Windows, open "Git Bash" from the Start menu.
 
-### 4.2 安装第三方 skill
+### 4.2 Install the third-party skills
 
-本仓库**不复制**第三方 skill 的源码，只依赖它们。按顺序装到仓库根目录的 `skills/` 下（目录名保持下面一致，脚本和文档都按这个名字引用）：
+This repository **does not copy** third-party skill source code — it only depends on them. Install them under `skills/` at the repo root, in this order (keep the directory names exactly as listed, because scripts and docs refer to them):
 
-| 目录 | 上游 | 用途 |
+| Directory | Upstream | Purpose |
 |---|---|---|
-| `skills/web-video-presentation/` | <https://github.com/ConardLi/garden-skills> | 把口播稿做成可录屏的 Vite + React 网页 |
-| `skills/cheat-on-content/` | <https://github.com/XBuilderLAB/cheat-on-content> | 打分 / 盲预测 / T+3 天复盘 |
-| `skills/redbook-creator-publish/` | <https://lobehub.com/skills/rov639-skillhub-redbook-creator-publish> | 图文线发布包（可选） |
-| `skills/atutun-xhs-cover/` | <https://github.com/panggungunvibe/atutun-xhs-cover> | 阿囤囤风格封面提示词（可选，默认不用） |
+| `skills/web-video-presentation/` | <https://github.com/ConardLi/garden-skills> | Turns the narration script into a recordable Vite + React page |
+| `skills/cheat-on-content/` | <https://github.com/XBuilderLAB/cheat-on-content> | Scoring / blind prediction / T+3 day retro |
+| `skills/redbook-creator-publish/` | <https://lobehub.com/skills/rov639-skillhub-redbook-creator-publish> | Image-post publishing package (optional) |
+| `skills/atutun-xhs-cover/` | <https://github.com/panggungunvibe/atutun-xhs-cover> | Atutun-style cover prompts (optional, off by default) |
 
-发布链路还需要 **xiaohongshu-mcp**：<https://github.com/xpzouying/xiaohongshu-mcp>。按它的 README 放到 `mcp/`，登录态文件（`cookies.json` 等）已在 `.gitignore` 里。
+The publishing path also needs **xiaohongshu-mcp**: <https://github.com/xpzouying/xiaohongshu-mcp>. Follow its README to place it under `mcp/`. Login state files (`cookies.json`, etc.) are already in `.gitignore`.
 
-装完后**完全退出并重启你的 agent 客户端**（包括托盘进程），否则新 skill 不会被识别。
+After installing, **fully quit and restart your agent client** (including any tray process), or the new skills will not be picked up.
 
-### 4.3 克隆与安装依赖
+### 4.3 Clone and install dependencies
 
 ```powershell
 git clone https://github.com/<your-name>/xhs-video-agent.git
 cd xhs-video-agent
 
-# Playwright 驱动 + ffmpeg 安装器
+# Playwright driver + ffmpeg installer
 npm install --prefix tools/record
 
-# 后台数据抓取（可选，做复盘时用）
+# Backend metrics scraper (optional, used during retro)
 npm install --prefix tools/metrics
 
-# 免费 TTS
+# Free TTS
 pip install edge-tts
 
-# 确认 Chrome 路径（不是默认安装位置时才需要设置）
+# Confirm the Chrome path (only needed if Chrome is not in the default location)
 $env:CHROME_PATH = "D:\Program Files\Google\Chrome\Application\chrome.exe"
 ```
 
-### 4.4 初始化你的账号档案
+### 4.4 Initialize your account profile
 
-`account.md` 和 `log.md` 是本地私有文件（已 gitignore），从模板复制：
+`account.md` and `log.md` are private local files (already gitignored). Copy them from the templates:
 
 ```powershell
 Copy-Item templates\account.md .\account.md
 Copy-Item templates\log.md .\log.md
 ```
 
-打开 `account.md`，填人设、受众、选题边界、红线。**它是所有创作的唯一设定来源**，agent 每次开工前必须先读。
+Open `account.md` and fill in the persona, audience, topic boundaries, and red lines. **It is the single source of truth for all content** — the agent must read it before starting any work.
 
-### 4.5 跑第一条
+### 4.5 Produce your first video
 
 ```powershell
-# 1) 建一期项目目录，并把 5 份骨架拷进去
+# 1) Create an episode directory and copy the five skeletons into it
 New-Item -ItemType Directory -Force videos\ep01 | Out-Null
 Copy-Item templates\episode\*.md videos\ep01\
 
-# 2) 把原始素材文章放进项目
+# 2) Put the source article into the project
 #    videos\ep01\article.md
 ```
 
-然后交给 agent，按顺序说三句话（每句话对应一道闸门）：
+Then hand it to the agent and say three things in order (each maps to one gate):
 
-**① 调研与写稿**
+**① Research and script**
 
-> 读 `docs/WORKFLOW.md` 的 Phase 0 / Phase 1，用 `videos/ep01/article.md` 做一期 3:4 竖版，先产出 `facts.md`，我确认后再写 `script.md` + `outline.md` + `beats.json` + `design-intent.md` + `script-selfcheck.md`。
+> Read Phase 0 / Phase 1 of `docs/WORKFLOW.md`, use `videos/ep01/article.md` for a 3:4 portrait episode, and produce `facts.md` first. After I confirm it, write `script.md` + `outline.md` + `beats.json` + `design-intent.md` + `script-selfcheck.md`.
 
 ```powershell
-# facts 定稿后
+# After facts.md is final
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\check.ps1 -ProjectDir videos\ep01 -Gate pre-script
 
-# 文稿三件套 + 自检完成后
+# After the script trio + self-check are done
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\check.ps1 -ProjectDir videos\ep01 -Gate pre-code
 ```
 
-**② 生成网页**
+**② Build the web page**
 
 ```bash
-# 在 Git Bash 中执行；目标目录必须不存在或为空
+# Run in Git Bash; the target directory must not exist or must be empty
 cd videos/ep01
 bash ../../skills/web-video-presentation/scripts/scaffold.sh ./presentation-vertical --theme=blueprint
 ```
 
-> 上游 `web-video-presentation` 原生只支持 16:9。要做小红书 3:4，需要先按 [docs/VIDEO-GUIDE.md](docs/VIDEO-GUIDE.md) §3.2 的 4 条改动清单给 skill 打本地补丁（新增 `templates/src/stage.config.ts`、`scaffold.sh` 增加 `--ratio` 参数）。这是**唯一需要你手动改上游 skill 的地方**，其余改动都在本仓库内。暂时不想改也可以先用 16:9 跑通全流程，画面会在小红书里上下留黑边。
+> Upstream `web-video-presentation` only supports 16:9 natively. For Xiaohongshu 3:4 you first need to apply the four-item local patch in [docs/VIDEO-GUIDE.md](docs/VIDEO-GUIDE.md) §3.2 (add `templates/src/stage.config.ts`, add a `--ratio` argument to `scaffold.sh`). This is **the only place you have to modify an upstream skill**; everything else lives in this repo. If you do not want to patch it yet, you can run the whole flow in 16:9 — Xiaohongshu will letterbox it.
 
-**③ 配音与出片**
+**③ Voice-over and final cut**
 
 ```bash
 cd videos/ep01/presentation-vertical
-npm run dev -- --port 5175          # 保持这个终端开着
+npm run dev -- --port 5175          # keep this terminal open
 ```
 
-另开一个 Git Bash：
+Open another Git Bash:
 
 ```bash
 cd videos/ep01/presentation-vertical
 npm run extract-narrations
-# 从 skills/web-video-presentation/templates/scripts/tts-providers/README.md
-# 复制 edge-tts 片段为 scripts/tts-providers/edge-tts.sh
+# Copy the edge-tts snippet from skills/web-video-presentation/templates/scripts/tts-providers/README.md
+# into scripts/tts-providers/edge-tts.sh
 PRESENTATION_TTS=edge-tts PRESENTATION_TTS_VOICE=zh-CN-YunxiNeural npm run synthesize-audio
 ```
 
-另开 PowerShell（不要关 dev server）：
+Open another PowerShell (do not close the dev server):
 
 ```powershell
 $env:VARIANT = "vertical"
 $env:VIDEO_PROJECT = "videos\ep01"
 
-node tools\record\record.mjs                 # 无头录屏，脚本自己按 Space 起步
-python tools\record\build_master.py videos\ep01   # 拼音频 → videos\ep01\ep01-vertical.mp4
-python tools\record\verify_sync.py videos\ep01    # 音画同步校验
+node tools\record\record.mjs                 # headless recording, presses Space itself
+python tools\record\build_master.py videos\ep01   # place audio → videos\ep01\ep01-vertical.mp4
+python tools\record\verify_sync.py videos\ep01    # A/V sync verification
 ```
 
-产物：
+Outputs:
 
 ```
 videos\ep01\
-├── raw-vertical\video.webm      # 静音录屏
-├── raw-vertical\marks.json      # 每拍真实切换时刻（对轨的唯一依据）
-└── ep01-vertical.mp4            # 带音频成片（1080×1440）
+├── raw-vertical\video.webm      # silent screen recording
+├── raw-vertical\marks.json      # real switch time of each beat (the only basis for audio alignment)
+└── ep01-vertical.mp4            # final cut with audio (1080×1440)
 ```
 
-### 4.6 过闸门并发布
+### 4.6 Pass the gates and publish
 
 ```powershell
-# 工序契约 + 数量守恒 + 时间轴
+# Process contract + count conservation + timeline
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\check.ps1 -ProjectDir videos\ep01 -Gate delivery
 
-# 逐拍抽帧目检（人对语义负责）
+# Per-beat frame extraction for human review (the human owns semantics)
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\shots-review.ps1 -ProjectDir videos\ep01
 
-# 发布合规（9 项；需要 .cheat-state.json 和预测档案）
+# Publish compliance (9 checks; needs .cheat-state.json and a prediction file)
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\gate\validate.ps1 `
-  -Title "同一个问题，AI 为什么每次答得不一样" `
+  -Title "Why does AI answer the same question differently every time?" `
   -TagsCount 5 `
   -VideoPath "videos\ep01\ep01-vertical.mp4" `
   -PredictionPath "predictions\ep01.md"
 ```
 
-全部 `exit 0` 后，通过 xiaohongshu-mcp 的 `publish_with_video` 发布。**这是写操作，必须人工点最后一下确认**——skill 与 MCP 的硬约束都要求如此。
+Once everything exits 0, publish through xiaohongshu-mcp's `publish_with_video`. **This is a write operation, so a human must click the final confirmation** — both the skill and the MCP enforce this.
 
-### 4.7 发布后
+### 4.7 After publishing
 
 ```powershell
-node tools\metrics\login.js          # 首次扫码，生成 tools\metrics\session.json
+node tools\metrics\login.js          # first run scans a QR code, creates tools\metrics\session.json
 powershell -File tools\metrics\pull.ps1   # → data\metrics\latest.json
 ```
 
-T+3 天把实际数据和发布前的盲预测对比，一行教训追加到 `docs/LESSONS.md`。细节见 [docs/CHEAT-WORKFLOW.md](docs/CHEAT-WORKFLOW.md)。
+On T+3 days, compare the actual numbers with the blind prediction you wrote before publishing, and append one line of lesson to `docs/LESSONS.md`. See [docs/CHEAT-WORKFLOW.md](docs/CHEAT-WORKFLOW.md) for details.
 
 ---
 
-## 5. cheat 校准回路
+## 5. The Cheat Calibration Loop
 
-这套流程真正区别于"随便让 AI 写个稿"的地方，是它**要求你在写稿前下注、写完后复盘**。三段时间回路：
+What really separates this flow from "just ask AI to write something" is that it **makes you place a bet before writing and review it afterwards**. Three phases:
 
-| 时间点 | 动作 | 产物 |
+| When | Action | Artifact |
 |---|---|---|
-| **创作前** | 读当前 rubric + 上一条数据 + 最近教训，回答三问：动哪个指标 / 参照哪一篇 / 规避哪条教训 | `design-intent.md` |
-| **创作中** | 五维自评，每维给分并用稿内原句作证；任一维 ≤2 必须改或写明保留理由；再做一次"一句话复述" | `script-selfcheck.md` 的 `## cheat 视线` 段 |
-| **创作后（T+3d）** | 对比预测与实际，判哪一维准、哪一维错，压成一行 + 一条下篇动作 | `docs/LESSONS.md` 追加一行 |
+| **Before writing** | Read the current rubric + the last video's numbers + recent lessons, then answer three questions: which metric am I moving / which episode is my reference / which lesson am I avoiding | `design-intent.md` |
+| **While writing** | Self-score on five dimensions, citing exact lines from the script as evidence; any dimension ≤2 must be changed or explicitly justified; then do a one-sentence retelling | the `## cheat view` section of `script-selfcheck.md` |
+| **After writing (T+3d)** | Compare prediction with actual, judge which dimension was right and which was wrong, compress into one line + one action for the next video | append one line to `docs/LESSONS.md` |
 
-### 五维公式（v1-retention）
+### Five-dimension formula (v1-retention)
 
 ```
 score = HO×2 + PE×2 + TK×1.5 + NA×1 + QL×0.5
 ```
 
-- **HO** Hook：前 3 秒能不能让人停下
-- **PE** Payoff：看完有没有拿到可执行的东西
-- **TK** Takeaway：能不能一句话复述
-- **NA** Narrative：叙事是否连贯、有没有跳跃
-- **QL** Quality：事实、表达、节奏的底线质量
+- **HO** Hook: can the first 3 seconds stop someone from scrolling
+- **PE** Payoff: does the viewer get something actionable
+- **TK** Takeaway: can it be retold in one sentence
+- **NA** Narrative: is the story coherent, with no jumps
+- **QL** Quality: baseline quality of facts, wording, and pacing
 
-目标函数不是曝光，是**人均观看秒数**。公式的完整定义、锚点句、打分纪律见 [`docs/RUBRIC.md`](docs/RUBRIC.md)。
+The objective function is not impressions — it is **average watch seconds per viewer**. Full definitions, anchor sentences, and scoring discipline are in [`docs/RUBRIC.md`](docs/RUBRIC.md).
 
-### 三条不可妥协的原则
+### Three non-negotiable principles
 
-1. **预测写完就锁**：`prediction_hashes` 哈希锁，发布前改预测 = 破坏校准样本。`validate.ps1` 会校验哈希，对不上直接禁发。
-2. **盲预测**：预测必须写在看到数据之前；已经看过同类数据时要显式标注"已污染"。
-3. **一行教训**：复盘只写可执行动作（"每个术语先给动作再给名字"），不写"这次数据不好"这种结论。
+1. **A prediction is locked once written**: `prediction_hashes` hash-locks it. Editing a prediction before publishing destroys your calibration sample. `validate.ps1` verifies the hash and blocks publishing on a mismatch.
+2. **Blind prediction**: predictions must be written before you see any numbers; if you have already seen similar data, mark them explicitly as "contaminated".
+3. **One-line lesson**: retros only record executable actions ("give the action before the name for every term"), never conclusions like "the numbers were bad this time."
 
 ---
 
-## 6. 三道闸门
+## 6. The Three Gates
 
-| 闸门 | 管什么 | 命令 | 退出码 |
+| Gate | What it governs | Command | Exit codes |
 |---|---|---|---|
-| `check.ps1` | **工序契约**：上一道工序是否定稿、步数是否守恒、音频是否齐全、时间轴是否覆盖 | `tools\pipeline\check.ps1 -ProjectDir <项目> -Gate <pre-script\|pre-code\|pre-render\|delivery>` | 0 全绿（WARN 不阻断）/ 1 有 FAIL / 2 参数错 |
-| `shots-review.ps1` | **语义目检**：按 `marks.json` 逐拍抽帧，生成人工核对清单（图表数值 / 信息量 / 来源标注 / 钩子回收） | `tools\pipeline\shots-review.ps1 -ProjectDir <项目>` | 0 生成成功 / 2 环境错 |
-| `validate.ps1` | **发布合规**：标题长度、tags 数量、成片存在、封面尺寸（可选）、预测哈希锁、当日篇数、发布间隔、halt、音频响度 | `tools\gate\validate.ps1 -Title ... -TagsCount ... -VideoPath ... -PredictionPath ...` | 0 可发 / 1 禁发 |
+| `check.ps1` | **Process contract**: is the previous step final, is the beat count conserved, is audio complete, does the timeline cover every beat | `tools\pipeline\check.ps1 -ProjectDir <project> -Gate <pre-script\|pre-code\|pre-render\|delivery>` | 0 all green (WARN does not block) / 1 any FAIL / 2 bad arguments |
+| `shots-review.ps1` | **Semantic review**: extracts one frame per beat from `marks.json` and generates a human checklist (chart values / information density / source attribution / hook payoff) | `tools\pipeline\shots-review.ps1 -ProjectDir <project>` | 0 generated / 2 environment error |
+| `validate.ps1` | **Publish compliance**: title length, tag count, video exists, cover size (optional), prediction hash lock, daily post count, posting interval, halt switch, audio loudness | `tools\gate\validate.ps1 -Title ... -TagsCount ... -VideoPath ... -PredictionPath ...` | 0 can publish / 1 blocked |
 
-辅助工具：
+Helper tools:
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `tools\pipeline\blind-read-check.py` | 生成"盲读复述"派活 prompt，交给一个只看稿子的隔离 reviewer |
-| `tools\pipeline\compress-audit.py` | 对比 `article.md` 与 `script.md`，找出被删过头的框架句 / 过渡句 |
-| `tools\pipeline\normalize-bom.ps1` | 把 `.ps1` 的 UTF-8 BOM 归一到恰好 1 个（Windows PowerShell 5.1 中文解析的前提） |
-| `tools\record\shot.mjs` | 只截一张图，调试单步画面用 |
+| `tools\pipeline\blind-read-check.py` | Generates a "blind retelling" prompt for an isolated reviewer that only sees the script |
+| `tools\pipeline\compress-audit.py` | Compares `article.md` with `script.md` to find framework/transition sentences that were cut too aggressively |
+| `tools\pipeline\normalize-bom.ps1` | Normalizes the UTF-8 BOM of `.ps1` files to exactly 1 (required for Chinese text under Windows PowerShell 5.1) |
+| `tools\record\shot.mjs` | Captures a single screenshot, for debugging one step's visuals |
 
-> 机器闸门只负责"能证明的东西"。画面里的数字是否和口播一致、例子有没有标来源、钩子有没有回收——这些只能靠 `shots-review.ps1` 生成的清单人工勾。
+> Machine gates only cover what can be proven. Whether a chart's numbers match the narration, whether examples are attributed, whether the hook is paid off — those can only be checked by a human ticking the list generated by `shots-review.ps1`.
 
 ---
 
-## 7. 可选：无人值守心跳
+## 7. Optional: Unattended Heartbeat
 
-`tools\pipeline\heartbeat.ps1` 是一个**可选**的启动器：由调度器（例如 Trae Schedule 或 Windows 任务计划）定时拉起，让 agent 读取 `backlog.json` 继续推进队列里的任务。
+`tools\pipeline\heartbeat.ps1` is an **optional** launcher: a scheduler (such as Trae Schedule or Windows Task Scheduler) starts it periodically, and it lets the agent read `backlog.json` and keep working through the queue.
 
-它做的事：补全 PATH → 调用你的 agent CLI → 把 stdout/stderr 写进 `cache\heartbeat\*.log`。
+What it does: complete the PATH → invoke your agent CLI → write stdout/stderr to `cache\heartbeat\*.log`.
 
 ```powershell
-$env:CODEBUDDY_CLI = "C:\Users\<you>\AppData\Roaming\npm\codebuddy.ps1"  # 或你的 agent CLI
-$env:HEARTBEAT_MODEL = ""          # 留空 = 用 CLI 默认模型
-$env:HEARTBEAT_PROMPT = "执行心跳"  # 传给 CLI 的指令
+$env:CODEBUDDY_CLI = "C:\Users\<you>\AppData\Roaming\npm\codebuddy.ps1"  # or your agent CLI
+$env:HEARTBEAT_MODEL = ""          # empty = use the CLI default model
+$env:HEARTBEAT_PROMPT = "run the heartbeat"  # instruction passed to the CLI
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\heartbeat.ps1
 ```
 
-**风险提示**：无人值守意味着 agent 会在没有人看的时候写文件、跑命令。请务必：
+**Risk warning**: unattended means the agent writes files and runs commands while nobody is watching. Please:
 
-- 只在你信任的仓库里启用，且先用 `-WhatIf` 式的小任务试跑
-- 保留 `halt` 熔断：`validate.ps1` 会检查 halt 文件，存在即禁发
-- 定期看 `cache\heartbeat\*.log`，不要让它变成黑箱
-- 队列文件 `backlog.json` 不要放敏感信息
+- Only enable it in repositories you trust, and start with a small `-WhatIf`-style task
+- Keep the `halt` circuit breaker: `validate.ps1` checks the halt file and blocks publishing when it exists
+- Periodically read `cache\heartbeat\*.log`; do not let it become a black box
+- Do not put sensitive information into the `backlog.json` queue
 
-没有调度需求就**不要启用**，整套流程手动跑完全够用。
+If you have no scheduling need, **do not enable it**. Running the flow manually is entirely sufficient.
 
 ---
 
-## 8. 目录结构
+## 8. Repository Layout
 
 ```
 xhs-video-agent/
@@ -358,159 +358,159 @@ xhs-video-agent/
 ├── LICENSE
 ├── .gitignore
 ├── docs/
-│   ├── WORKFLOW.md            # 端到端流程（最详细的规程）
-│   ├── CHEAT-WORKFLOW.md      # cheat 校准回路速查
-│   ├── VIDEO-GUIDE.md         # 视频线环境约定 + 踩坑 + 3:4 改造清单
-│   ├── RUBRIC.md              # v1-retention 五维评分规则
-│   ├── LESSONS.md             # 已发样本的硬教训（开工前必读）
-│   └── SCRIPT-PATTERNS.md     # 写作 pattern 沉淀
+│   ├── WORKFLOW.md            # End-to-end process (the most detailed spec)
+│   ├── CHEAT-WORKFLOW.md      # Cheat calibration loop cheat sheet
+│   ├── VIDEO-GUIDE.md         # Video-line environment conventions + pitfalls + 3:4 patch list
+│   ├── RUBRIC.md              # v1-retention five-dimension scoring rules
+│   ├── LESSONS.md             # Hard lessons from shipped videos (read before starting)
+│   └── SCRIPT-PATTERNS.md     # Writing pattern library
 ├── tools/
-│   ├── gate/validate.ps1      # 发布合规闸门（9 项）
+│   ├── gate/validate.ps1      # Publish compliance gate (9 checks)
 │   ├── pipeline/
-│   │   ├── check.ps1          # 工序契约闸门
-│   │   ├── shots-review.ps1   # 逐拍抽帧目检
+│   │   ├── check.ps1          # Process contract gate
+│   │   ├── shots-review.ps1   # Per-beat frame extraction for review
 │   │   ├── blind-read-check.py
 │   │   ├── compress-audit.py
 │   │   ├── normalize-bom.ps1
-│   │   ├── heartbeat.ps1      # 可选心跳
-│   │   └── terminology.txt    # 术语表（口播用词约束）
+│   │   ├── heartbeat.ps1      # Optional heartbeat
+│   │   └── terminology.txt    # Terminology list (narration wording constraints)
 │   ├── record/
-│   │   ├── record.mjs         # Playwright 无头录屏 → webm + marks.json
-│   │   ├── shot.mjs           # 单步截图
-│   │   ├── build_master.py    # 按 marks.json 拼音频 → mp4
-│   │   ├── verify_sync.py     # 音画同步互相关校验
+│   │   ├── record.mjs         # Playwright headless recording → webm + marks.json
+│   │   ├── shot.mjs           # Single-step screenshot
+│   │   ├── build_master.py    # Place audio by marks.json → mp4
+│   │   ├── verify_sync.py     # A/V sync cross-correlation check
 │   │   └── package.json
 │   ├── metrics/
-│   │   ├── login.js           # 创作者中心扫码登录
-│   │   ├── pull.js / pull.ps1 # 抓后台数据 → data/metrics/latest.json
-│   │   └── adapter/           # 数据适配
-│   ├── research/fetch_sources.py  # 公网多源抓素材（Sogou/360/arXiv）
-│   └── cover/                 # 可选封面渲染（HTML/CSS → PNG）
+│   │   ├── login.js           # QR-code login to the creator center
+│   │   ├── pull.js / pull.ps1 # Fetch backend metrics → data/metrics/latest.json
+│   │   └── adapter/           # Data adapters
+│   ├── research/fetch_sources.py  # Fetch public sources (Sogou/360/arXiv)
+│   └── cover/                 # Optional cover rendering (HTML/CSS → PNG)
 ├── examples/
 │   ├── README.md
-│   ├── ep11-sampling/         # 一条完整视频的全部文本资产
-│   └── shots/                 # 成片截图 ×5
+│   ├── ep11-sampling/         # All text assets of one complete video
+│   └── shots/                 # Frames from the final video ×5
 ├── templates/
-│   ├── account.md             # 账号设定模板
-│   ├── log.md                 # 发布日志模板
-│   └── episode/               # 一期视频的 5 份骨架
-└── （运行时生成，均已 gitignore）
-    ├── videos/<episode>/      # 你的每期项目
-    ├── predictions/           # 盲预测档案
-    ├── data/metrics/          # 后台数据
-    ├── cache/                 # 缓存与心跳日志
-    └── account.md / log.md    # 你的私有账号档案
+│   ├── account.md             # Account profile template
+│   ├── log.md                 # Publishing log template
+│   └── episode/               # Five skeletons for one episode
+└── (generated at runtime, all gitignored)
+    ├── videos/<episode>/      # Your per-episode projects
+    ├── predictions/           # Blind prediction files
+    ├── data/metrics/          # Backend metrics
+    ├── cache/                 # Cache and heartbeat logs
+    └── account.md / log.md    # Your private account profile
 ```
 
-### 环境变量
+### Environment variables
 
-所有脚本默认以**仓库根目录**为基准，只在需要覆盖时读环境变量：
+All scripts default to the **repository root** and only read environment variables when you need to override:
 
-| 变量 | 作用 | 默认 |
+| Variable | Purpose | Default |
 |---|---|---|
-| `CHROME_PATH` | Chrome 可执行文件 | `C:/Program Files/Google/Chrome/Application/chrome.exe` |
-| `VIDEO_PROJECT` | 某期视频目录 | `videos/personal-agent-deep-dive` |
-| `PRESENTATION_DIR` | 网页工程目录 | `<VIDEO_PROJECT>/presentation[-vertical]` |
-| `VARIANT` | `wide`(16:9) / `vertical`(3:4) | `wide` |
-| `PORT` | 录屏时访问的开发服务器端口 | 5174 / 5175 |
-| `TOTAL_STEPS` | 总步数 | 读 `<PRESENTATION_DIR>/audio-segments.json` |
-| `TRAIL_MS` | 每拍读后停留时间 | 1500 |
-| `STORAGE_KEY` | 浏览器游标 key（改步数时 bump） | `presentation-cursor-v8` |
-| `FFMPEG` | ffmpeg 可执行文件 | PATH → 仓库内 `@ffmpeg-installer` |
-| `NODE_EXE` | node 可执行文件 | `node` |
-| `PW_CORE` | playwright-core 目录 | `tools/record/node_modules/playwright-core` |
-| `PULL_URL` | 后台数据页地址 | 脚本内置 |
-| `CODEBUDDY_CLI` / `HEARTBEAT_MODEL` / `HEARTBEAT_PROMPT` | 心跳启动器参数 | 见第 7 节 |
+| `CHROME_PATH` | Chrome executable | `C:/Program Files/Google/Chrome/Application/chrome.exe` |
+| `VIDEO_PROJECT` | Episode video directory | `videos/personal-agent-deep-dive` |
+| `PRESENTATION_DIR` | Web project directory | `<VIDEO_PROJECT>/presentation[-vertical]` |
+| `VARIANT` | `wide` (16:9) / `vertical` (3:4) | `wide` |
+| `PORT` | Dev server port used during recording | 5174 / 5175 |
+| `TOTAL_STEPS` | Total step count | Read from `<PRESENTATION_DIR>/audio-segments.json` |
+| `TRAIL_MS` | Dwell time after each beat's audio | 1500 |
+| `STORAGE_KEY` | Browser cursor key (bump when step count changes) | `presentation-cursor-v8` |
+| `FFMPEG` | ffmpeg executable | PATH → bundled `@ffmpeg-installer` |
+| `NODE_EXE` | node executable | `node` |
+| `PW_CORE` | playwright-core directory | `tools/record/node_modules/playwright-core` |
+| `PULL_URL` | Backend metrics page URL | Built into the script |
+| `CODEBUDDY_CLI` / `HEARTBEAT_MODEL` / `HEARTBEAT_PROMPT` | Heartbeat launcher parameters | See section 7 |
 
 ---
 
-## 9. 示例导览
+## 9. Example Walkthrough
 
-[`examples/ep11-sampling/`](examples/ep11-sampling/) 是一条真实发布视频的**全部文本资产**，按流水线顺序排列：
+[`examples/ep11-sampling/`](examples/ep11-sampling/) contains **all text assets** of one real published video, ordered by pipeline stage:
 
-| 文件 | 在流程里的位置 | 看点 |
+| File | Position in the flow | What to look at |
 |---|---|---|
-| [`article.md`](examples/ep11-sampling/article.md) | Phase 0 输入 | 原始素材：为什么"同一个问题答案不同" |
-| [`facts.md`](examples/ep11-sampling/facts.md) | Phase 0 产物 | 4 个公网信源 + 交叉关系 + 口径边界 + 教学设计 + 论证链 |
-| [`design-intent.md`](examples/ep11-sampling/design-intent.md) | 创作前 | 三问：动哪个指标 / 参照哪篇 / 规避哪条教训 |
-| [`script.md`](examples/ep11-sampling/script.md) | Phase 1 | 13 拍口播稿，`---` 分拍，段落形态而非字幕形态 |
-| [`outline.md`](examples/ep11-sampling/outline.md) | Phase 1 | 每步画面 / 元素 / 转场 / 视觉焦点 / 阅读保护时长 |
-| [`script-selfcheck.md`](examples/ep11-sampling/script-selfcheck.md) | Phase 1 闸门 | 四层自检逐项 pass/fail + 开场三要素判定 + 盲读记录 |
-| [`beats.json`](examples/ep11-sampling/beats.json) | Phase 1 产物 | 毫秒级节拍表；出片后以 `marks.json` 为准 |
+| [`article.md`](examples/ep11-sampling/article.md) | Phase 0 input | Source material: why the same question gets different answers |
+| [`facts.md`](examples/ep11-sampling/facts.md) | Phase 0 output | 4 public sources + cross-relations + scope boundaries + teaching design + argument chain |
+| [`design-intent.md`](examples/ep11-sampling/design-intent.md) | Before writing | Three questions: which metric / which reference video / which lesson to avoid |
+| [`script.md`](examples/ep11-sampling/script.md) | Phase 1 | 13-beat narration, separated by `---`, written as paragraphs rather than subtitle lines |
+| [`outline.md`](examples/ep11-sampling/outline.md) | Phase 1 | Per-step visuals / elements / transitions / visual focus / reading-protection duration |
+| [`script-selfcheck.md`](examples/ep11-sampling/script-selfcheck.md) | Phase 1 gate | Four-layer self-check pass/fail + opening three elements + blind retelling record |
+| [`beats.json`](examples/ep11-sampling/beats.json) | Phase 1 output | Millisecond beat table; `marks.json` wins after recording |
 
-逐文件的作用与"应该怎么模仿"见 [`examples/README.md`](examples/README.md)。**不要照抄文案**——抄结构、抄检查项、抄口径边界，文案必须是你自己的选题。
+See [`examples/README.md`](examples/README.md) for what each file does and "how to imitate it". **Do not copy the wording** — copy the structure, the checklists, and the scope boundaries. The script has to be your own topic.
 
 ---
 
 ## 10. FAQ
 
-**Q1. 页面打开了，点着没声音？**
-默认就是 Manual 模式，设计上不播音，不是 bug。录音用 `?auto=1`，或按 `M` 切到 Audio 模式。录屏脚本访问的就是 `?auto=1`。
+**Q1. The page opens but there is no sound when I click?**
+That is Manual mode by design; it does not play audio. Record with `?auto=1`, or press `M` to switch to Audio mode. The recording script always visits `?auto=1`.
 
-**Q2. `?auto=1` 为什么要按 Space？**
-浏览器的自动播放策略要求一次用户手势。页面里有一个 `AutoStartGate`，`record.mjs` 会在加载完成后自己 `keyboard.press("Space")`，所以无头录屏不用你操作；手动在浏览器里预览时才需要按一次。
+**Q2. Why does `?auto=1` require pressing Space?**
+Browser autoplay policy requires one user gesture. The page has an `AutoStartGate`, and `record.mjs` presses Space itself after load — so headless recording needs no interaction. You only press once when previewing manually in a browser.
 
-**Q3. 还要不要做封面？**
-默认不做。平台取首帧，所以第 1 拍要承担封面职责：大标题 + 钩子 + 一眼能看懂的信息。`tools/cover/` 仍可用（`python tools\cover\cover.py --help` 了解参数），但 `validate.ps1 -CoverPath` 是可选项，不传只打 WARN。
+**Q3. Do I still need a cover image?**
+No, by default. The platform uses the first frame, so beat 1 carries the cover duty: a large title + hook + information that reads at a glance. `tools/cover/` still works (`python tools\cover\cover.py --help` for options), but `validate.ps1 -CoverPath` is optional and only emits a WARN when omitted.
 
-**Q4. `edge-tts: command not found`？**
-Python 的 `Scripts` 目录不在 PATH。用 `python -m site --user-base` 找到用户级 Scripts，或直接用 `python -m edge_tts --version` 验证；把该目录加入 PATH 后重开终端。
+**Q4. `edge-tts: command not found`?**
+Python's `Scripts` directory is not on PATH. Use `python -m site --user-base` to find the user-level Scripts directory, or verify with `python -m edge_tts --version`; add it to PATH and reopen the terminal.
 
-**Q5. 找不到 ffmpeg？**
-三种来源按优先级：`$env:FFMPEG` → `tools/record/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe`（`npm install` 后就有）→ PATH 里的 `ffmpeg`。都没有就 `winget install Gyan.FFmpeg` 或去 ffmpeg.org 下载。
+**Q5. ffmpeg not found?**
+Three sources in priority order: `$env:FFMPEG` → `tools/record/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe` (available after `npm install`) → `ffmpeg` on PATH. If none exist, run `winget install Gyan.FFmpeg` or download from ffmpeg.org.
 
-**Q6. 成片超过 180 秒怎么办？**
-先看 `check.ps1` 的 C14 时长估算（`汉字数/4 + 拍数×1.5`）。压缩优先砍拍数而不是加快语速：删掉重复解释的拍、合并相邻的并列概念。60 秒档在实测里容易"听不懂"，除非 `design-intent.md` 明确只讲一个信息点。
+**Q6. The video runs over 180 seconds — what now?**
+Check the C14 duration estimate in `check.ps1` (`Chinese characters / 4 + beats × 1.5`). Trim beats rather than speeding up narration: delete beats that repeat explanations, merge adjacent parallel concepts. In practice the 60-second format is hard to follow; only use it when `design-intent.md` explicitly says there is a single point.
 
-**Q7. 盲预测是什么？为什么不能改？**
-发布前先写下"这条会跑到什么水平"，写完用哈希锁固定。发布后再改预测，就等于把校准样本污染了，之后所有复盘都不可信。`validate.ps1` 会校验哈希，改过就禁发。
+**Q7. What is a blind prediction, and why can't I change it?**
+Before publishing you write down "how far this will go", then hash-lock it. Editing the prediction after publishing contaminates the calibration sample, making every later retro untrustworthy. `validate.ps1` verifies the hash and blocks publishing if it changed.
 
-**Q8. 后台登录失效了？**
-重新跑 `node tools\metrics\login.js` 扫码，生成新的 `tools\metrics\session.json`。该文件与 cookies 都不会进仓库。
+**Q8. The backend login expired?**
+Re-run `node tools\metrics\login.js` and scan the QR code to generate a new `tools\metrics\session.json`. Neither that file nor the cookies ever enter the repository.
 
-**Q9. 上游 skill 不支持 3:4 怎么办？**
-按 [docs/VIDEO-GUIDE.md](docs/VIDEO-GUIDE.md) §3.2 的 4 条改动清单给它打本地补丁，核心是新增 `stage.config.ts` 作为 `STAGE_W/STAGE_H` 唯一真相源，并让 `scaffold.sh` 支持 `--ratio=3:4`。暂时不改也能用 16:9 跑通全链路。
+**Q9. What if the upstream skill does not support 3:4?**
+Apply the four-item local patch in [docs/VIDEO-GUIDE.md](docs/VIDEO-GUIDE.md) §3.2. The core is adding `stage.config.ts` as the single source of truth for `STAGE_W/STAGE_H`, and making `scaffold.sh` accept `--ratio=3:4`. Without the patch you can still run the whole chain in 16:9.
 
-**Q10. 为什么脚本里全是相对路径？**
-为了 clone 到任何目录都能跑。脚本以自身位置推导仓库根（`$PSScriptRoot\..\..` / `path.resolve(__dirname, '../..')`），需要指向别的项目时用第 8 节的环境变量覆盖，不要再写死绝对路径。
+**Q10. Why are all script paths relative?**
+So the repo runs from any clone location. Scripts derive the repo root from their own location (`$PSScriptRoot\..\..` / `path.resolve(__dirname, '../..')`). To point at another project, use the environment variables in section 8 — do not hard-code absolute paths.
 
-**Q11. 我可以只用其中一部分吗？**
-可以。`tools/record`（录屏 + 拼音频）和 `tools/gate` 是独立的，前端可以是任何能按 `?auto=1` 自动推进的网页；`cheat` 回路也可以只拿 rubric 和复盘表用。
+**Q11. Can I use only part of it?**
+Yes. `tools/record` (recording + audio muxing) and `tools/gate` are standalone; the front end can be any web page that auto-advances under `?auto=1`. The cheat loop can also be used with only the rubric and retro table.
 
-**Q12. 支持 macOS / Linux 吗？**
-核心 Node / Python 脚本是跨平台的，但 `check.ps1`、`validate.ps1`、`shots-review.ps1`、`heartbeat.ps1` 依赖 Windows PowerShell 5.1 和 `System.Drawing`。当前只在 Windows 上验证过。
-
----
-
-## 11. 已知限制
-
-- **仅 Windows 验证**：PowerShell 5.1、`System.Drawing`、Chrome 默认路径假设都偏 Windows。
-- **3:4 补丁不在本仓库**：上游 skill 只支持 16:9，竖版改造需要你按清单动手（第 4.5 节 / VIDEO-GUIDE §3.2）。
-- **示例不含 mp4**：仓库只放文本资产和截图，避免体积与版权问题；成片需要你自己跑出来。
-- **发布依赖第三方 MCP**：xiaohongshu-mcp 的接口与页面结构可能随平台变化，登录态也会过期。
-- **后台数据抓取是脆弱环节**：`tools/metrics` 依赖创作者中心页面结构，改版后需要更新选择器。
-- **没有 CI / 测试 / Docker**：这是有意的取舍——流水线的核心是内容和判断，不是工程设施。
-- **TTS 是机器音**：edge-tts 免费、稳定，但不是真人。对音色要求高的场景需要换 provider。
-- **rubric 是作者账号校准出来的**：五维权重对你的赛道未必最优，建议先跑 3 条再用自己的数据 bump。
+**Q12. Does it support macOS / Linux?**
+The core Node / Python scripts are cross-platform, but `check.ps1`, `validate.ps1`, `shots-review.ps1`, and `heartbeat.ps1` depend on Windows PowerShell 5.1 and `System.Drawing`. It has only been verified on Windows.
 
 ---
 
-## 12. 依赖与致谢
+## 11. Known Limitations
 
-本仓库**不包含**以下项目的源码，仅通过约定调用，版权归各自作者：
+- **Verified on Windows only**: PowerShell 5.1, `System.Drawing`, and the default Chrome path assumption all lean Windows.
+- **The 3:4 patch is not in this repo**: the upstream skill only supports 16:9; the portrait conversion is a manual checklist (section 4.5 / VIDEO-GUIDE §3.2).
+- **No mp4 in examples**: the repo only ships text assets and screenshots to avoid size and copyright issues; you have to produce the final video yourself.
+- **Publishing depends on a third-party MCP**: xiaohongshu-mcp's interfaces and page structure may change with the platform, and login state expires.
+- **Backend metrics scraping is fragile**: `tools/metrics` depends on the creator center's page structure and needs selector updates after redesigns.
+- **No CI / tests / Docker**: an intentional trade-off — the core of this pipeline is content and judgment, not engineering infrastructure.
+- **TTS is synthetic**: edge-tts is free and stable, but it is not a human voice. If voice quality matters, switch providers.
+- **The rubric was calibrated on the author's account**: the five-dimension weights may not be optimal for your niche; ship 3 videos first, then tune them with your own data.
 
-| 项目 | 作者/来源 | 在本流程里的位置 |
+---
+
+## 12. Dependencies & Credits
+
+This repository **does not include** the source code of the following projects; it only calls them by convention, and copyright belongs to their respective authors:
+
+| Project | Author/source | Role in this flow |
 |---|---|---|
-| [web-video-presentation](https://github.com/ConardLi/garden-skills) | ConardLi（code秘密花园） | 口播稿 → Vite + React 网页演示 |
-| [cheat-on-content](https://github.com/XBuilderLAB/cheat-on-content) | XBuilderLAB | 打分 / 盲预测 / 复盘校准回路 |
-| [redbook-creator-publish](https://lobehub.com/skills/rov639-skillhub-redbook-creator-publish) | rov639 | 图文线发布包（可选） |
-| [atutun-xhs-cover](https://github.com/panggungunvibe/atutun-xhs-cover) | panggungunvibe | 阿囤囤风格封面提示词（可选） |
-| [xiaohongshu-mcp](https://github.com/xpzouying/xiaohongshu-mcp) | xpzouying | 发布与站内检索 |
-| [Playwright](https://playwright.dev/) | Microsoft | 无头录屏与截图 |
-| [edge-tts](https://github.com/rany2/edge-tts) | rany2 | 免费中文配音 |
-| [ffmpeg](https://ffmpeg.org/) | FFmpeg 社区 | 音视频拼接与抽帧 |
+| [web-video-presentation](https://github.com/ConardLi/garden-skills) | ConardLi | Narration script → Vite + React web presentation |
+| [cheat-on-content](https://github.com/XBuilderLAB/cheat-on-content) | XBuilderLAB | Scoring / blind prediction / retro calibration loop |
+| [redbook-creator-publish](https://lobehub.com/skills/rov639-skillhub-redbook-creator-publish) | rov639 | Image-post publishing package (optional) |
+| [atutun-xhs-cover](https://github.com/panggungunvibe/atutun-xhs-cover) | panggungunvibe | Atutun-style cover prompts (optional) |
+| [xiaohongshu-mcp](https://github.com/xpzouying/xiaohongshu-mcp) | xpzouying | Publishing and in-platform search |
+| [Playwright](https://playwright.dev/) | Microsoft | Headless recording and screenshots |
+| [edge-tts](https://github.com/rany2/edge-tts) | rany2 | Free Chinese voice-over |
+| [ffmpeg](https://ffmpeg.org/) | FFmpeg community | A/V muxing and frame extraction |
 
-本仓库自写的部分（`tools/`、`templates/`、`docs/` 的方法描述）采用 MIT 协议。示例中的信源引用（OpenAI Help Center、arXiv:1904.09751、Thinking Machines 技术报告等）版权归原作者，仅作事实引用。
+The parts written for this repository (`tools/`, `templates/`, and the method descriptions in `docs/`) are licensed under MIT. Source citations in the examples (OpenAI Help Center, arXiv:1904.09751, Thinking Machines technical report, etc.) remain the property of their original authors and are used only as factual references.
 
 ---
 
