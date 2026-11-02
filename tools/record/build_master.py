@@ -1,18 +1,19 @@
 """
-把无头录制得到的静音视频 + 79 段口播 mp3 合成成片。
+Combine the silent video from headless recording with the 79 narration mp3 segments into a master.
 
-对轨原理
---------
-运行时是「音频播完 + 200ms → 推进下一步」，所以浏览器真实跑出来的每步
-时长和我们按 mp3 时长推算的值会有几十毫秒级累积误差。录制时页面里记录了
-每一步切换的 performance.now() 时刻（marks.json），这里直接用这些真实
-时刻把 mp3 摆到时间轴上，而不是靠时长累加。
+Sync principle
+--------------
+The runtime advances to the next step after "audio finishes + 200ms", so the real
+duration of each step in the browser accumulates tens of milliseconds of error
+compared with the value computed from mp3 durations. During recording the page logs
+the performance.now() timestamp of every step switch (marks.json); here we place the
+mp3 files on the timeline using those real timestamps instead of accumulating durations.
 
-音频用「解码成 PCM → Python 按偏移写入 → 统一编码」的方式拼，
-不依赖 ffmpeg 滤镜的版本差异（本机 ffmpeg 是 2018 年的构建，
-`apad=pad_dur` 不可用）。
+Audio is assembled by "decode to PCM → Python writes at offsets → encode once",
+so it does not depend on ffmpeg filter version differences (the local ffmpeg is a 2018
+build, where `apad=pad_dur` is unavailable).
 
-用法
+Usage
 ----
     python build_master.py
 """
@@ -26,11 +27,11 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# 视频项目目录：优先 VIDEO_PROJECT，其次命令行第 1 个参数，最后回退到示例项目
+# Video project dir: prefer VIDEO_PROJECT, then the 1st CLI argument, finally fall back to the sample project
 _default_project = REPO_ROOT / "videos" / "personal-agent-deep-dive"
 ROOT = Path(os.environ.get("VIDEO_PROJECT") or (sys.argv[1] if len(sys.argv) > 1 else _default_project)).resolve()
 
-# wide = 16:9 B站版；vertical = 3:4 小红书版。用 VARIANT=vertical 切换。
+# wide = 16:9 Bilibili version; vertical = 3:4 Xiaohongshu version. Switch with VARIANT=vertical.
 VARIANT = os.environ.get("VARIANT", "wide")
 if VARIANT == "vertical":
     RAW = ROOT / "raw-vertical"
@@ -55,28 +56,28 @@ def _find_ffmpeg() -> str:
     found = shutil.which("ffmpeg")
     if found:
         return found
-    sys.exit("找不到 ffmpeg：请安装 ffmpeg 或设置 FFMPEG 环境变量")
+    sys.exit("ffmpeg not found: install ffmpeg or set the FFMPEG environment variable")
 
 
 FFMPEG = _find_ffmpeg()
 
-SR = 24000          # 解码用原生采样率（无损，PCM 字节率据此算）
-SR_OUT = 48000       # 输出采样率：48k，匹配绝大多数播放器/系统的原生输出率
-CH = 1              # 单声道
-BYTES_PER_SEC = SR * CH * 2  # s16le（仅用于按文件大小算时长）
+SR = 24000          # native sample rate for decoding (lossless; the PCM byte rate is computed from it)
+SR_OUT = 48000       # output sample rate: 48k, matching the native output rate of most players/systems
+CH = 1              # mono
+BYTES_PER_SEC = SR * CH * 2  # s16le (used only to derive duration from file size)
 
 DUR_RE = re.compile(r"Duration: (\d+):(\d\d):(\d\d\.\d+)")
 
 
 def probe_duration(path: Path) -> float:
-    """@ffmpeg-installer 只带 ffmpeg.exe，没有 ffprobe，所以解析 stderr。"""
+    """@ffmpeg-installer ships only ffmpeg.exe, no ffprobe, so parse stderr."""
     out = subprocess.run(
         [FFMPEG, "-hide_banner", "-i", str(path)],
         capture_output=True, text=True,
     )
     m = DUR_RE.search(out.stderr)
     if not m:
-        raise RuntimeError(f"读不出时长: {path}")
+        raise RuntimeError(f"cannot read duration: {path}")
     h, mi, s = m.groups()
     return int(h) * 3600 + int(mi) * 60 + float(s)
 
@@ -97,24 +98,24 @@ def main() -> int:
     start = marks_doc["start"]
     marks = marks_doc["marks"]
     if start is None:
-        print("✗ marks.json 里没有 start（Space 时刻），无法对轨", file=sys.stderr)
+        print("✗ marks.json has no start (Space timestamp), cannot sync", file=sys.stderr)
         return 1
 
     n = min(len(marks), len(segs))
     if n != len(segs):
-        print(f"⚠ marks {len(marks)} 段 vs 音频 {len(segs)} 段")
+        print(f"⚠ marks {len(marks)} segments vs audio {len(segs)} segments")
 
-    # 每步音频在时间轴上的起点（秒，0 = 按下 Space 那一刻）。
-    # 第 0 步的 mark 是打点器启动时记的（早于 Space），强制归零——
-    # 它的音频是在 autoStarted 变 true 时才开始播的。
+    # Start point of each step's audio on the timeline (seconds, 0 = the moment Space is pressed).
+    # Step 0's mark is recorded when the marker starts (before Space), so force it to zero —
+    # its audio only starts playing when autoStarted turns true.
     offsets = [0.0]
     for i in range(1, n):
         offsets.append((marks[i]["t"] - start) / 1000.0)
 
-    print("前 6 步起点(s):", [round(o, 2) for o in offsets[:6]])
-    print("末 3 步起点(s):", [round(o, 2) for o in offsets[-3:]])
+    print("first 6 step starts (s):", [round(o, 2) for o in offsets[:6]])
+    print("last 3 step starts (s):", [round(o, 2) for o in offsets[-3:]])
 
-    # ── 1. 逐段解码为 PCM ──────────────────────────────────────────────
+    # ── 1. Decode each segment to PCM ──────────────────────────────────────
     pcm_dir = RAW / "pcm"
     pcm_dir.mkdir(exist_ok=True)
     durs = []
@@ -122,12 +123,13 @@ def main() -> int:
         dst = pcm_dir / f"{i:02d}.pcm"
         decode_mp3(AUDIO / s["audio"], dst)
         durs.append(dst.stat().st_size / BYTES_PER_SEC)
-    print(f"\n解码 {n} 段，合计 {sum(durs):.1f}s")
+    print(f"\ndecoded {n} segments, {sum(durs):.1f}s total")
 
-    # ── 2. 按实测时刻写入时间轴 ────────────────────────────────────────
-    # 关键：偏移必须对齐到「样本」(偶数字节)，不能用 int(秒 * 字节率)——
-    # 秒是小数，int 后可能是奇数，导致该段整体错 1 字节、s16le 被字节交换成
-    # 高频乱码（就是用户听到的"脉冲式爆破杂音"）。这里先转成样本数再 *2。
+    # ── 2. Write onto the timeline at measured timestamps ──────────────────
+    # Key: the offset must be aligned to "samples" (even byte count), not int(seconds * byte rate) —
+    # seconds are fractional and int may land on an odd number, which shifts the whole segment by 1
+    # byte and byte-swaps s16le into high-frequency garbage (the "pulsing blast noise" the user hears).
+    # Here convert to a sample count first, then ×2.
     total = offsets[-1] + durs[-1] + 0.4
     buf = bytearray(int(total * SR) * 2)
 
@@ -141,47 +143,48 @@ def main() -> int:
 
     pcm_path = RAW / "narration.pcm"
     pcm_path.write_bytes(buf)
-    print(f"音轨总长 {len(buf)/BYTES_PER_SEC:.1f}s")
+    print(f"audio track total {len(buf)/BYTES_PER_SEC:.1f}s")
 
     audio_out = RAW / "narration.wav"
     subprocess.run(
         [FFMPEG, "-y", "-hide_banner", "-loglevel", "error",
          "-f", "s16le", "-ar", str(SR), "-ac", str(CH), "-i", str(pcm_path),
-         # ── 关键修复：改用无损 PCM，彻底消除「拖条/倍速时的脉冲式爆音」──
-         # 之前的 48k AAC 在拖条/变速时仍爆音，根因是「有损解码器状态」而非采样率：
-         # 播放器在 seek 或 atempo(变速) 时会重启 AAC 解码器的内部缓冲，
-         # 产生一段不连续样本 → 短促连续的高频爆破杂音（撕拉感）。PCM 没有解码器、
-         # 没有帧边界、没有 priming 样本，seek 直接定位到样本级，变速也只是把样本
-         # 搬快/慢，不会再触发解码器重置 → 爆音根因消失。
-         # 24k 源用 SoX 高质量重采样器整数倍上采样到 48k（precision=32 长 FIR）。
-         # 48k 下上采样的镜像落在 24–36kHz（不可闻），无需 lowpass，
-         # 人声亮度完整保留 → 也不会再"糊"。
+         # ── Key fix: switch to lossless PCM to fully eliminate "pulsing pops when scrubbing/speed-changing" ──
+         # The previous 48k AAC still popped when scrubbing/speed-changing; the root cause is "lossy decoder state",
+         # not the sample rate: when the player seeks or applies atempo (speed change) it restarts the AAC decoder's
+         # internal buffer, producing a run of discontinuous samples → short bursts of high-frequency blast noise
+         # (a tearing feel). PCM has no decoder, no frame boundaries, no priming samples; seeking lands exactly at
+         # the sample level, and speed changes just play samples faster/slower without triggering a decoder reset →
+         # the root cause of the pops is gone.
+         # The 24k source is upsampled to 48k by an integer factor with SoX's high-quality resampler (precision=32 long FIR).
+         # At 48k the upsampling image falls at 24–36kHz (inaudible), so no lowpass is needed, and the
+         # narration's brightness is fully preserved → no "muddiness" either.
          "-af", "aresample=48000:resampler=soxr:precision=32",
          "-c:a", "pcm_s16le", "-ar", "48000", str(audio_out)],
         check=True,
     )
-    print(f"✓ 音轨编码完成 {probe_duration(audio_out):.1f}s")
+    print(f"✓ audio track encoded {probe_duration(audio_out):.1f}s")
 
-    # ── 3. 对齐视频起点 ────────────────────────────────────────────────
+    # ── 3. Align the video start point ─────────────────────────────────────
     video = RAW / "video.webm"
     v_total = probe_duration(video)
     meta = json.loads((RAW / "timing.json").read_text(encoding="utf-8"))
     d_after_space = (meta["close_node"] - meta["press_node"]) / 1000.0
     offset = max(0.0, v_total - d_after_space)
 
-    # 理论值会有系统性误差（Playwright 的 webm 时间轴和墙上时间不完全等价），
-    # 所以用 verify_sync.py 实测出的画面跳变偏差来修正。
+    # Theoretical values carry systematic error (Playwright's webm timeline is not fully equivalent to wall-clock time),
+    # so correct it with the frame-change offset measured by verify_sync.py.
     fix_path = RAW / "sync.json"
     delta = 0.0
     if fix_path.exists():
         delta = json.loads(fix_path.read_text(encoding="utf-8"))["offset_delta"]
     offset = max(0.0, offset + delta)
 
-    print(f"\n视频总长 {v_total:.1f}s ｜ Space 之后 {d_after_space:.1f}s")
-    print(f"理论裁切 {v_total - d_after_space:.2f}s ｜ 实测修正 {delta:+.2f}s "
-          f"→ 实际裁掉 {offset:.2f}s")
+    print(f"\nvideo total {v_total:.1f}s ｜ after Space {d_after_space:.1f}s")
+    print(f"theoretical trim {v_total - d_after_space:.2f}s ｜ measured correction {delta:+.2f}s "
+          f"→ actually trimmed {offset:.2f}s")
 
-    # ── 4. 合成无损成片（MKV 原生支持 pcm_s16le，根治拖条/变速爆音）──────
+    # ── 4. Compose the lossless master (MKV natively supports pcm_s16le, curing scrub/speed-change pops) ──────
     final_pcm = FINAL.with_suffix(".mkv")
     subprocess.run(
         [FFMPEG, "-y", "-hide_banner", "-loglevel", "error",
@@ -196,12 +199,12 @@ def main() -> int:
         check=True,
     )
     dur = probe_duration(final_pcm)
-    print(f"\n✓ 无损成片(本地验证用): {final_pcm}")
-    print(f"  时长 {dur/60:.1f} 分钟 ({dur:.0f}s) ｜ "
-          f"大小 {final_pcm.stat().st_size/1024/1024:.0f} MB")
+    print(f"\n✓ lossless master (for local verification): {final_pcm}")
+    print(f"  duration {dur/60:.1f} min ({dur:.0f}s) ｜ "
+          f"size {final_pcm.stat().st_size/1024/1024:.0f} MB")
 
-    # ── 5. 导出 MP4（供上传小红书；平台会二次转码，
-    #        从源头 PCM 重新编码为干净 AAC，避免继承有损解码器爆音）─────────
+    # ── 5. Export MP4 (for uploading to Xiaohongshu; the platform re-transcodes,
+    #        re-encoding from the source PCM into clean AAC to avoid inheriting lossy-decoder pops) ─────────
     final_mp4 = FINAL.with_suffix(".mp4")
     subprocess.run(
         [FFMPEG, "-y", "-hide_banner", "-loglevel", "error",
@@ -214,9 +217,9 @@ def main() -> int:
         check=True,
     )
     dm = probe_duration(final_mp4)
-    print(f"✓ 上传版(小红书): {final_mp4}")
-    print(f"  时长 {dm/60:.1f} 分钟 ({dm:.0f}s) ｜ "
-          f"大小 {final_mp4.stat().st_size/1024/1024:.0f} MB")
+    print(f"✓ upload version (Xiaohongshu): {final_mp4}")
+    print(f"  duration {dm/60:.1f} min ({dm:.0f}s) ｜ "
+          f"size {final_mp4.stat().st_size/1024/1024:.0f} MB")
     return 0
 
 

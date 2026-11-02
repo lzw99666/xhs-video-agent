@@ -1,29 +1,29 @@
-# templates — 复制到哪里
+# templates — where to copy them
 
-这些文件是**骨架**，不是可直接发布的成品。复制后按内容替换。
+These files are **skeletons**, not ready-to-publish output. Replace the content after copying.
 
-| 模板 | 复制到 | 说明 |
+| Template | Copy to | Notes |
 |---|---|---|
-| `account.md` | `<repo-root>/account.md` | 账号设定（人设 / 受众 / 内容线 / 红线）。所有创作前先读。 |
-| `log.md` | `<repo-root>/log.md` | 发布记录唯一真相源；`validate.ps1` 的"当日篇数"读这里。 |
-| `episode/` | `<repo-root>/videos/<episode-name>/` | 一期视频的五件套：调研卡 / 创作意图 / 口播稿 / 分镜大纲 / 文案自检。 |
+| `account.md` | `<repo-root>/account.md` | Account settings (persona / audience / content lines / red lines). Read before every episode. |
+| `log.md` | `<repo-root>/log.md` | Single source of truth for publishing records; `validate.ps1`'s "posts today" reads it here. |
+| `episode/` | `<repo-root>/videos/<episode-name>/` | The five-file set for one video: research card / design intent / narration script / shot outline / copy self-check. |
 
-## 还需要哪些运行时文件
+## Which runtime files you also need
 
-- `.cheat-state.json`：由 `cheat-on-content` 的 `/cheat-init` 生成（含预测哈希锁）。
-- `backlog.json`：想跑无人值守心跳时再建；只跑单条视频可以不要。
-- `predictions/`、`scripts/`、`candidates.md`：同样由 `/cheat-init` 建立。
+- `.cheat-state.json`: created by `cheat-on-content`'s `/cheat-init` (includes the prediction hash lock).
+- `backlog.json`: create it only when you want to run the unattended heartbeat; a single video does not need it.
+- `predictions/`, `scripts/`, `candidates.md`: also created by `/cheat-init`.
 
-## 复制命令
+## Copy commands
 
 ```powershell
-# 账号与日志（只做一次）
+# Account and log (do this once)
 Copy-Item templates\account.md account.md
 Copy-Item templates\log.md log.md
 
-# 新一期
+# A new episode
 New-Item -ItemType Directory -Force videos\my-ep01
 Copy-Item templates\episode\* videos\my-ep01\
 ```
 
-> 骨架阶段的 `check.ps1` 会报警（文件还没写满），这是预期行为；内容定稿后再跑闸门。
+> At the skeleton stage `check.ps1` will warn (the files are not filled in yet); that is expected. Run the gates once the content is final.

@@ -1,26 +1,26 @@
-# 运营日志（发布记录唯一真相源）
+# Operations log (single source of truth for publishing records)
 
-> 每次发布后立刻追加一条。`validate.ps1` 的"当日篇数 / 间隔 2h"以本文件为准。
-> 条目格式固定，便于机械读取：`## YYYY-MM-DD · 第N篇 · <episode>`
-
----
-
-## YYYY-MM-DD · 第1篇 · <episode>
-
-- **标题**：<≤20 字>
-- **形态**：视频 / 图文
-- **时长**：<秒>
-- **预测档案**：`predictions/<date>_<id>_<short>.md`
-- **URL**：<发布后粘贴>
-- **发布时刻**：<YYYY-MM-DD HH:MM>
-- **首帧**：<一句话描述>
-- **备注**：<异常 / 版本 / 人工确认人>
+> Append one entry immediately after every publish. `validate.ps1`'s "posts today / 2h gap" follows this file.
+> The entry format is fixed for mechanical reading: `## YYYY-MM-DD · post N · <episode>`
 
 ---
 
-## 周复盘（YYYY-MM-DD）
+## YYYY-MM-DD · post 1 · <episode>
 
-- 本周发布：<N> 篇
-- 人均观看秒数：<中位 / 最好 / 最差>
-- 命中的预测：<哪几条>
-- 下周动作：<最多 3 条，可执行>
+- **Title**: <≤20 characters>
+- **Format**: video / image-text
+- **Duration**: <seconds>
+- **Prediction file**: `predictions/<date>_<id>_<short>.md`
+- **URL**: <paste after publishing>
+- **Published at**: <YYYY-MM-DD HH:MM>
+- **First frame**: <one-sentence description>
+- **Notes**: <anomalies / version / who confirmed>
+
+---
+
+## Weekly retro (YYYY-MM-DD)
+
+- Published this week: <N> posts
+- Average watch seconds per viewer: <median / best / worst>
+- Predictions that hit: <which ones>
+- Actions for next week: <max 3, executable>

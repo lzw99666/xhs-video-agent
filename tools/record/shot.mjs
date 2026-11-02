@@ -1,14 +1,14 @@
 /**
- * 单步截图工具（竖版预览用）。
+ * Single-step screenshot tool (for vertical previews).
  *
- * 用法：
+ * Usage:
  *   node shot.mjs <chapterIndex> <stepIndex> <outPng> [--wide]
  *
- * 例：
+ * Example:
  *   node shot.mjs 0 1 ../_shots/hook-1.png
  *
- * 会写入 localStorage 光标 → reload → 等动画播完 → 截图。
- * 录制态 UI（进度条 / 模式按钮）默认隐藏，与实际成片构图一致。
+ * Writes the localStorage cursor → reload → wait for the animation to finish → screenshot.
+ * Editing-mode UI (progress bar / mode button) is hidden by default, matching the actual video framing.
  */
 import { chromium } from "playwright-core";
 
@@ -48,7 +48,7 @@ await page.addStyleTag({
   content: ".pb-hover, .at-hover { display: none !important; }",
 });
 await page.evaluate(() => document.fonts.ready);
-await new Promise((r) => setTimeout(r, 3200)); // 等入场动画播完
+await new Promise((r) => setTimeout(r, 3200)); // wait for the entrance animation to finish
 await page.screenshot({ path: out });
 await browser.close();
 console.log("shot →", out);

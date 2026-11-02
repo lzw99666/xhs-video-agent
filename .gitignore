@@ -1,8 +1,8 @@
-# 依赖
+# Dependencies
 node_modules/
 tools/*/node_modules/
 
-# 运行时产物
+# Runtime artifacts
 videos/
 raw/
 raw-vertical/
@@ -12,13 +12,13 @@ raw-vertical/
 *.mp3
 *.wav
 
-# 私有账号档案与发布记录（从 templates/ 复制，留在本地）
+# Private account profile and publish log (copied from templates/, kept locally)
 /account.md
 /log.md
 /backlog.json
 /STATUS.md
 
-# cheat 校准数据（属于个人账号）
+# cheat calibration data (belongs to the personal account)
 .cheat-state.json
 /.cheat-cache/
 /predictions/
@@ -26,12 +26,12 @@ raw-vertical/
 /cache/
 rubric-memo.md
 
-# 登录态与 cookies
+# Login state and cookies
 session.json
 cookies.json
 *.cookie
 
-# 日志
+# Logs
 *.log
 tools/record/record.log
 tools/record/_shots/
@@ -42,7 +42,7 @@ __pycache__/
 .venv/
 venv/
 
-# 编辑器 / 系统
+# Editor / OS
 .vscode/
 .idea/
 .DS_Store

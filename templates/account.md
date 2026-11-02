@@ -1,50 +1,50 @@
-# 账号设定（唯一真相源）
+# Account settings (single source of truth)
 
-> 每次创作前先读本文件；本文件与 `log.md` 是本流程的"外部记忆"。
-> 修改人设 / 红线前先想清楚：下游的标题、脚本、发布检查都以这里为准。
+> Read this before every episode; this file and `log.md` are the process's "external memory".
+> Think before changing the persona / red lines: downstream titles, scripts and publishing checks all follow this.
 
-## 1. 人设
+## 1. Persona
 
-- **身份**：<你是谁 / 在学什么 / 有什么可验证的经历>
-- **语气**：<例如：真诚学习者，讲人话，不端着>
-- **不装的部分**：<明确不假装懂的领域>
-- **口头禅 / 禁用词**：<列出你不说的话>
+- **Identity**: <who you are / what you are learning / what verifiable experience you have>
+- **Tone**: <e.g. sincere learner, plain language, no posturing>
+- **What you do not fake**: <areas you explicitly do not pretend to understand>
+- **Catchphrases / banned words**: <list what you never say>
 
-## 2. 受众
+## 2. Audience
 
-- **核心人群**：<年龄 / 职业 / 正在解决什么问题>
-- **他们的默认状态**：<已经知道什么，还不知道什么>
-- **他们为什么会关注你**：<一句话>
+- **Core group**: <age / occupation / what problem they are solving>
+- **Their default state**: <what they already know, what they do not know yet>
+- **Why they would follow you**: <one sentence>
 
-## 3. 内容线
+## 3. Content lines
 
-| 线 | 形态 | 规格 | 目标 |
+| Line | Format | Spec | Goal |
 |---|---|---|---|
-| 常规线 | 机制解释 / 工具实测 | 3:4 竖版 1080×1440，120–180s | 留存 |
-| 实验线 | 单变量对照 | 同上 | 验证一个假设 |
-| 图文线 | 清单 / 教程 | 3:4 图文 | 收藏 |
+| Regular line | Mechanism explainer / tool test | 3:4 vertical 1080×1440, 120–180s | Retention |
+| Experimental line | Single-variable comparison | Same as above | Validate one hypothesis |
+| Image-text line | Checklist / tutorial | 3:4 image-text | Saves |
 
-## 4. 标题红线
+## 4. Title red lines
 
-- 标题 ≤ 20 字（`validate.ps1` 硬校验）。
-- 不用"震惊 / 必看 / 99% 的人不知道"这类空承诺。
-- 标题必须能在首帧被画面承接；本号不单独设封面，**首帧即封面**。
+- Title ≤ 20 characters (`validate.ps1` hard check).
+- No empty promises like "shocking / must-see / 99% of people don't know".
+- The title must be carried by the first frame's image; this account sets no separate cover image, **the first frame is the cover image**.
 
-## 5. 发布红线
+## 5. Publishing red lines
 
-- 每天 ≤ 2 篇，间隔 ≥ 2h（`validate.ps1` 读 `log.md` 与 `.cheat-state.json`）。
-- 不发布未经校验的预测档案（盲预测哈希锁必须匹配）。
-- 发布必须人工确认；`publish: "auto"` 只在连续 5 篇零异常后再议。
-- 不删评论、不刷互动、不碰平台风控。
+- ≤ 2 posts per day, ≥ 2h apart (`validate.ps1` reads `log.md` and `.cheat-state.json`).
+- Do not publish without a verified prediction file (the blind prediction hash lock must match).
+- Publishing requires human confirmation; `publish: "auto"` is only discussed after 5 consecutive episodes with zero anomalies.
+- Do not delete comments, do not fake engagement, do not touch platform risk controls.
 
-## 6. 视觉
+## 6. Visuals
 
-- 竖版 3:4：1080×1440。
-- 主色 / 底色 / 字体：<填写后与 `outline.md` 的主题 token 对齐>。
-- 首帧承担标题功能：大标题 + 钩子 + 一个具象物件。
+- Vertical 3:4: 1080×1440.
+- Primary color / background / fonts: <fill in, then align with the theme tokens in `outline.md`>.
+- The first frame carries the title's job: large title + hook + one concrete object.
 
-## 7. 历史
+## 7. History
 
-| 日期 | 事件 | 结论 |
+| Date | Event | Conclusion |
 |---|---|---|
-| YYYY-MM-DD | <发布 / 改版 / 复盘> | <一句话> |
+| YYYY-MM-DD | <publish / revamp / retro> | <one sentence> |

@@ -1,28 +1,28 @@
-# outline.md · 分镜大纲（<episode> · <章数> 章 <步数> 步）
+# outline.md · shot outline (<episode> · <chapter-count> chapters, <step-count> steps)
 
-> 画幅：3:4 竖版 1080×1440；主题：<blueprint / chalk-garden / terminal-green / warm-keynote>。
-> 结构：<钩子 x 拍 → 机制 x 拍 → 反转 x 拍 → 落地 x 拍>。
-> **首帧即封面**：第 1 步自带大标题 + 钩子 + 一个具象物件。
-> 必须满足：`script.md` 拍数 == `outline.md` step 数 == `narrations.ts` 总长 == 音频段数。
-> 章节代码禁止硬编码毫秒/秒数；对轨一律读 `raw/marks.json`。
+> Frame: 3:4 vertical 1080×1440; theme: <blueprint / chalk-garden / terminal-green / warm-keynote>.
+> Structure: <hook x beats → mechanism x beats → reversal x beats → landing x beats>.
+> **The first frame is the cover image**: step 1 carries a large title + hook + one concrete object.
+> Must satisfy: `script.md` beat count == `outline.md` step count == `narrations.ts` total length == audio segment count.
+> Chapter code must not hardcode milliseconds/seconds; alignment always reads `raw/marks.json`.
 
-## 01 · <章名>（<role>）｜<N> 步
+## 01 · <chapter-name> (<role>) | <N> steps
 
-**叙事衔接**：<这一章承接上一章留下的什么问题，又逼出下一章什么问题。>
+**Narrative link**: <which question left by the previous chapter this chapter answers, and which question it forces for the next chapter.>
 
-**信息池**
-- <事实编号 F1 / 来源 S1>
-- <事实编号 F2 / 来源 S2>
+**Information pool**
+- <fact ID F1 / source S1>
+- <fact ID F2 / source S2>
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Screen | Elements | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
-| 1 | <首帧：大标题 + 具象物件> | <viz 组件> | <入场 / 重绘> | <先看哪 → 再看哪> | <1.2s> |
+| 1 | <first frame: large title + concrete object> | <viz component> | <entrance / redraw> | <what to look at first → then where> | <1.2s> |
 | 2 | <...> | <...> | <...> | <...> | <...> |
 
-## 02 · <章名>（<role>）｜<N> 步
+## 02 · <chapter-name> (<role>) | <N> steps
 
-**叙事衔接**：<...>
+**Narrative link**: <...>
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Screen | Elements | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
 | 3 | <...> | <...> | <...> | <...> | <...> |

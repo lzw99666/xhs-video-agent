@@ -1,6 +1,6 @@
-// 抓取小红书创作者中心数据（账号概览 + 全部笔记汇总），落盘为工作流可用的 JSON。
-// 用法：node pull.js
-// 依赖：tools/metrics/session.json（首次需 node login.js 扫码登录）
+// Scrape Xiaohongshu creator-center data (account overview + all notes summary) and save it as workflow-ready JSON.
+// Usage: node pull.js
+// Requires: tools/metrics/session.json (run node login.js once to log in by QR code)
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
@@ -27,7 +27,7 @@ function pickAccount(s) {
     period: [iso(s.begin_time), iso(s.end_time)],
     impressions: n(s.impl_count),
     reads: n(s.view_count),
-    ctr: n(s.cover_click_rate), // 小数，如 0.054 = 5.4%
+    ctr: n(s.cover_click_rate), // decimal, e.g. 0.054 = 5.4%
     full_view_rate: n(s.video_full_view_rate),
     likes: n(s.like_count),
     comments: n(s.comment_count),
@@ -46,7 +46,7 @@ function pickAccount(s) {
 
 (async () => {
   if (!fs.existsSync(SESSION)) {
-    console.error('[FATAL] 缺少 session.json，请先运行 node login.js');
+    console.error('[FATAL] session.json is missing, run first: node login.js');
     process.exit(2);
   }
   const browser = await chromium.launch({ executablePath: CHROME, headless: true });
@@ -65,20 +65,20 @@ function pickAccount(s) {
     await page.goto(HOME, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(6000);
     if (page.url().includes('/login')) {
-      console.error('[FATAL] session 已失效，请重新运行 node login.js 扫码登录');
+      console.error('[FATAL] session expired, run node login.js again to log in by QR code');
       await browser.close();
       process.exit(3);
     }
     await page.goto(ANALYSIS, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(10000);
   } catch (e) {
-    console.error('[FATAL] 页面加载失败: ' + e.message);
+    console.error('[FATAL] page load failed: ' + e.message);
     await browser.close();
     process.exit(4);
   }
 
   if (!cap.list) {
-    console.error('[FATAL] 未捕获到笔记列表接口（可能登录态失效或页面改版）');
+    console.error('[FATAL] note-list API was not captured (session may have expired or the page changed)');
     await browser.close();
     process.exit(5);
   }

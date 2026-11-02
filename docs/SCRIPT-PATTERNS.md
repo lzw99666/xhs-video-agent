@@ -1,205 +1,205 @@
-# 写作 Pattern 沉淀
+# Writing pattern library
 
-> 本文件是 xhs-video-agent 的组成部分；示例数据来自作者账号，仅用于说明方法。
+> This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
-> **本文件由 cheat-seed 在写 draft 前必读，由 cheat-retro 在复盘后建议追加新 pattern**。
+> **cheat-seed must read this before writing a draft; cheat-retro suggests new patterns to append after a retro**.
 >
-> RUBRIC.md 教 agent **怎么打分**，本文件教 agent **怎么写**。两者解耦——分数高的稿子不一定写得好（rubric 漏掉的维度），写得好的稿子不一定分数高（结构创新跑出 pattern 之外）。
+> RUBRIC.md teaches the agent **how to score**; this file teaches the agent **how to write**. The two are decoupled — a high-scoring script is not necessarily well written (dimensions the rubric misses), and a well-written script does not necessarily score high (structural innovation lands outside the patterns).
 >
-> **本模板初始为空**——从两个来源累积 pattern：
+> **This template starts empty** — patterns accumulate from two sources:
 >
-> 1. **对标账号导入**（建议起步用）—— 跑 `/cheat-learn-from` 拆对标账号样本 → 写到下方"对标 [账号名] 借鉴"段，每条 pattern 标 **Imported, untested**
-> 2. **自己复盘累积**（长期主力）—— 跑 `/cheat-retro` 时发现的用户改稿 pattern → 写到下方"用户改稿历史观察"段
+> 1. **Benchmark account import** (recommended to start) — run `/cheat-learn-from` to break down benchmark account samples → write them into the "Benchmark [account-name] borrowings" section below, and tag each pattern **Imported, untested**
+> 2. **Your own retro accumulation** (the long-term main source) — patterns from user script edits noticed during `/cheat-retro` → write them into the "Observed history of user edits" section below
 >
-> 想看完整范例：跑一次 `/cheat-learn-from` 导入你所在赛道的对标账号，pattern 会自动落到下方"对标 [账号名] 借鉴"段。
+> For a complete example: run `/cheat-learn-from` once to import a benchmark account in your niche, and the patterns will land in the "Benchmark [account-name] borrowings" section below.
 
 ---
 
-## ⚠️ Pattern 是 toolbox 不是 mold（核心 meta 原则）
+## ⚠️ Patterns are a toolbox, not a mold (core meta principle)
 
-任何 pattern 都是**从你已发样本反推的"路径之一"**——不是默认应该 apply 的模板。
+Every pattern is **one of the paths reverse-engineered from your published samples** — not a template you should apply by default.
 
-如果你每篇都用同一种"3 段式 + 致谢段 + 互动钩子"，账号上限只是"做得稳定的中等爆款"。**真正的爆款来自结构创新**——pattern 之外的东西。
+If you use the same "3-part + thank-you section + engagement hook" every time, the account ceiling is only "a consistently competent mid-tier hit". **Real hits come from structural innovation** — from outside the patterns.
 
-写稿前**永远先回答**：这篇稿子的最强属性是什么？再决定用什么 pattern。
+Before writing, **always answer first**: what is the strongest property of this script? Then decide which pattern to use.
 
 ---
 
-## 结构选型 cheat sheet（按文章属性匹配）
+## Structure-selection cheat sheet (match the article's properties)
 
-文章属性决定结构。下面是**框架**——你的具体内容应该自己填，cheat-retro 复盘后会建议哪些 pattern 应该加入。
+The article's properties determine the structure. What follows is a **framework** — fill in your own specifics; after a retro, cheat-retro will suggest which patterns should be added.
 
-| 文章属性 | 适合的结构（一般原则）| 你的样本 |
+| Article property | Suitable structure (general principle) | Your samples |
 |---|---|---|
-| **强 metaphor**（具体载体可类比一切）| metaphor 优先：开头场景代入比喻 → 主体翻译比喻 | （待填） |
-| **强时间维度**（一天循环 / 阶段演变）| 时间线叙事：时间点切换开场 → 命名概念 → 数据穿插 | （待填） |
-| **强讽刺戏仿（SAT 高）**| 脱口秀向：单事件段子开场 → punchline → 扩展 | （待填） |
-| **强数据反差**（冷数据暴力）| 数据反转开场：具体数字 → 反直觉对比 → 数据驱动叙事 | （待填） |
-| **多个真实事件 / 案例**| 案例驱动：标志性事件开场 → 抽象命名 → 三段失效 | （待填） |
-| **多个并行概念**| 3 段工业流水：影响声明 → 3 段命名 → 致谢 / MVP 句 | （待填） |
-| **强场景代入**（具体的、第一/二人称视角的瞬间）| 第二人称代入 → 反转 → 数据 → 三段 | （待填） |
-| **强可挪用句式**（高 MS）| 模板核心：句式贯穿全稿 → 互动钩子激活模板 | （待填） |
+| **Strong metaphor** (a concrete carrier that can stand in for anything) | Metaphor first: open with a scene that leads into the metaphor → the body translates the metaphor | (to fill) |
+| **Strong time dimension** (a daily cycle / staged evolution) | Timeline narrative: open on a time-point switch → name the concept → interleave data | (to fill) |
+| **Strong satire / parody (high SAT)** | Stand-up style: open with a single-event bit → punchline → expansion | (to fill) |
+| **Strong data contrast** (brutal cold data) | Data-reversal opening: concrete number → counter-intuitive contrast → data-driven narrative | (to fill) |
+| **Multiple real events / cases** | Case-driven: open on an iconic event → abstract naming → three segments of how it fails | (to fill) |
+| **Multiple parallel concepts** | 3-part industrial assembly line: impact statement → 3 named segments → thank-you / MVP line | (to fill) |
+| **Strong scene immersion** (a specific moment in first/second person) | Second-person immersion → reversal → data → three segments | (to fill) |
+| **Strong reusable phrasing** (high MS) | Template core: the phrasing runs through the whole script → an engagement hook activates the template | (to fill) |
 
-> 上表的"结构"是**通用框架**，不是普世真理。你的频道可能有完全不同的结构是有效的——填到"你的样本"列里就成为你账号的 pattern 库。
+> The "structures" in this table are a **general framework**, not universal truth. Your channel may find entirely different structures that work — write them into the "Your samples" column and they become your account's pattern library.
 
-### 用法
+### How to use
 
-写稿前先问：
-1. 这篇稿子最强的属性是什么？
-2. 表里对应哪种结构？（不在表里 → 写到底部"新发现的 Pattern"段，标 ≥1 样本待验证）
-3. 如果属性多元，哪种结构能让最强属性发挥到最大？
-
----
-
-## 通用 pattern 库（**初始抽象骨架，复盘后填具体**）
-
-### Pattern 1：开头钩子（前 3 秒）
-
-**原则**：绝不用"近年来 / 大家好 / 今天聊一聊"。
-
-**已知有效的钩子类型**（参考——具体哪种最适合你账号要试）：
-
-- **A. 第二人称场景代入 → 反转**（适用：原文有具体载体 / 实验对象 / 案例）
-- **B. 戏仿原文体的影响声明**（适用：原文有锐利的核心断言）
-- **C. 直接甩数据 / 反转性观察**（适用：原文有强数据点 + 反差）
-
-> 你的账号哪种最有效，cheat-retro 复盘后会逐渐填出来。
+Before writing, ask:
+1. What is the strongest property of this script?
+2. Which structure in the table matches? (Not in the table → write it into "Newly discovered patterns" at the bottom, tagged ≥1 sample to verify)
+3. If the properties are mixed, which structure lets the strongest property shine most?
 
 ---
 
-### Pattern 2：主体段落数量 + 切分
+## General pattern library (**abstract skeleton to start with; fill in specifics after retros**)
 
-**原则**：避免 4-7 个并列概念。一般压缩到 **3 个**——挑最具命名力 + 最具可挪用性的。
+### Pattern 1: Opening hook (first 3 seconds)
 
-> 这是个**经验法则**——不是绝对。某些频道（如教程类）适合更多段。看你账号的实测。
+**Principle**: never use "in recent years / hi everyone / today let's talk about".
+
+**Known effective hook types** (reference — which one suits your account is for you to test):
+
+- **A. Second-person scene immersion → reversal** (applies: the source has a concrete carrier / experiment subject / case)
+- **B. Impact statement parodying the source's style** (applies: the source has a sharp core claim)
+- **C. Drop the data / a reversal observation directly** (applies: the source has a strong data point + contrast)
+
+> Which works best on your account will be filled in gradually after cheat-retro retros.
 
 ---
 
-### Pattern 3：学术包装的剥离 / 保留（如适用）
+### Pattern 2: Number of body sections + splitting
 
-**原则**：观众能不能在评论区**复述/挪用**这个东西？
+**Principle**: avoid 4–7 parallel concepts. Usually compress to **3** — pick the ones with the most naming power + the most reusability.
 
-| 一般保留 | 一般剥离 |
+> This is a **rule of thumb** — not absolute. Some channels (tutorials, for example) suit more sections. It depends on your account's measurements.
+
+---
+
+### Pattern 3: Stripping / keeping academic packaging (where applicable)
+
+**Principle**: can the audience **restate / reuse** this thing in the comments?
+
+| Generally keep | Generally strip |
 |---|---|
-| 自创概念名（高 MS 来源）| 模型名（缩写大于 3 字符的）|
-| 关键精确数字 | 样本数量铺垫 |
-| 致谢段（如果它本身就是 MVP 句）| 文献综述 |
-| 反转性数据点 | 局限性讨论 |
-| 作者原话的金句段 | 实验流程细节（除非是钩子）|
+| Self-coined concept names (the source of high MS) | Model names (abbreviations longer than 3 characters) |
+| Key precise numbers | Sample-size setup |
+| The thank-you section (if it is itself the MVP line) | Literature review |
+| Reversal data points | Limitations discussion |
+| Quotable passages in the author's own words | Experiment procedure details (unless it is the hook) |
 
-> 如果你不做学术 / 论文解读类，这个 pattern 不适用——可以删。
-
----
-
-### Pattern 4：emotional 标记节点
-
-**原则**：跑得好的稿子里第一人称"我"出现 0-2 次，**永远在 emotional 高潮处**——给观众"该共鸣了"的提示信号。每出现 1 次"我"，必须紧跟一个高强度信息点。**不要空说"我觉得"**。
+> If you do not make academic / paper-explainer content, this pattern does not apply — you can delete it.
 
 ---
 
-### Pattern 5：双声道结构（作者 + 用户旁白）
+### Pattern 4: Emotional marker points
 
-**原则**（如果你做内容解读 / 评论类）：
-
-- 作者的话引出**框架**
-- 你的话做**接地翻译**（"打工人版" / "意思就是说" / "换句话说" / "说人话就是"）
-- 你的话做**emotional 标记**（"最让我破防的" / "全文最反转的" / "更恐怖的是"）
-
-**永远不要**让一段超过 4 行没有用户接地词。
-
-> 不解读他人内容的频道（纯个人观点表达）这个 pattern 不适用。
+**Principle**: in scripts that perform well, the first-person "I" appears 0–2 times, **always at an emotional peak** — a cue to the audience that "this is where you resonate". Every "I" must be followed immediately by a high-intensity information point. **Do not say "I think" for nothing**.
 
 ---
 
-### Pattern 6：致谢段 / MVP 句不是必选
+### Pattern 5: Dual-channel structure (author + user narration)
 
-**原则**：只有当致谢段或 outro **本身就是 MVP 句**（即可独立成模因）时才完整引用。否则用文末核心金句替代。
+**Principle** (if you make explainer / commentary content):
 
-致谢段是**某些样本**的核心传播载体，但不是必杀技——**MVP 句才是**。
+- The author's words introduce the **framework**
+- Your words do the **grounded translation** ("the office-worker version" / "meaning that" / "in other words" / "in plain language")
+- Your words do the **emotional marking** ("what broke me most" / "the biggest reversal in the whole piece" / "what's scarier is")
 
-> 你账号有没有标志性 outro？要建立一个吗？
+**Never** let a passage run more than 4 lines without a grounded phrase from you.
 
----
-
-### Pattern 7：句子长度 / 段落节奏（**最容易忽视**）
-
-**写稿用段落版**（每段 100-300 字，逗号、句号、自然句），**不要写一行一行的字幕格式**——那是用户拍完后剪映自动断的字幕，**不是写作时的形态**。
-
-- **写作形态**（scripts/<id>.md / videos/<id>/script.md）：完整段落
-- **字幕形态**（视频拍完）：剪映自动断成 5-15 字 / 行
-- cheat-seed 写 draft 时**只输出段落版**
-
-**段落内的句子节奏**：
-- **短句为主**——避免复合句、避免"其..."、"以..."这种文言连接
-- 句号 + 逗号正常使用，不要怕标点
-- **多用语气词**（你账号的风格相关）
+> Channels that do not explain other people's content (pure personal opinion) can skip this pattern.
 
 ---
 
-### Pattern 8：词汇风格
+### Pattern 6: The thank-you section / MVP line is optional
 
-**原则**：**你应该建立你自己的词汇库**——这是品牌识别的关键。
+**Principle**: quote the thank-you section or outro in full only when it **is itself the MVP line** (i.e. can stand alone as a meme). Otherwise replace it with the core quotable line at the end.
 
-| 类别 | 用法 | 你的词汇 |
+The thank-you section is the core distribution vehicle for **some samples**, but it is not the killer move — **the MVP line is**.
+
+> Does your account have a signature outro? Do you want to build one?
+
+---
+
+### Pattern 7: Sentence length / paragraph rhythm (**most often overlooked**)
+
+**Write the paragraph version** (100–300 characters per paragraph, commas, periods, natural sentences), **not the one-line-per-row subtitle format** — that format is the subtitles cut automatically by CapCut after shooting, **not the writing form**.
+
+- **Writing form** (`scripts/<id>.md` / `videos/<id>/script.md`): complete paragraphs
+- **Subtitle form** (after the video is shot): CapCut cuts automatically into 5–15 character / line
+- cheat-seed **outputs the paragraph version only** when writing a draft
+
+**Sentence rhythm inside a paragraph**:
+- **Short sentences mainly** — avoid compound sentences, avoid classical connectives like "thereof…", "whereby…"
+- Use periods + commas normally; do not fear punctuation
+- **Use utterance particles liberally** (depends on your account's style)
+
+---
+
+### Pattern 8: Vocabulary style
+
+**Principle**: **you should build your own vocabulary bank** — this is the key to brand recognition.
+
+| Category | Use | Your vocabulary |
 |---|---|---|
-| 接地翻译 | 把抽象概念翻译成日常话 | （待填）|
-| 反转标记 | "但是" / "更恐怖的是" 等 | （待填）|
-| emotional 标记 | "破防" / "头皮发麻" 等 | （待填）|
-| 节奏词 | 句尾的"啊 / 这就 / 你看" | （待填）|
+| Grounded translation | Translate abstract concepts into everyday words | (to fill) |
+| Reversal markers | "but" / "what's scarier is" and so on | (to fill) |
+| Emotional markers | "broke me" / "made my scalp tingle" and so on | (to fill) |
+| Rhythm words | "huh / there you go / look" at sentence ends | (to fill) |
 
-**避免**（普适）：
-- 论文体连接词："其次" / "本研究" / "综上所述" / "因此"
-- 形容词堆砌
-- 冗长定语
-
----
-
-### Pattern 9：时长目标
-
-**原则**：你的 typical_duration_seconds 决定字数（已在 cheat-init 时设定）。
-
-**不要超过 typical_duration × 1.2**——临界值越长，完播率代价越大。
-
-**本号当前口径（2026-10-31 实测校准）**：`typical_duration_seconds = 165` → 口播 **520–640 字**，成片目标带 **150–180s**，硬上限 180s。**换算改用实测语速 4 字/秒 + 每拍 1.5s 停留**（`est = 汉字数/4 + 拍数×1.5`，check.ps1 C14 自动校验）。旧口径 3.3 字/秒已证伪：591 字按它估 179s，实出片 153.3s，系统性偏长约 17%。60 秒档（180–220 字）在 ep10 被判定"听不懂"，原因是电报体压掉了所有铺垫；除非 `design-intent.md` 明确说明"只需一个信息点"，否则不写 60 秒稿。
-
-> 你账号实测的时长甜点是多少？cheat-retro 复盘后会发现。
+**Avoid** (universally):
+- Academic connectives: "secondly" / "this study" / "in summary" / "therefore"
+- Piled-up adjectives
+- Long attributive clauses
 
 ---
 
-## 用户改稿历史观察（**持续追加，cheat-retro 复盘后建议补充**）
+### Pattern 9: Duration target
 
-> 每次复盘发现"用户改了 X，流量出现明显 Y 影响"时，cheat-retro 会建议在这里追加一行。
-> **本表初始为空**——从你的复盘里慢慢填。
+**Principle**: your `typical_duration_seconds` decides the character count (already set at cheat-init time).
 
-| 视频 | 你砍掉了什么 | 你加了什么 | 流量影响 |
+**Do not exceed typical_duration × 1.2** — the longer you go past it, the higher the completion-rate cost.
+
+**Current calibration for this account (measured 2026-10-31)**: `typical_duration_seconds = 165` → narration script **520–640 characters**, target band **150–180s**, hard cap 180s. **The conversion uses the measured speaking rate of 4 characters/second + 1.5s hold per beat** (`est = characters/4 + beats×1.5`, auto-checked by check.ps1 C14). The old 3.3 characters/second figure has been disproved: 591 characters estimated 179s under it, actual output was 153.3s, systematically ~17% too long. The 60-second format (180–220 characters) was judged "not understandable" in ep10 because the telegraphic style removed all setup; do not write a 60-second script unless `design-intent.md` explicitly says "only one information point is needed".
+
+> What is your account's measured duration sweet spot? cheat-retro will find it after a retro.
+
+---
+
+## Observed history of user edits (**append continuously; cheat-retro suggests additions after a retro**)
+
+> Whenever a retro finds "the user changed X and traffic showed a clear Y effect", cheat-retro will suggest appending a row here.
+> **This table starts empty** — fill it in slowly from your retros.
+
+| Video | What you cut | What you added | Traffic effect |
 |---|---|---|---|
-| （待填——第一次复盘后开始）| | | |
+| (to fill — start after the first retro) | | | |
 
 ---
 
-## 新发现的 Pattern（编号续，从复盘里发现）
+## Newly discovered patterns (continue the numbering; discovered in retros)
 
-> cheat-retro 复盘时发现新现象（你的改稿带来明显流量变化、评论区出现新模式），会建议追加新 pattern 编号到这里。
+> When cheat-retro finds a new phenomenon during a retro (your edits caused a clear traffic change, a new pattern appeared in the comments), it will suggest appending a new pattern number here.
 >
-> 单样本支持的 pattern 标 "待验证"——≥2 样本支持后升级为正式 pattern。
+> A pattern supported by a single sample is tagged "to verify" — promote it to a full pattern after ≥2 samples support it.
 
-（待填——从你的复盘里逐步累积）
+(to fill — accumulated gradually from your retros)
 
 ---
 
-## 对标 [账号名] 借鉴（imported by /cheat-learn-from）
+## Benchmark [account-name] borrowings (imported by /cheat-learn-from)
 
-> 这一段由 `/cheat-learn-from` 填入——从对标账号的样本拆出的 pattern。
+> This section is filled in by `/cheat-learn-from` — patterns broken out of benchmark account samples.
 >
-> **每条 pattern 默认标 `**Imported, untested on my channel**`** ——你的频道未必适用，
-> 实拍验证后（≥2 次跑出 + 复盘确认有效）再去掉这个标记，升入正式 pattern 库。
+> **Each pattern is tagged `**Imported, untested on my channel**` by default** — your channel may not fit it;
+> remove the tag after real-shoot verification (≥2 runs + retro confirmation) and promote it into the general pattern library.
 
-（待 cheat-learn-from 填入——本段在 init 时不存在，跑过 cheat-learn-from 才出现）
+(to be filled by cheat-learn-from — this section does not exist at init time; it appears only after cheat-learn-from has run)
 
 ---
 
-## 维护建议
+## Maintenance advice
 
-- **保持 < 500 行**——每次复盘后追加新 pattern，但也定期删除被推翻的旧 pattern（与 RUBRIC.md 同 lifecycle 协议——见第三方 skill `cheat-on-content` 的 `shared-references/observation-lifecycle.md`）
-- **每条新 pattern 必须有 ≥1 样本支持**——单点观察先放到底部"新发现的 Pattern"段，≥2 才升正式 pattern
-- 每条 pattern **必须可追溯到具体视频** + 数据（不写"开头钩子很重要"，写"我的视频 X 用 IS 戏仿开场，T+7d 71w"）
+- **Stay under 500 lines** — append new patterns after every retro, but also periodically delete old patterns that were disproved (same lifecycle protocol as RUBRIC.md — see `shared-references/observation-lifecycle.md` in the third-party skill `cheat-on-content`)
+- **Every new pattern must have ≥1 supporting sample** — a single observation goes into "Newly discovered patterns" at the bottom first; promote it only at ≥2
+- Every pattern **must be traceable to a specific video** + data (do not write "opening hooks matter", write "my video X opened with an IS parody, T+7d 71w")

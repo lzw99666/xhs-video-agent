@@ -1,38 +1,38 @@
 ﻿<#
-check.ps1 —— 五工序契约闸门（改进 C）+ master timeline 覆盖率核对（改进 B·脚本部分）
+check.ps1 —— five-stage contract gate (improvement C) + master timeline coverage check (improvement B, script part)
 
-用途：在每道工序边界机械校验"上道工序是否已定稿/完整"，防止"未定稿就动笔"与"带病交付"。
-与 tools\gate\validate.ps1 分工：validate 管【发布合规】，本脚本管【工序契约】。
+Purpose: mechanically verify at every stage boundary that "the previous stage is final/complete", preventing "writing before things are final" and "delivering while broken".
+Division of labour with tools\gate\validate.ps1: validate covers [publishing compliance], this script covers [stage contracts].
 
-用法（在仓库根目录下运行）：
+Usage (run from the repo root):
   powershell -NoProfile -ExecutionPolicy Bypass -File tools/pipeline/check.ps1 `
       -ProjectDir videos/regular-ep09-reliability -Gate delivery
 
-gate（校验到哪一步）：
-  pre-script  写 script 前 —— 只验 facts 是否定稿
-  pre-code    写章节代码前 —— 验 facts + script + outline（三要素 / 步数一致）
-  pre-render  出片前 —— 再加 数量守恒(C4) + 音频(C6)
-  delivery    交付/发布前 —— 全部 + 时间轴一致性(C5，最严)
-  media       仅媒体层 —— 只验 数量守恒(C4)+时间轴(C5)+音频(C6)，跳过文本三件套
-              （gh-daily 线根目录无 facts/script/outline 时用）
-  all         不按工序门，文件存在即验（默认）
+gate (how far to validate):
+  pre-script  before writing script — only verifies that facts are final
+  pre-code    before writing chapter code — verifies facts + script + outline (three elements / step counts match)
+  pre-render  before rendering — also count conservation (C4) + audio (C6)
+  delivery    before delivery/publishing — everything + timeline consistency (C5, strictest)
+  media       media layer only — only count conservation (C4) + timeline (C5) + audio (C6), skipping the three text artifacts
+              (for gh-daily lines whose root has no facts/script/outline)
+  all         no stage gate; validate whatever files exist (default)
 
-开关：
-  -SkipFacts    跳过 facts.md 校验（gh-daily 线豁免调研卡时使用）
-  -Determinism  额外做帧哈希确定性核对：首跑写基准 raw\shots.sha256，再渲一次复跑即比对
+Switches:
+  -SkipFacts    skip facts.md validation (for gh-daily lines that waive the research card)
+  -Determinism  additionally run the frame-hash determinism check: the first run writes the baseline raw\shots.sha256, re-render and run again to compare
 
-2026-10-19 变更：
-  C7（内容可用性）由 FAIL 降级为 WARN —— 内容质量改由 skill 自带质检机制把关
-    （SCRIPT-STYLE 四层自检 + CHAPTER-CRAFT 完工自检），机械断言只作提醒。
-  C8（人设红线）保持 FAIL，不降级。
-  新增 C9 画面元素：章节 tsx 是否引用 components/viz 具象元素（WARN）。
-  新增 C10 文案自检存证：script-selfcheck.md 存在且覆盖四层自检
-    （pre-code / pre-render / delivery 门为 FAIL）。
-2026-10-27 变更：
-  新增 C13 创作前三问存证：design-intent.md 存在且非占位（**仅 WARN，不阻断**，
-    见 WORKFLOW 8.4「cheat → 创作三段回路」）。
+2026-10-19 changes:
+  C7 (content usability) demoted from FAIL to WARN — content quality is now guarded by the skill's built-in QA mechanisms
+    (SCRIPT-STYLE four-layer self-check + CHAPTER-CRAFT completion self-check); mechanical assertions are reminders only.
+  C8 (persona red line) stays FAIL, not demoted.
+  Added C9 visual elements: whether chapter tsx files reference concrete components/viz elements (WARN).
+  Added C10 copy self-check evidence: script-selfcheck.md exists and covers the four-layer self-check
+    (FAIL at the pre-code / pre-render / delivery gates).
+2026-10-27 changes:
+  Added C13 design-intent evidence: design-intent.md exists and is not a placeholder (**WARN only, does not block**,
+    see WORKFLOW 8.4 "cheat → creation three-pass loop").
 
-退出码：0 = 全绿（WARN 不阻断）；1 = 有 FAIL；2 = 参数/环境错误
+Exit codes: 0 = all green (WARN does not block); 1 = there are FAILs; 2 = argument/environment error
 #>
 [CmdletBinding()]
 param(
@@ -54,10 +54,10 @@ function Add-Result([string]$level, [string]$id, [string]$msg) {
   Write-Output ("{0} {1} {2}" -f $tag, $id, $msg)
 }
 
-# --- 路径解析 ---
+# --- path resolution ---
 try { $root = (Resolve-Path -LiteralPath $ProjectDir -ErrorAction Stop).Path }
-catch { Write-Output "ERROR: ProjectDir 不存在: $ProjectDir"; exit 2 }
-if (-not (Test-Path -LiteralPath $root -PathType Container)) { Write-Output "ERROR: 不是目录: $root"; exit 2 }
+catch { Write-Output "ERROR: ProjectDir does not exist: $ProjectDir"; exit 2 }
+if (-not (Test-Path -LiteralPath $root -PathType Container)) { Write-Output "ERROR: not a directory: $root"; exit 2 }
 
 $facts    = Join-Path $root 'facts.md'
 $scriptMd = Join-Path $root 'script.md'
@@ -74,8 +74,9 @@ $strict      = $Gate -eq 'delivery'
 
 function Read-Raw([string]$p) { if (Test-Path -LiteralPath $p) { Get-Content -LiteralPath $p -Raw -Encoding UTF8 } else { $null } }
 function Count-Beats([string]$p) {
-  # 按 '---' 切块，只统计"含真实口播文本"的块（排除题头块与纯标题/引用/空行块），
-  # 避免把题头下的横向分隔线误算成一拍。
+  # Split on '---' into blocks and only count blocks that contain real narration text
+  # (skipping header blocks and blocks with only headings/quotes/blank lines), so the
+  # horizontal rule under the header is not mistaken for a beat.
   $lines = Get-Content -LiteralPath $p -Encoding UTF8
   $blocks = New-Object System.Collections.ArrayList
   $cur = New-Object System.Collections.ArrayList
@@ -94,100 +95,100 @@ function Count-Beats([string]$p) {
   return $n
 }
 function Test-Placeholder([string]$text) {
-  foreach ($t in @('TODO', '待补', '待定', '待填', 'placeholder', 'xxxx')) {
+  foreach ($t in @('TODO', 'TBD', 'FIXME', 'placeholder', 'xxxx')) {
     if ($text -match [regex]::Escape($t)) { return $t }
   }
   return $null
 }
 
-# --- C13 · 创作前三问存证（2026-10-27 新增，仅 WARN，不阻断） ---
-# 内容判断不交给硬编码规则：只提示"design-intent 有没有真的写"，不判断内容好坏（见 WORKFLOW 8.4）。
+# --- C13 · design-intent evidence (added 2026-10-27, WARN only, does not block) ---
+# Content judgement is not delegated to hard-coded rules: this only reminds that design-intent was actually written, without judging quality (see WORKFLOW 8.4).
 if ($Gate -in @('all', 'pre-script', 'pre-code', 'pre-render', 'delivery')) {
   $diPath = Join-Path $root 'design-intent.md'
   if (-not (Test-Path -LiteralPath $diPath)) {
-    Add-Result 'WARN' 'C13-design-intent' '缺 design-intent.md（创作前三问未落盘，见 WORKFLOW 8.4）'
+    Add-Result 'WARN' 'C13-design-intent' 'design-intent.md is missing (the three pre-creation questions were never saved, see WORKFLOW 8.4)'
   }
   else {
     $di = Read-Raw $diPath
     $diLen = if ($di) { $di.Trim().Length } else { 0 }
     $diPh = if ($di) { Test-Placeholder $di } else { $null }
     if ($diLen -lt 120) {
-      Add-Result 'WARN' 'C13-design-intent' ("design-intent.md 过短（{0} 字符），三问可能未具体回答" -f $diLen)
+      Add-Result 'WARN' 'C13-design-intent' ("design-intent.md is too short ({0} characters); the three questions may not be answered concretely" -f $diLen)
     }
     elseif ($diPh) {
-      Add-Result 'WARN' 'C13-design-intent' ("design-intent.md 含占位符 '{0}'，判定未完成" -f $diPh)
+      Add-Result 'WARN' 'C13-design-intent' ("design-intent.md contains the placeholder '{0}', treating it as unfinished" -f $diPh)
     }
-    else { Add-Result 'PASS' 'C13-design-intent' 'design-intent.md 已落盘（创作前三问）' }
+    else { Add-Result 'PASS' 'C13-design-intent' 'design-intent.md saved (three pre-creation questions)' }
   }
 }
 
-# --- C1 · facts 定稿（工序一） ---
+# --- C1 · facts final (stage 1) ---
 if ($needFacts) {
   $f = Read-Raw $facts
   if (-not $f) {
-    Add-Result 'FAIL' 'C1-facts-exists' "缺少 facts.md 调研卡：$facts（调研不实不动笔）"
+    Add-Result 'FAIL' 'C1-facts-exists' "facts.md research card missing: $facts (no writing without solid research)"
   }
   else {
     $ph = Test-Placeholder $f
-    if ($ph) { Add-Result 'FAIL' 'C1-facts-final' "facts.md 含占位符 '$ph'，判定未定稿" }
-    else { Add-Result 'PASS' 'C1-facts-final' 'facts.md 无占位符，视为定稿' }
-    if ($f -match '(?m)^#{2,3}\s*[一二三四五]、?\s*信源') { Add-Result 'PASS' 'C1-sources' '含「信源清单」段' }
-    else { Add-Result 'FAIL' 'C1-sources' 'facts.md 缺「## 一、信源清单」段' }
-    if ($f -match '(?m)^#{2,3}\s*[一二三四五]、?\s*关键数据') { Add-Result 'PASS' 'C1-data' '含「关键数据（带出处）」段' }
-    else { Add-Result 'FAIL' 'C1-data' 'facts.md 缺「## 二、关键数据（带出处）」段' }
+    if ($ph) { Add-Result 'FAIL' 'C1-facts-final' "facts.md contains the placeholder '$ph', treating it as not final" }
+    else { Add-Result 'PASS' 'C1-facts-final' 'facts.md has no placeholders, treated as final' }
+    if ($f -match '(?m)^#{2,3}\s*(?:\d+\s*\.\s*)?source') { Add-Result 'PASS' 'C1-sources' 'contains the source-list section' }
+    else { Add-Result 'FAIL' 'C1-sources' 'facts.md is missing the source-list section (section 1, sources)' }
+    if ($f -match '(?m)^#{2,3}\s*(?:\d+\s*\.\s*)?key[ -]?data') { Add-Result 'PASS' 'C1-data' 'contains the key-data-with-sources section' }
+    else { Add-Result 'FAIL' 'C1-data' 'facts.md is missing the key-data-with-sources section (section 2, key data with sources)' }
   }
 }
 
-# --- C2 · script 定稿（工序二） ---
+# --- C2 · script final (stage 2) ---
 $beats_script = $null
 if ($needScript) {
   $s = Read-Raw $scriptMd
-  if (-not $s) { Add-Result 'FAIL' 'C2-script-exists' "缺少 script.md：$scriptMd" }
+  if (-not $s) { Add-Result 'FAIL' 'C2-script-exists' "script.md missing: $scriptMd" }
   else {
     $ph = Test-Placeholder $s
-    if ($ph) { Add-Result 'FAIL' 'C2-script-final' "script.md 含占位符 '$ph'，判定未定稿" }
-    else { Add-Result 'PASS' 'C2-script-final' 'script.md 无占位符，视为定稿' }
+    if ($ph) { Add-Result 'FAIL' 'C2-script-final' "script.md contains the placeholder '$ph', treating it as not final" }
+    else { Add-Result 'PASS' 'C2-script-final' 'script.md has no placeholders, treated as final' }
     $beats_script = Count-Beats $scriptMd
-    if ($beats_script -ge 2) { Add-Result 'PASS' 'C2-beats' ("script.md 拍数（--- 分隔）= {0}" -f $beats_script) }
-    else { Add-Result 'FAIL' 'C2-beats' ("script.md 拍数异常（{0}），应 ≥2" -f $beats_script) }
+    if ($beats_script -ge 2) { Add-Result 'PASS' 'C2-beats' ("script.md beat count (--- separated) = {0}" -f $beats_script) }
+    else { Add-Result 'FAIL' 'C2-beats' ("script.md beat count abnormal ({0}), expected ≥2" -f $beats_script) }
   }
 }
 
-# --- C3 · outline 分镜要素（工序三） ---
+# --- C3 · outline storyboard elements (stage 3) ---
 if ($needOutline) {
   $o = Read-Raw $outline
-  if (-not $o) { Add-Result 'FAIL' 'C3-outline-exists' "缺少 outline.md：$outline" }
+  if (-not $o) { Add-Result 'FAIL' 'C3-outline-exists' "outline.md missing: $outline" }
   else {
     $lines = Get-Content -LiteralPath $outline -Encoding UTF8
     $chapN = 0; $stepSum = 0; $missing = @()
     for ($i = 0; $i -lt $lines.Count; $i++) {
-      if ($lines[$i] -match '^##\s+\S+.*｜\s*(\d+)\s*步') {
+      if ($lines[$i] -match '^##\s+\S+.*\|\s*(\d+)\s*steps?') {
         $chapN++; $stepSum += [int]$Matches[1]
         $hdr = $null
         for ($j = $i + 1; $j -lt [Math]::Min($i + 15, $lines.Count); $j++) {
           if ($lines[$j] -match '^\|\s*step\s*\|') { $hdr = $lines[$j]; break }
         }
-        if ((-not $hdr) -or ($hdr -notmatch '转场') -or ($hdr -notmatch '视觉焦点') -or ($hdr -notmatch '保护')) {
+        if ((-not $hdr) -or ($hdr -notmatch 'transition') -or ($hdr -notmatch 'visual focus') -or ($hdr -notmatch 'protection')) {
           $missing += $lines[$i].Trim()
         }
       }
     }
-    if ($chapN -eq 0) { Add-Result 'FAIL' 'C3-sections' 'outline.md 未发现「## …｜N 步」章节声明' }
-    else { Add-Result 'PASS' 'C3-sections' ("outline.md 章数 {0}，声明步数合计 {1}" -f $chapN, $stepSum) }
-    if ($missing.Count -eq 0) { Add-Result 'PASS' 'C3-three-elems' '每章表头含 转场/视觉焦点/保护 三要素' }
-    else { Add-Result 'FAIL' 'C3-three-elems' ("以下章节表头缺三要素: " + ($missing -join ' | ')) }
+    if ($chapN -eq 0) { Add-Result 'FAIL' 'C3-sections' 'outline.md has no "## <title> | N steps" chapter declarations' }
+    else { Add-Result 'PASS' 'C3-sections' ("outline.md has {0} chapters declaring {1} steps in total" -f $chapN, $stepSum) }
+    if ($missing.Count -eq 0) { Add-Result 'PASS' 'C3-three-elems' 'every chapter header has the three elements: transition / visual focus / protection' }
+    else { Add-Result 'FAIL' 'C3-three-elems' ("these chapter headers lack the three elements: " + ($missing -join ' | ')) }
     if ($beats_script -and ($stepSum -ne $beats_script)) {
-      Add-Result 'FAIL' 'C3-steps-match' ("outline 步数({0}) ≠ script 拍数({1})" -f $stepSum, $beats_script)
+      Add-Result 'FAIL' 'C3-steps-match' ("outline steps({0}) ≠ script beats({1})" -f $stepSum, $beats_script)
     }
     elseif ($beats_script) {
-      Add-Result 'PASS' 'C3-steps-match' ("outline 步数 == script 拍数 == {0}" -f $stepSum)
+      Add-Result 'PASS' 'C3-steps-match' ("outline steps == script beats == {0}" -f $stepSum)
     }
   }
 }
 
-# --- C4 · 数量守恒（工序四/五） ---
+# --- C4 · count conservation (stages 4/5) ---
 if ($needMedia) {
-  if (-not $pres) { Add-Result 'FAIL' 'C4-pres' "未找到含 presentation 的网页工程目录" }
+  if (-not $pres) { Add-Result 'FAIL' 'C4-pres' "no web project directory containing 'presentation' found" }
   else {
     $pp = $pres.FullName
     $n_narr = 0
@@ -202,20 +203,20 @@ if ($needMedia) {
     $ref = if ($beats_script) { $beats_script } else { $n_narr }
     $bad = @()
     foreach ($p in @(
-        @{ n = 'narrations 条目'; v = $n_narr },
-        @{ n = 'audio-segments 条目'; v = $n_seg },
-        @{ n = 'public/audio mp3 数'; v = $n_mp3 },
-        @{ n = 'beats.json 条目'; v = $n_beats })) {
+        @{ n = 'narrations entries'; v = $n_narr },
+        @{ n = 'audio-segments entries'; v = $n_seg },
+        @{ n = 'public/audio mp3 count'; v = $n_mp3 },
+        @{ n = 'beats.json entries'; v = $n_beats })) {
       if (($null -ne $p.v) -and ($p.v -ne $ref)) { $bad += ("{0}={1}" -f $p.n, $p.v) }
     }
-    if ($bad.Count -eq 0) { Add-Result 'PASS' 'C4-counts' ("数量守恒：全部 == {0}" -f $ref) }
-    else { Add-Result 'FAIL' 'C4-counts' ("数量不守恒（基准 {0}）：{1}" -f $ref, ($bad -join '; ')) }
-    if ($null -eq $n_seg) { Add-Result ($(if ($strict) { 'FAIL' } else { 'WARN' })) 'C4-seg' '缺 audio-segments.json' }
-    if ($null -eq $n_beats) { Add-Result ($(if ($strict) { 'FAIL' } else { 'WARN' })) 'C4-beats' '缺 beats.json' }
+    if ($bad.Count -eq 0) { Add-Result 'PASS' 'C4-counts' ("count conservation: all == {0}" -f $ref) }
+    else { Add-Result 'FAIL' 'C4-counts' ("counts not conserved (baseline {0}): {1}" -f $ref, ($bad -join '; ')) }
+    if ($null -eq $n_seg) { Add-Result ($(if ($strict) { 'FAIL' } else { 'WARN' })) 'C4-seg' 'audio-segments.json missing' }
+    if ($null -eq $n_beats) { Add-Result ($(if ($strict) { 'FAIL' } else { 'WARN' })) 'C4-beats' 'beats.json missing' }
   }
 }
 
-# --- C5 · 时间轴一致性 / master timeline 覆盖率（工序四） ---
+# --- C5 · timeline consistency / master timeline coverage (stage 4) ---
 if ($needMedia -and $pres) {
   $pp = $pres.FullName
   if (Test-Path $beats) {
@@ -223,34 +224,34 @@ if ($needMedia -and $pres) {
     $errs = @()
     foreach ($b in $bj) {
       foreach ($k in @('step_id', 'chapter', 'step', 'start_ms', 'dur_ms', 'text')) {
-        if (-not ($b.PSObject.Properties.Name -contains $k)) { $errs += ("{0}.{1} 缺失" -f $b.step_id, $k) }
+        if (-not ($b.PSObject.Properties.Name -contains $k)) { $errs += ("{0}.{1} missing" -f $b.step_id, $k) }
       }
       if ($b.dur_ms -le 0) { $errs += ("{0}.dur_ms<=0" -f $b.step_id) }
     }
-    if ($errs.Count -eq 0) { Add-Result 'PASS' 'C5-beats-schema' 'beats.json 字段完整、dur_ms>0' }
-    else { Add-Result 'FAIL' 'C5-beats-schema' ("beats.json 异常: " + ($errs -join ', ')) }
+    if ($errs.Count -eq 0) { Add-Result 'PASS' 'C5-beats-schema' 'beats.json fields complete, dur_ms>0' }
+    else { Add-Result 'FAIL' 'C5-beats-schema' ("beats.json invalid: " + ($errs -join ', ')) }
 
     $marksPath = Join-Path $pp 'raw\marks.json'
     if (Test-Path $marksPath) {
       $mj = Get-Content -LiteralPath $marksPath -Raw -Encoding UTF8 | ConvertFrom-Json
       $markIds = @($mj.marks | ForEach-Object { $_.id })
       $missing = @($bj | ForEach-Object { $_.step_id } | Where-Object { $markIds -notcontains $_ })
-      if ($missing.Count -eq 0) { Add-Result 'PASS' 'C5-marks-cover' ("marks.json（master timeline）覆盖全部 {0} 步" -f $bj.Count) }
-      else { Add-Result 'FAIL' 'C5-marks-cover' ("marks.json 缺 {0} 步: {1}" -f $missing.Count, ($missing -join ',')) }
+      if ($missing.Count -eq 0) { Add-Result 'PASS' 'C5-marks-cover' ("marks.json (master timeline) covers all {0} steps" -f $bj.Count) }
+      else { Add-Result 'FAIL' 'C5-marks-cover' ("marks.json is missing {0} steps: {1}" -f $missing.Count, ($missing -join ',')) }
     }
-    else { Add-Result 'WARN' 'C5-marks-cover' 'raw\marks.json 未留存（出片后清理 raw\ 属正常），无法核对帧覆盖' }
+    else { Add-Result 'WARN' 'C5-marks-cover' 'raw\marks.json not kept (cleaning raw\ after rendering is normal), cannot verify frame coverage' }
 
     $shotsDir = Join-Path $pp 'raw\shots'
     if (Test-Path $shotsDir) {
       $n_shot = @(Get-ChildItem -LiteralPath $shotsDir -Filter '*.png').Count
-      if ($n_shot -eq $bj.Count) { Add-Result 'PASS' 'C5-shots' ("raw\shots 帧数({0}) == beats 步数" -f $n_shot) }
-      else { Add-Result 'FAIL' 'C5-shots' ("raw\shots 帧数({0}) ≠ beats 步数({1})" -f $n_shot, $bj.Count) }
+      if ($n_shot -eq $bj.Count) { Add-Result 'PASS' 'C5-shots' ("raw\shots frame count({0}) == beats steps" -f $n_shot) }
+      else { Add-Result 'FAIL' 'C5-shots' ("raw\shots frame count({0}) ≠ beats steps({1})" -f $n_shot, $bj.Count) }
     }
-    else { Add-Result 'WARN' 'C5-shots' 'raw\shots 未留存，无法核对帧覆盖' }
+    else { Add-Result 'WARN' 'C5-shots' 'raw\shots not kept, cannot verify frame coverage' }
   }
 }
 
-# --- C6 · 音频存在且非空（工序五） ---
+# --- C6 · audio exists and is non-empty (stage 5) ---
 if ($needMedia -and $pres) {
   $pp = $pres.FullName
   $segPath = Join-Path $pp 'audio-segments.json'
@@ -262,44 +263,44 @@ if ($needMedia -and $pres) {
       if (-not (Test-Path -LiteralPath $af)) { $missing += $sg.audio }
       elseif ((Get-Item -LiteralPath $af).Length -lt 2048) { $empty += $sg.audio }
     }
-    if (($missing.Count -eq 0) -and ($empty.Count -eq 0)) { Add-Result 'PASS' 'C6-audio' ("{0} 段音频全部存在且非空" -f $segs.Count) }
+    if (($missing.Count -eq 0) -and ($empty.Count -eq 0)) { Add-Result 'PASS' 'C6-audio' ("all {0} audio segments exist and are non-empty" -f $segs.Count) }
     else {
-      if ($missing.Count) { Add-Result 'FAIL' 'C6-audio-missing' ("缺音频文件: " + (($missing | Select-Object -First 5) -join ', ')) }
-      if ($empty.Count) { Add-Result 'FAIL' 'C6-audio-empty' ("音频过小(疑似空/静音): " + (($empty | Select-Object -First 5) -join ', ')) }
+      if ($missing.Count) { Add-Result 'FAIL' 'C6-audio-missing' ("missing audio files: " + (($missing | Select-Object -First 5) -join ', ')) }
+      if ($empty.Count) { Add-Result 'FAIL' 'C6-audio-empty' ("audio too small (likely empty/silent): " + (($empty | Select-Object -First 5) -join ', ')) }
     }
   }
-  else { Add-Result ($(if ($strict) { 'FAIL' } else { 'WARN' })) 'C6-audio' '无 audio-segments.json，跳过音频核对' }
+  else { Add-Result ($(if ($strict) { 'FAIL' } else { 'WARN' })) 'C6-audio' 'no audio-segments.json, skipping audio verification' }
 }
 
-# --- C7 · 内容可用性（2026-10-18 新增，治"内容烂"；全机械可查，不做 AI 判断） ---
-# 背景：C1~C6 只验工艺（定稿/数量守恒/时间轴/音频），烂稿可全绿通过。
-# C7 补的是"观众能不能听懂"这一层：教学设计段 + 结尾落点 + 钩子闭环 + 术语首现解释。
+# --- C7 · content usability (added 2026-10-18, targets "bad content"; fully mechanical, no AI judgement) ---
+# Background: C1~C6 only verify craft (finalized / count conservation / timeline / audio); a bad script can pass all green.
+# C7 adds the "can the audience understand it" layer: teaching-design section + closing payoff + hook loop + first-use term explanations.
 #
-# 【2026-10-19 调整】C7 全部由 FAIL 降级为 WARN —— 用户裁定：内容质量**不要用硬编码
-# 规则去约束**，改由 skill 自带质检机制把关（SCRIPT-STYLE 四层自检 + CHAPTER-CRAFT
-# 完工自检），机械断言只留作提醒。人设红线 C8 仍为 FAIL（红线不降级）。
+# [2026-10-19 adjustment] C7 demoted from FAIL to WARN — the user ruled that content quality **must not be constrained
+# by hard-coded rules**, and is guarded by the skill's built-in QA mechanisms (SCRIPT-STYLE four-layer self-check +
+# CHAPTER-CRAFT completion self-check); mechanical assertions remain as reminders only. Persona red line C8 stays FAIL (red lines are not demoted).
 $c7 = 'WARN'
 if ($needFacts) {
   $f = Read-Raw $facts
   if ($f) {
     $sect = $null
-    if ($f -match '(?ms)^#{2,3}[^\r\n]*教学设计[^\r\n]*\r?\n(.*?)(?=^#{1,3}\s|\z)') { $sect = $Matches[1] }
+    if ($f -match '(?ms)^#{2,3}[^\r\n]*(?:teaching design|instructional design)[^\r\n]*\r?\n(.*?)(?=^#{1,3}\s|\z)') { $sect = $Matches[1] }
     if (-not $sect) {
-      Add-Result $c7 'C7-facts-design' 'facts.md 缺「## 四、教学设计」段（facts 不能只是事实台账，必须含讲法设计）'
+      Add-Result $c7 'C7-facts-design' 'facts.md is missing the teaching-design section (facts must not be a bare fact ledger; it must include how it is taught)'
     }
     else {
       $miss = @()
       foreach ($it in @(
-          @{ n = '教学目标';     p = '教学目标' },
-          @{ n = '观众前置假设'; p = '前置(假设|知识)' },
-          @{ n = '例子上下文';   p = '上下文' },
-          @{ n = '体验翻译';     p = '体验' },
-          @{ n = '论证链/叙事弧'; p = '论证链|叙事弧' },
-          @{ n = '结尾落点';     p = '落点|可执行|建议' })) {
+          @{ n = 'teaching goal';     p = 'teaching goal|learning objective' },
+          @{ n = 'audience prior assumptions'; p = 'viewer prior assumptions|assumed audience background|prior assumptions|audience background' },
+          @{ n = 'example context';   p = 'context' },
+          @{ n = 'experience translation';     p = 'experience translation|experience' },
+          @{ n = 'argument chain / narrative arc'; p = 'argument chain|narrative arc' },
+          @{ n = 'closing payoff';     p = 'ending landing point|landing point|actionable advice|payoff' })) {
         if ($sect -notmatch $it.p) { $miss += $it.n }
       }
-      if ($miss.Count -eq 0) { Add-Result 'PASS' 'C7-facts-design' '教学设计段 6 子项齐全（目标/前置/例子上下文/体验翻译/论证链/落点）' }
-      else { Add-Result $c7 'C7-facts-design' ("教学设计段缺子项: " + ($miss -join ', ')) }
+      if ($miss.Count -eq 0) { Add-Result 'PASS' 'C7-facts-design' 'teaching-design section has all 6 sub-items (goal / priors / example context / experience translation / argument chain / payoff)' }
+      else { Add-Result $c7 'C7-facts-design' ("teaching-design section is missing sub-items: " + ($miss -join ', ')) }
     }
   }
 }
@@ -324,25 +325,25 @@ if ($needScript) {
     }
     $n = $texts.Count
 
-    # C7a · 结尾落点：末 2 拍须含可执行/结论句（观众看完得知道做什么）
+    # C7a · closing payoff: the last 2 beats must contain an actionable/conclusive sentence (the audience must know what to do)
     $tail2 = ($texts | Select-Object -Last 2) -join ' '
-    if (($n -ge 2) -and ($tail2 -match '你可以|建议|记住|设成|调成|试试|下次|如果你|往下压|往上放|固定|一句话')) {
-      Add-Result 'PASS' 'C7a-ending-action' '结尾含可执行/结论句'
+    if (($n -ge 2) -and ($tail2 -match 'you can|you should|recommend|suggest|remember|set .{0,25}to|try|next time|if you|push .{0,25}to|turn .{0,25}to|add a|rerun|ask for|stick to|back to|in your hands')) {
+      Add-Result 'PASS' 'C7a-ending-action' 'closing contains an actionable/conclusive sentence'
     } else {
-      Add-Result $c7 'C7a-ending-action' '结尾 2 拍无可执行建议句（观众看完不知道做什么）'
+      Add-Result $c7 'C7a-ending-action' 'the last 2 beats have no actionable advice (the audience will not know what to do)'
     }
 
-    # C7b · 钩子闭环：首拍抛出的疑问须在末 3 拍被回收
+    # C7b · hook loop: the question raised in the first beat must be answered in the last 3 beats
     $head  = $texts[0]
     $tail3 = ($texts | Select-Object -Last 3) -join ' '
-    if ($head -match '为什么|是不是|有没有|总是|老|忽|居然|竟然|同一个|一样|反而|却|一会|一会儿') {
-      if ($tail3 -match '所以|这就是|回到|原因|开头|一开始|那句|其实') { Add-Result 'PASS' 'C7b-hook-loop' '钩子有回收句，悬念闭合' }
-      else { Add-Result $c7 'C7b-hook-loop' '首拍钩子抛出的事件在结尾未被回收（悬念悬空）' }
+    if ($head -match 'why|does|do you|is it|same|always|ever|but|yet|still|differ|different|reverse') {
+      if ($tail3 -match 'so|that is why|that.s why|back to|reason|at the start|in the beginning|the point|actually|which is why') { Add-Result 'PASS' 'C7b-hook-loop' 'the hook has a payoff sentence, the suspense closes' }
+      else { Add-Result $c7 'C7b-hook-loop' 'the event raised by the first-beat hook is never resolved at the end (suspense left hanging)' }
     } else {
-      Add-Result 'WARN' 'C7b-hook-loop' '首拍未识别到钩子疑问句，跳过闭环检查'
+      Add-Result 'WARN' 'C7b-hook-loop' 'no hook question detected in the first beat, skipping the loop check'
     }
 
-    # C7c · 术语首现须解释（对零前置观众）
+    # C7c · a term must be explained on first appearance (for zero-prior audience)
     $termMiss = @()
     foreach ($term in @(
         @{ n = 'Temperature'; p = 'Temperature' },
@@ -352,59 +353,59 @@ if ($needScript) {
       $idx = -1
       for ($i = 0; $i -lt $n; $i++) { if ($texts[$i] -match $term.p) { $idx = $i; break } }
       if ($idx -ge 0) {
-        if ($texts[$idx] -notmatch '就是|意思是|可以理解|简单说|说白了|相当于|也就是|指的是') { $termMiss += $term.n }
+        if ($texts[$idx] -notmatch 'means|meaning|that is|in other words|basically|literally|called|refers to|stands for|which is|is the') { $termMiss += $term.n }
       }
     }
-    if ($termMiss.Count -eq 0) { Add-Result 'PASS' 'C7c-term-explain' '术语首次出现处均有解释句' }
-    else { Add-Result $c7 'C7c-term-explain' ("以下术语首现未解释: " + ($termMiss -join ', ') + '（零前置观众会听不懂）') }
+    if ($termMiss.Count -eq 0) { Add-Result 'PASS' 'C7c-term-explain' 'every term is explained where it first appears' }
+    else { Add-Result $c7 'C7c-term-explain' ("these terms are not explained on first appearance: " + ($termMiss -join ', ') + ' (a zero-prior audience will not follow)') }
   }
 }
 
-# --- C8 · 人设红线扫描（2026-10-18 新增，治"编造个人经历"；全机械可查，不做 AI 判断） ---
-# 规则：script.md 出现第一人称经历表述（我踩过/我实测/我做过/我试过/我跑通…）时，
-#       facts.md 必须含「## 五、实证清单」段，且逐条列出该表述对应的真实记录（日期/文件/来源）。
-#       缺段或未覆盖即 FAIL —— 对应 account.md 红线「不得编造个人经历与实测数据」。
+# --- C8 · persona red-line scan (added 2026-10-18, targets "invented personal experience"; fully mechanical, no AI judgement) ---
+# Rule: when script.md contains first-person experience claims (I stepped in it / I measured / I built / I tried / I ran ...),
+#       facts.md must contain the evidence-list section and itemize the real record behind each claim (date/file/source).
+#       A missing section or uncovered claims is FAIL — matching account.md red line "never invent personal experience or measured data".
 if ($needScript) {
   $s8 = Read-Raw $scriptMd
   if ($s8) {
-    $claimPat = '我踩过|我踩坑|我实测|我测试过|我试过|我做过|我跑通|我用过|我摸索|我亲身|我亲手|我自己(跑|试|做|测|搭|拧|写)'
+    $claimPat = '(?i)I\s+(?:tried|tested|measured|built|ran|used|walked|stepped|wrote|made|did|debugged|deployed|broke)|I.ve\s+(?:tried|tested|measured|built|run|used|done)|I\s+have\s+(?:tried|tested|measured|built|run|used|done)|I\s+myself'
     $claimTags = New-Object System.Collections.ArrayList
     foreach ($ln in (Get-Content -LiteralPath $scriptMd -Encoding UTF8)) {
       $t = $ln.Trim()
       if (($t -eq '') -or ($t.StartsWith('#')) -or ($t.StartsWith('>'))) { continue }
       foreach ($m in [regex]::Matches($t, $claimPat)) {
-        $tag = if ($m.Value -match '^我自己') { '我自己' } else { $m.Value }
+        $tag = $m.Value
         if ($claimTags -notcontains $tag) { [void]$claimTags.Add($tag) }
       }
     }
     if ($claimTags.Count -eq 0) {
-      Add-Result 'PASS' 'C8-persona-claims' 'script 无第一人称经历表述，无编造风险'
+      Add-Result 'PASS' 'C8-persona-claims' 'script has no first-person experience claims, no fabrication risk'
     }
     else {
       $f8 = Read-Raw $facts
       if (-not $f8) {
-        Add-Result 'FAIL' 'C8-persona-claims' ("script 含第一人称经历表述（{0}），但缺 facts.md 无法核验实证" -f ($claimTags -join '/'))
+        Add-Result 'FAIL' 'C8-persona-claims' ("script contains first-person experience claims ({0}), but facts.md is missing so they cannot be verified" -f ($claimTags -join '/'))
       }
       else {
         $sec8 = $null
-        if ($f8 -match '(?ms)^#{2,3}[^\r\n]*实证清单[^\r\n]*\r?\n(.*?)(?=^#{1,3}\s|\z)') { $sec8 = $Matches[1] }
+        if ($f8 -match '(?ms)^#{2,3}[^\r\n]*(?:evidence list)[^\r\n]*\r?\n(.*?)(?=^#{1,3}\s|\z)') { $sec8 = $Matches[1] }
         if (-not $sec8) {
-          Add-Result 'FAIL' 'C8-persona-claims' ("script 含第一人称经历表述（{0}），但 facts.md 缺「## 五、实证清单」段 → 疑编造个人经历" -f ($claimTags -join '/'))
+          Add-Result 'FAIL' 'C8-persona-claims' ("script contains first-person experience claims ({0}), but facts.md has no evidence-list section → suspected fabrication of personal experience" -f ($claimTags -join '/'))
         }
         else {
           $unbacked = @($claimTags | Where-Object { $sec8 -notmatch [regex]::Escape($_) })
-          if ($unbacked.Count -eq 0) { Add-Result 'PASS' 'C8-persona-claims' ("实证清单已覆盖全部第一人称表述：{0}" -f ($claimTags -join '/')) }
-          else { Add-Result 'FAIL' 'C8-persona-claims' ("以下第一人称经历表述无实证记录：{0}（红线：不得编造个人经历）" -f ($unbacked -join '/')) }
+          if ($unbacked.Count -eq 0) { Add-Result 'PASS' 'C8-persona-claims' ("the evidence list covers every first-person claim: {0}" -f ($claimTags -join '/')) }
+          else { Add-Result 'FAIL' 'C8-persona-claims' ("these first-person experience claims have no evidence record: {0} (red line: never invent personal experience)" -f ($unbacked -join '/')) }
         }
       }
     }
   }
 }
 
-# --- C9 · 画面元素（2026-10-19 新增，治"画面空洞 / 内容只占屏 1/3"；WARN 不阻断） ---
-# 规则：每个章节 tsx 至少引用 1 个 components/viz 具象元素（讲到什么挂什么）。
-# 只做"有没有用"的机械判断；"每步 ≥1 个 + 与口播相关 + 中部主视觉 ≥55%"这类
-# 语义判断留给 CHAPTER-CRAFT.md 完工自检（人工/AI 审核）。
+# --- C9 · visual elements (added 2026-10-19, targets "empty visuals / content covers only 1/3 of the screen"; WARN, does not block) ---
+# Rule: each chapter tsx must reference at least 1 concrete components/viz element (show what you talk about).
+# Only the mechanical "is it used" check; semantic judgements such as "≥1 per step + relevant to the narration + main visual ≥55% in the middle"
+# are left to the CHAPTER-CRAFT.md completion self-check (human/AI review).
 if ($needOutline -and $pres) {
   $chapDir = Join-Path $pres.FullName 'src\chapters'
   if (Test-Path -LiteralPath $chapDir) {
@@ -414,43 +415,44 @@ if ($needOutline -and $pres) {
       $raw = Get-Content -LiteralPath $t.FullName -Raw -Encoding UTF8
       if ($raw -notmatch 'components/viz') { $noViz += $t.Name }
     }
-    if ($tsx.Count -eq 0) { Add-Result 'WARN' 'C9-viz' 'src\chapters 下无章节 tsx，无法核对画面元素' }
-    elseif ($noViz.Count -eq 0) { Add-Result 'PASS' 'C9-viz' ("{0} 个章节全部引用 components/viz 具象元素" -f $tsx.Count) }
-    else { Add-Result 'WARN' 'C9-viz' ("以下章节未引用 components/viz 具象元素（画面可能空洞）: " + ($noViz -join ', ')) }
+    if ($tsx.Count -eq 0) { Add-Result 'WARN' 'C9-viz' 'no chapter tsx under src\chapters, cannot verify visual elements' }
+    elseif ($noViz.Count -eq 0) { Add-Result 'PASS' 'C9-viz' ("all {0} chapters reference concrete components/viz elements" -f $tsx.Count) }
+    else { Add-Result 'WARN' 'C9-viz' ("these chapters do not reference concrete components/viz elements (visuals may be empty): " + ($noViz -join ', ')) }
   }
 }
 
-# --- C10 · 文案自检存证（2026-10-19 新增，治"文案不行"） ---
-# 规则：Phase 1 必须按 SCRIPT-STYLE.md 的四层自检（形式层 / 风骨层 / 念出来 / 结构层）
-#       走完 → 修稿 → 落盘 script-selfcheck.md 存证。pre-code 起强制。
+# --- C10 · copy self-check evidence (added 2026-10-19, targets "bad copy") ---
+# Rule: Phase 1 must complete SCRIPT-STYLE.md's four-layer self-check (form / soul / read-aloud / structure)
+#       → revise → save script-selfcheck.md as evidence. Enforced from pre-code onward.
 if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
   $sc = Join-Path $root 'script-selfcheck.md'
   if (Test-Path -LiteralPath $sc) {
     $scRaw = Read-Raw $sc
-    if (($scRaw -match '形式') -and ($scRaw -match '风骨') -and ($scRaw -match '念出来') -and ($scRaw -match '结构')) {
-      # 2026-10-31 收紧：四层自检只是「走过形式」，开场三要素与盲读复述必须留下逐项判定，
-      # 否则无法区分「真的读过」与「只写了四个小标题」（ep11 连续四版都栽在开场，见 SCRIPT-STYLE 第 7 条）。
-      $hasElements = ($scRaw -match '三要素') -and ($scRaw -match '(?m)^.*PASS|MISSING')
-      $hasBlind = ($scRaw -match '盲读')
+    if (($scRaw -match '\bform\b') -and ($scRaw -match 'substance layer|character layer|substance') -and ($scRaw -match 'read[\s-]*(?:it[\s-]*)?aloud') -and ($scRaw -match '\bstructure\b')) {
+      # 2026-10-31 tightened: the four-layer self-check only proves "the form was gone through"; the opening three elements and
+      # the blind-read retelling must leave per-item verdicts, otherwise there is no way to tell "really read it" from
+      # "just wrote four headings" (ep11 failed on the opening four revisions in a row, see SCRIPT-STYLE item 7).
+      $hasElements = ($scRaw -match 'three elements|opening three') -and ($scRaw -match '(?m)^.*PASS|MISSING')
+      $hasBlind = ($scRaw -match 'blind[\s-]*read')
       if ($hasElements -and $hasBlind) {
-        Add-Result 'PASS' 'C10-script-selfcheck' 'script-selfcheck.md 覆盖四层自检 + 开场三要素逐项判定 + 盲读复述'
+        Add-Result 'PASS' 'C10-script-selfcheck' 'script-selfcheck.md covers the four-layer self-check + per-item opening three-elements verdict + blind-read retelling'
       }
       else {
         $miss = @()
-        if (-not $hasElements) { $miss += '开场三要素逐项判定（谁/什么事/为什么值得看，各标 PASS 或 MISSING）' }
-        if (-not $hasBlind) { $miss += '盲读复述记录（含第 5 项开场三要素）' }
-        Add-Result 'FAIL' 'C10-script-selfcheck' ("script-selfcheck.md 缺：" + ($miss -join '；'))
+        if (-not $hasElements) { $miss += 'per-item opening three-elements verdict (who / what happens / why worth watching, each marked PASS or MISSING)' }
+        if (-not $hasBlind) { $miss += 'blind-read retelling record (including item 5, the opening three elements)' }
+        Add-Result 'FAIL' 'C10-script-selfcheck' ("script-selfcheck.md is missing: " + ($miss -join '; '))
       }
     }
-    else { Add-Result 'FAIL' 'C10-script-selfcheck' 'script-selfcheck.md 未覆盖四层自检（形式/风骨/念出来/结构），视同未走完' }
+    else { Add-Result 'FAIL' 'C10-script-selfcheck' 'script-selfcheck.md does not cover the four-layer self-check (form / soul / read-aloud / structure), counted as not completed' }
   }
-  else { Add-Result 'FAIL' 'C10-script-selfcheck' '缺 script-selfcheck.md：Phase 1 未按 SCRIPT-STYLE 四层自检存证（禁止进入 Phase 2）' }
+  else { Add-Result 'FAIL' 'C10-script-selfcheck' 'script-selfcheck.md missing: Phase 1 did not record the SCRIPT-STYLE four-layer self-check (must not enter Phase 2)' }
 }
 
-# --- C14 · 时长估算（2026-10-31 新增；WARN） ---
-# 背景：脚本 591 字按 3.3 字/秒估 179s，实际 TTS 出片 153.3s（13 拍 × 1.5s 停留）。
-# 实测语速接近 4 字/秒，字数口径必须换成实测值，否则每篇都会系统性偏短/偏长。
-# 判据：est = 汉字数 / 4.0 + 拍数 × 1.5；目标带 120–180s，超出只 WARN 不阻断。
+# --- C14 · duration estimate (added 2026-10-31; WARN) ---
+# Background: a 591-character script estimated at 3.3 chars/s → 179s, but the actual TTS render was 153.3s (13 beats × 1.5s dwell).
+# Measured speech rate is close to 4 chars/s, so the character-count formula must use the measured value, otherwise every episode is systematically short/long.
+# Criterion: est = CJK characters / 4.0 + beats × 1.5; target band 120–180s, outside only WARN, does not block.
 if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
   if (Test-Path -LiteralPath $scriptMd) {
     $body = (Get-Content -LiteralPath $scriptMd -Encoding UTF8 | Where-Object {
@@ -461,15 +463,15 @@ if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
     if ($cjk -gt 0) {
       $est = [math]::Round($cjk / 4.0 + $beats * 1.5, 0)
       if (($est -lt 120) -or ($est -gt 180)) {
-        Add-Result 'WARN' 'C14-duration' ("估算 $est s（${cjk}字 / ${beats}拍）不在 120–180s 目标带；口径 = 字数/4 + 拍×1.5")
+        Add-Result 'WARN' 'C14-duration' ("estimated $est s (${cjk} chars / ${beats} beats) outside the 120–180s target band; formula = chars/4 + beats×1.5")
       }
-      else { Add-Result 'PASS' 'C14-duration' "估算 $est s（${cjk}字 / ${beats}拍）在目标带内" }
+      else { Add-Result 'PASS' 'C14-duration' "estimated $est s (${cjk} chars / ${beats} beats) within the target band" }
     }
   }
 }
 
-# --- C15 · 账本 JSON 完整性（2026-10-31 新增；FAIL） ---
-# 背景：手工改 backlog/.cheat-state 两次留下尾逗号，导致 CLI 启动即崩、白跑一轮。
+# --- C15 · ledger JSON integrity (added 2026-10-31; FAIL) ---
+# Background: hand-editing backlog/.cheat-state left trailing commas twice, crashing the CLI at startup and wasting a whole run.
 if ($Gate -in @('all', 'pre-script', 'pre-code', 'pre-render', 'delivery')) {
   $rootDir = $root
   for ($i = 0; $i -lt 3; $i++) {
@@ -481,26 +483,26 @@ if ($Gate -in @('all', 'pre-script', 'pre-code', 'pre-render', 'delivery')) {
     if (Test-Path -LiteralPath $jp) {
       try {
         $null = (Get-Content -LiteralPath $jp -Raw -Encoding UTF8 | ConvertFrom-Json)
-        Add-Result 'PASS' 'C15-json' "$jf 解析通过"
+        Add-Result 'PASS' 'C15-json' "$jf parsed successfully"
       }
-      catch { Add-Result 'FAIL' 'C15-json' "$jf 不是合法 JSON：$($_.Exception.Message)" }
+      catch { Add-Result 'FAIL' 'C15-json' "$jf is not valid JSON: $($_.Exception.Message)" }
     }
   }
 }
 
-# --- C11 · 口播稿结构（2026-10-19 新增，治"结构散架"；pre-code / pre-render / delivery 生效） ---
-# 背景：措辞全过、结构散架的稿子照样让人听不懂（ep08 就栽在这，见 SCRIPT-STYLE 第 5 节）。
-# 做三层机械断言：
-#   C11-seq  分类树自洽 —— 同一层级不得混用量词（路/种/类/档），序号不得跳号。
-#   C11-list 编号必列项 —— 报了「N 项」必须把 N 项列出来，禁止只报编号。
-#   C11-term 术语首现即解释 —— 术语首现的那一拍、其后 40 字内须含其关键词（表见 terminology.txt）。
-# 【收紧说明 2026-10-19】C11-list 初版对合格稿大量误伤（「个」量词、「两件事」、
-#   「」内示例全被命中），已收紧为：仅认「件/条/种/步/坑」量词、N≥3、跳过引号内示例，
-#   方做到 ep08 命中、ep07/06/05/04 不误伤（详见回归报告）。
+# --- C11 · narration script structure (added 2026-10-19, targets "structure falls apart"; effective for pre-code / pre-render / delivery) ---
+# Background: a script whose wording all passes but whose structure falls apart still loses the audience (ep08 failed here, see SCRIPT-STYLE section 5).
+# Three mechanical assertions:
+#   C11-seq  classification-tree consistency — the same level must not mix classifier units (road/kind/class/tier), and numbering must not skip.
+#   C11-list enumerated items — saying "N items" requires listing all N items, not just the number.
+#   C11-term explain on first appearance — the beat where a term first appears must contain its keywords within the next 40 characters (table in terminology.txt).
+# [tightening note 2026-10-19] the first version of C11-list produced many false positives on valid scripts (the generic classifier, "two things",
+#   examples inside quotes were all matched); it is now tightened to: only the item/entry/kind/step/pitfall classifiers, N≥3, skip quoted examples,
+#   so ep08 is caught while ep07/06/05/04 stay clean (see the regression report).
 if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
   $sRaw = Read-Raw $scriptMd
   if ($sRaw) {
-    # 正文行（去标题/引用/分隔线），压成无空白串，便于按"字"开窗
+    # Body lines (drop headings/quotes/rules), flattened into a whitespace-free string so windows can be cut by "characters"
     $bl = New-Object System.Collections.ArrayList
     foreach ($ln in (Get-Content -LiteralPath $scriptMd -Encoding UTF8)) {
       $t = $ln.Trim()
@@ -509,7 +511,7 @@ if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
     }
     $body = ($bl -join '') -replace '\s+', ''
 
-    # 逐拍（--- 分隔）正文，供 C11-term 做「首现那一拍」定位
+    # Per-beat (--- separated) body text, so C11-term can locate "the beat of first appearance"
     $bt = New-Object System.Collections.ArrayList
     $cur = New-Object System.Collections.ArrayList
     foreach ($ln in (Get-Content -LiteralPath $scriptMd -Encoding UTF8)) {
@@ -528,59 +530,60 @@ if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
       if ($t -ne '') { $beatTexts += $t }
     }
 
-    $numMap = @{ '一' = 1; '二' = 2; '两' = 2; '三' = 3; '四' = 4; '五' = 5; '六' = 6; '七' = 7; '八' = 8; '九' = 9; '十' = 10 }
+    $numMap = @{ 'one' = 1; 'two' = 2; 'three' = 3; 'four' = 4; 'five' = 5; 'six' = 6; 'seven' = 7; 'eight' = 8; 'nine' = 9; 'ten' = 10; 'first' = 1; 'second' = 2; 'third' = 3; 'fourth' = 4; 'fifth' = 5; 'sixth' = 6; 'seventh' = 7; 'eighth' = 8; 'ninth' = 9; 'tenth' = 10 }
     function Convert-CnNum([string]$w) {
       if ($w -match '^\d+$') { return [int]$w }
-      if ($numMap.ContainsKey($w)) { return [int]$numMap[$w] }
+      $k = $w.ToLowerInvariant()
+      if ($numMap.ContainsKey($k)) { return [int]$numMap[$k] }
       return -1
     }
 
-    # ---- C11-seq 序号一致性 ----
-    $seqHits = @([regex]::Matches($body, '第\s*([一二三四五六七八九十两\d]+)\s*(路|种|类|档)'))
+    # ---- C11-seq numbering consistency ----
+    $seqHits = @([regex]::Matches($body, '(?i)(?:the\s*)?(\d+|one|two|three|four|five|six|seven|eight|nine|ten|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth)\s*(road|kind|class|tier|type)'))
     if ($seqHits.Count -eq 0) {
-      Add-Result 'PASS' 'C11-seq' '未发现「第X路/种/类/档」量词编号，跳过'
+      Add-Result 'PASS' 'C11-seq' 'no "Nth + road/kind/class/tier" classifier numbering found, skipping'
     }
     else {
       $seqErrs = @()
-      $hasLu  = @($seqHits | Where-Object { $_.Groups[2].Value -eq '路' }).Count -gt 0
-      $hasAlt = @($seqHits | Where-Object { @('种', '类') -contains $_.Groups[2].Value }).Count -gt 0
+      $hasLu  = @($seqHits | Where-Object { @('road') -contains $_.Groups[2].Value }).Count -gt 0
+      $hasAlt = @($seqHits | Where-Object { @('kind', 'class', 'type', 'tier') -contains $_.Groups[2].Value }).Count -gt 0
       if ($hasLu -and $hasAlt) {
-        $seqErrs += ('量词混用（同一层级并列「路」与「种/类」）: ' + (($seqHits | ForEach-Object { $_.Value }) -join ' / '))
+        $seqErrs += ('mixed classifier units at the same level (road vs kind/class): ' + (($seqHits | ForEach-Object { $_.Value }) -join ' / '))
       }
       foreach ($g in ($seqHits | Group-Object { $_.Groups[2].Value })) {
         $nums = @($g.Group | ForEach-Object { Convert-CnNum $_.Groups[1].Value } | Where-Object { $_ -gt 0 } | Sort-Object -Unique)
         if ($nums.Count -ge 2) {
           $missing = @()
           for ($v = $nums[0]; $v -le $nums[-1]; $v++) { if ($nums -notcontains $v) { $missing += $v } }
-          if ($missing.Count -gt 0) { $seqErrs += ('「第X' + $g.Name + '」序号跳号，缺: ' + ($missing -join ',')) }
+          if ($missing.Count -gt 0) { $seqErrs += ('numbering skips values in the "' + $g.Name + '" series; missing: ' + ($missing -join ',')) }
         }
       }
-      if ($seqErrs.Count -eq 0) { Add-Result 'PASS' 'C11-seq' ('量词/序号自洽（{0} 处编号）' -f $seqHits.Count) }
-      else { Add-Result 'FAIL' 'C11-seq' ('分类树序号不自洽: ' + ($seqErrs -join ' | ')) }
+      if ($seqErrs.Count -eq 0) { Add-Result 'PASS' 'C11-seq' ('classifier units/numbering self-consistent ({0} numbered spots)' -f $seqHits.Count) }
+      else { Add-Result 'FAIL' 'C11-seq' ('classification-tree numbering inconsistent: ' + ($seqErrs -join ' | ')) }
     }
 
-    # ---- C11-list 编号必列项（收紧版） ----
-    $bodyNoQ = [regex]::Replace($body, '[「“『][^」”』]*[」”』]', '')
-    $listHits = @([regex]::Matches($bodyNoQ, '(?<![一二三四五六七八九十两\d第])([三四五六七八九十]|\d+)\s*(件|条|种|步|坑)') | Where-Object { (Convert-CnNum $_.Groups[1].Value) -ge 3 })
+    # ---- C11-list enumerated items (tightened version) ----
+    $bodyNoQ = [regex]::Replace($body, '"[^"]*"', '')
+    $listHits = @([regex]::Matches($bodyNoQ, '(?i)(?<!\d)(\d+|three|four|five|six|seven|eight|nine|ten)\s*(items?|things?|steps?|kinds?|types?|pitfalls?|traps?)') | Where-Object { (Convert-CnNum $_.Groups[1].Value) -ge 3 })
     $listErrs = @()
     foreach ($m in $listHits) {
       $N = Convert-CnNum $m.Groups[1].Value
       $st = $m.Index + $m.Length
       $win = if ($st -lt $bodyNoQ.Length) { $bodyNoQ.Substring($st, [Math]::Min(60, $bodyNoQ.Length - $st)) } else { '' }
-      $immediate = ($win.Length -gt 0) -and ($win.StartsWith('：') -or $win.StartsWith(':'))
-      $sepCount = ([regex]::Matches($win, '、')).Count
+      $immediate = ($win.Length -gt 0) -and $win.StartsWith(':')
+      $sepCount = ([regex]::Matches($win, ',')).Count
       if ((-not $immediate) -and ($sepCount -lt ($N - 1))) {
-        $listErrs += ('报了 {0} 项却没列出内容（「{1}」处）' -f $N, $m.Value)
+        $listErrs += ('claims {0} items but does not list them (at "{1}")' -f $N, $m.Value)
       }
     }
-    if ($listHits.Count -eq 0) { Add-Result 'PASS' 'C11-list' '未发现需列项的编号表述，跳过' }
-    elseif ($listErrs.Count -eq 0) { Add-Result 'PASS' 'C11-list' ('{0} 处编号均有列项' -f $listHits.Count) }
-    else { Add-Result 'FAIL' 'C11-list' ('编号未列项: ' + ($listErrs -join ' | ')) }
+    if ($listHits.Count -eq 0) { Add-Result 'PASS' 'C11-list' 'no numbered claim requiring an item list found, skipping' }
+    elseif ($listErrs.Count -eq 0) { Add-Result 'PASS' 'C11-list' ('all {0} numbered claims list their items' -f $listHits.Count) }
+    else { Add-Result 'FAIL' 'C11-list' ('numbered claims without item lists: ' + ($listErrs -join ' | ')) }
 
-    # ---- C11-term 术语首现即解释 ----
+    # ---- C11-term explain on first appearance ----
     $termPath = Join-Path $PSScriptRoot 'terminology.txt'
     if (-not (Test-Path -LiteralPath $termPath)) {
-      $defTerms = "harness`t循环的代码|跑循环|循环`r`nDOM`t骨架|原始骨架|网页结构`r`n无障碍树`t读屏|读屏软件`r`n提示注入`t指令|指挥`r`nAPI`t接口|指挥"
+      $defTerms = "harness`tloop|looping|the loop code`r`nDOM`tskeleton|raw skeleton|page structure`r`naccessibility tree`tscreen reader|screen-reader`r`nprompt injection`tinstruction|command`r`nAPI`tinterface|endpoint"
       Set-Content -LiteralPath $termPath -Value $defTerms -Encoding UTF8
     }
     $termChecked = 0; $termErrs = @()
@@ -600,20 +603,20 @@ if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
         $win = if ($ts -lt $bexp.Length) { $bexp.Substring($ts, [Math]::Min(40, $bexp.Length - $ts)) } else { '' }
         $hit = $false
         foreach ($kw in $kws) { if ($win.Contains($kw)) { $hit = $true; break } }
-        if (-not $hit) { $termErrs += ('{0} 首现后 40 字内无解释（关键词: {1}）' -f $term, ($kws -join '/')) }
+        if (-not $hit) { $termErrs += ('{0} has no explanation within 40 characters after first appearance (keywords: {1})' -f $term, ($kws -join '/')) }
         break
       }
     }
-    if ($termChecked -eq 0) { Add-Result 'PASS' 'C11-term' '稿中未见术语表所列术语，跳过' }
-    elseif ($termErrs.Count -eq 0) { Add-Result 'PASS' 'C11-term' ('{0} 个出现的术语首现即解释' -f $termChecked) }
-    else { Add-Result 'FAIL' 'C11-term' ('术语首现未解释: ' + ($termErrs -join ' | ')) }
+    if ($termChecked -eq 0) { Add-Result 'PASS' 'C11-term' 'none of the terms listed in the terminology table appear in the script, skipping' }
+    elseif ($termErrs.Count -eq 0) { Add-Result 'PASS' 'C11-term' ('all {0} appearing terms are explained on first appearance' -f $termChecked) }
+    else { Add-Result 'FAIL' 'C11-term' ('terms not explained on first appearance: ' + ($termErrs -join ' | ')) }
   }
 }
 
-# --- C12 · PowerShell 脚本 BOM 归一（2026-10-19 新增） ---
-# 背景：编辑工具每次保存会给 .ps1 追加一个 BOM，累积成多 BOM 会让 Windows PowerShell 5.1
-#   解析失败（报 Unexpected token）；反之无 BOM 会让中文被按 ANSI 读成乱码。规范：**恰好 1 个 BOM**。
-#   修复：powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\normalize-bom.ps1
+# --- C12 · PowerShell script BOM normalization (added 2026-10-19) ---
+# Background: the editor appends one BOM to .ps1 on every save, and stacked BOMs make Windows PowerShell 5.1
+#   fail to parse (Unexpected token); conversely no BOM makes comments be read as ANSI garbage. Rule: **exactly 1 BOM**.
+#   Fix: powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\normalize-bom.ps1
 $projRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $psFiles = @(Get-ChildItem -LiteralPath $projRoot -Recurse -Filter '*.ps1' -File -ErrorAction SilentlyContinue |
   Where-Object { $_.FullName -notmatch '\\(node_modules|\.git|cache|videos|\.venv)\\' })
@@ -624,15 +627,15 @@ foreach ($f in $psFiles) {
   while (($bn + 2) -lt $bb.Length -and $bb[$bn] -eq 0xEF -and $bb[$bn + 1] -eq 0xBB -and $bb[$bn + 2] -eq 0xBF) { $bn += 3 }
   if ($bn -ne 3) { $badBom += ("{0}(BOM={1})" -f $f.Name, $bn) }
 }
-if ($badBom.Count -eq 0) { Add-Result 'PASS' 'C12-bom' ("{0} 个 .ps1 均为单 BOM" -f $psFiles.Count) }
-else { Add-Result 'FAIL' 'C12-bom' ('BOM 未归一（应恰好 1 个；跑 tools\pipeline\normalize-bom.ps1 修复）: ' + ($badBom -join ', ')) }
+if ($badBom.Count -eq 0) { Add-Result 'PASS' 'C12-bom' ("all {0} .ps1 files have a single BOM" -f $psFiles.Count) }
+else { Add-Result 'FAIL' 'C12-bom' ('BOM not normalized (should be exactly 1; run tools\pipeline\normalize-bom.ps1 to fix): ' + ($badBom -join ', ')) }
 
-# --- D1 · 确定性核对（-Determinism，改进 B） ---
+# --- D1 · determinism check (-Determinism, improvement B) ---
 if ($Determinism -and $pres) {
   $pp = $pres.FullName
   $shotsDir = Join-Path $pp 'raw\shots'
   $manifest = Join-Path $pp 'raw\shots.sha256'
-  if (-not (Test-Path $shotsDir)) { Add-Result 'WARN' 'D1' 'raw\shots 不存在，无法做确定性核对（先出片再跑 -Determinism）' }
+  if (-not (Test-Path $shotsDir)) { Add-Result 'WARN' 'D1' 'raw\shots does not exist, cannot run the determinism check (render first, then run with -Determinism)' }
   else {
     $cur = Get-ChildItem -LiteralPath $shotsDir -Filter '*.png' | Sort-Object Name | ForEach-Object {
       "{0}  {1}" -f $_.Name, (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
@@ -640,17 +643,17 @@ if ($Determinism -and $pres) {
     if (Test-Path $manifest) {
       $old = Get-Content -LiteralPath $manifest -Encoding UTF8
       $diff = Compare-Object $old $cur
-      if (-not $diff) { Add-Result 'PASS' 'D1' '两次渲染帧哈希一致 → 确定性通过（无抽卡）' }
-      else { Add-Result 'FAIL' 'D1' ("两次渲染帧哈希不一致 → 存在抽卡（{0} 处差异）" -f @($diff).Count) }
+      if (-not $diff) { Add-Result 'PASS' 'D1' 'frame hashes match across two renders → deterministic (no gacha)' }
+      else { Add-Result 'FAIL' 'D1' ("frame hashes differ across two renders → output is non-deterministic ({0} differences)" -f @($diff).Count) }
     }
     else {
       $cur | Set-Content -LiteralPath $manifest -Encoding UTF8
-      Add-Result 'WARN' 'D1' "首次运行：已写基准哈希 -> raw\shots.sha256（再渲一次复跑本项即比对）"
+      Add-Result 'WARN' 'D1' "first run: baseline hashes written to raw\shots.sha256 (render again and re-run this check to compare)"
     }
   }
 }
 
-# --- 汇总 ---
+# --- summary ---
 $nPass = @($results | Where-Object { $_.Level -eq 'PASS' }).Count
 $nWarn = @($results | Where-Object { $_.Level -eq 'WARN' }).Count
 $nFail = @($results | Where-Object { $_.Level -eq 'FAIL' }).Count

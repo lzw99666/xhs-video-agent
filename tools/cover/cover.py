@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-小红书「阿囤囤爆款风格」封面通用渲染工具
+Generic Xiaohongshu cover renderer in the "Atuntun viral style"
 --------------------------------------------------
-工艺：HTML/CSS 按阿囤囤规范排版 1080×1440 → Playwright 无头 Chrome 截图出 PNG。
-中文大字全部走 CSS 渲染，不经文生图，杜绝错字。
+Process: lay out 1080×1440 per the Atuntun spec with HTML/CSS → screenshot to PNG with headless Chrome via Playwright.
+All large Chinese text is rendered by CSS, not through text-to-image, eliminating wrong characters.
 
-用法示例：
-  python tools\\cover\\cover.py --title "大佬开源压箱底" --subtitle "AI写代码不再翻车" \
-      --person <人物图绝对路径> --style 1 --out <输出png绝对路径>
+Example usage:
+  python tools\\cover\\cover.py --title "Huge open-source stash" --subtitle "AI writes code without crashing" \
+      --person <absolute path to person image> --style 1 --out <absolute output png path>
 
-依赖：本机 Chrome + tools/record/node_modules/playwright-core + node.exe
+Dependencies: local Chrome + tools/record/node_modules/playwright-core + node.exe
 """
 import argparse
 import html
@@ -19,17 +19,17 @@ import sys
 import tempfile
 from pathlib import Path
 
-# ---------- 依赖路径：默认用仓库内的 playwright-core，可用环境变量覆盖 ----------
+# ---------- Dependency paths: use the repo's playwright-core by default; overridable via env vars ----------
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PW_CORE = os.environ.get("PW_CORE") or str(
     REPO_ROOT / "tools" / "record" / "node_modules" / "playwright-core"
 )
 NODE_EXE = os.environ.get("NODE_EXE") or "node"
 
-CANVAS_W, CANVAS_H = 1080, 1440  # 3:4 竖版小红书封面
-STROKE_DARK = "#0a0a0a"          # 文字粗黑描边固定色
+CANVAS_W, CANVAS_H = 1080, 1440  # 3:4 vertical Xiaohongshu cover
+STROKE_DARK = "#0a0a0a"          # fixed color for the heavy black text stroke
 
-# ---------- 颜色工具：由 --bg 推导渐变三档 ----------
+# ---------- Color helpers: derive the three gradient stops from --bg ----------
 def _hex_to_rgb(c):
     c = c.lstrip("#")
     return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4))
@@ -40,22 +40,22 @@ def _rgb_to_hex(r, g, b):
                               max(0, min(255, int(b))))
 
 def mix(color, target, ratio):
-    """color 向 target 混合 ratio 比例，用于生成背景渐变亮/暗档"""
+    """Blend color toward target by ratio, used to generate the bright/dark stops of the background gradient."""
     a, b = _hex_to_rgb(color), _hex_to_rgb(target)
     return _rgb_to_hex(*[a[i] + (b[i] - a[i]) * ratio for i in range(3)])
 
-# ---------- 字号自适应：保证大字不出安全区 ----------
+# ---------- Font-size fitting: keep large text inside the safe area ----------
 def fit_size(text, base, max_w, letter_spacing, min_size=40):
-    """按字数收缩字号：n*(字号+字距) <= max_w"""
+    """Shrink the font size by character count: n*(font size + letter spacing) <= max_w"""
     n = max(len(text), 1)
     return max(int(min(base, (max_w - n * letter_spacing) / n)), min_size)
 
-# ---------- 背景代码纹理（纯装饰，必须保持主题中立，禁止出现具体仓库/产品名） ----------
+# ---------- Background code texture (purely decorative; must stay topic-neutral, no specific repo/product names) ----------
 CODE_BG = """<span class="cm">// notes from learning</span>
 <span class="kw">def</span> <span class="fn">explain</span>(topic):
     <span class="kw">return</span> simple(topic)
 
-<span class="cm"># 越聊越长，越用越熟</span>
+<span class="cm"># the more you chat, the longer it grows; the more you use it, the more familiar it gets</span>
 <span class="kw">for</span> day <span class="kw">in</span> <span class="fn">progress</span>:
     <span class="fn">understand</span>(day)
 
@@ -65,7 +65,7 @@ CODE_BG = """<span class="cm">// notes from learning</span>
 }"""
 
 def base_css(bg, accent):
-    """两种风格共用的画布 / 背景代码纹理 / 暗角样式"""
+    """Canvas / background code texture / vignette styles shared by both styles."""
     bg_hi = mix(bg, "#ffffff", 0.06)
     bg_lo = mix(bg, "#000000", 0.5)
     return f"""
@@ -118,7 +118,7 @@ def base_css(bg, accent):
 """
 
 def build_style1(opts):
-    """风格 1 · 大字压顶风：主标题压顶，人物圆形居中偏下，可选贴纸"""
+    """Style 1 · big headline on top: main title pinned to the top, person in a circle slightly below center, optional stickers."""
     e = html.escape
     accent, bg = opts.accent, opts.bg
     t_fs = fit_size(opts.title, 132, 980, 4)
@@ -126,8 +126,8 @@ def build_style1(opts):
     if opts.subtitle:
         s_fs = fit_size(opts.subtitle, 56, 980, 3)
         sub_html = (f'<div class="subtitle" style="font-size:{s_fs}px">{e(opts.subtitle)}</div>')
-    # 主题贴纸：emoji 装饰（主题中立）默认开；文字卡片必须显式传 --sticker-label 才渲染，
-    # 防止上一期的文案残留到下一期（ep03 教训：「技能包·开源·免费」残留）
+    # Topic stickers: emoji decorations (topic-neutral) are on by default; the text card is rendered only when
+    # --sticker-label is explicitly passed, preventing last episode's copy from carrying over (ep03 lesson: leftover "skill pack · open source · free")
     stickers = ""
     if opts.stickers:
         stickers = """
@@ -206,7 +206,7 @@ def build_style1(opts):
 </body></html>"""
 
 def build_style4(opts):
-    """风格 4 · 教程清单风：标题压顶，左侧绿色 ✅ 竖排清单，人物居右，底部浅黄横幅"""
+    """Style 4 · tutorial checklist: title pinned to the top, green ✅ checklist stacked on the left, person on the right, light-yellow banner at the bottom."""
     e = html.escape
     accent, bg = opts.accent, opts.bg
     t_fs = fit_size(opts.title, 110, 980, 4)
@@ -268,7 +268,7 @@ def build_style4(opts):
   </div>
 </body></html>"""
 
-# ---------- Playwright 截图脚本（node + playwright-core） ----------
+# ---------- Playwright screenshot script (node + playwright-core) ----------
 SHOT_JS = r"""
 const { chromium } = require(process.env.PW_PATH);
 
@@ -281,7 +281,7 @@ const { chromium } = require(process.env.PW_PATH);
   });
   const page = await ctx.newPage();
   await page.goto(process.argv[2], { waitUntil: "load", timeout: 60000 });
-  // 等字体与人物位图全部就绪再截，避免半渲染
+  // Wait until fonts and the person bitmap are fully ready before shooting, to avoid a half-rendered frame
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all([...document.images].map(img =>
@@ -294,66 +294,66 @@ const { chromium } = require(process.env.PW_PATH);
 """
 
 def fail(msg):
-    print(f"[错误] {msg}", file=sys.stderr)
+    print(f"[ERROR] {msg}", file=sys.stderr)
     sys.exit(1)
 
 def main():
-    ap = argparse.ArgumentParser(description="阿囤囤风格小红书封面渲染工具（1080×1440 PNG）")
-    ap.add_argument("--title", required=True, help="主标题（大字压顶，必填）")
-    ap.add_argument("--subtitle", default="", help="副标题（可选）")
-    ap.add_argument("--person", default="", help="人物素材图绝对路径（真人照/头像等真实位图，仅圆形裁切+描边）；与 --no-person 二选一")
-    ap.add_argument("--no-person", action="store_true", help="无人物版（无合适真人照时渲染纯文字封面，缺口请在交付说明中记录）")
-    ap.add_argument("--style", type=int, default=1, help="风格编号：1=大字压顶风，4=教程清单风（默认 1）")
-    ap.add_argument("--out", required=True, help="输出 PNG 绝对路径（严格 1080×1440）")
-    ap.add_argument("--accent", default="#FDFFA7", help="主色（柔和浅黄），默认 #FDFFA7")
-    ap.add_argument("--bg", default="#0d1117", help="背景色（GitHub 暗色），默认 #0d1117")
-    ap.add_argument("--items", action="append", default=[], help="风格 4 的绿色勾选清单条目，可重复传")
-    ap.add_argument("--caption", default="", help="底部来源标注文字（可选）")
+    ap = argparse.ArgumentParser(description="Atuntun-style Xiaohongshu cover renderer (1080×1440 PNG)")
+    ap.add_argument("--title", required=True, help="main title (large headline pinned to the top, required)")
+    ap.add_argument("--subtitle", default="", help="subtitle (optional)")
+    ap.add_argument("--person", default="", help="absolute path to the person asset (a real photo/avatar bitmap; only circular crop + stroke applied); mutually exclusive with --no-person")
+    ap.add_argument("--no-person", action="store_true", help="no-person version (render a text-only cover when no suitable real photo is available; record the gap in the delivery notes)")
+    ap.add_argument("--style", type=int, default=1, help="style number: 1=big headline on top, 4=tutorial checklist (default 1)")
+    ap.add_argument("--out", required=True, help="absolute output PNG path (strictly 1080×1440)")
+    ap.add_argument("--accent", default="#FDFFA7", help="accent color (soft light yellow), default #FDFFA7")
+    ap.add_argument("--bg", default="#0d1117", help="background color (GitHub dark), default #0d1117")
+    ap.add_argument("--items", action="append", default=[], help="style 4 green checklist items, repeatable")
+    ap.add_argument("--caption", default="", help="bottom source caption text (optional)")
     ap.add_argument("--stickers", action=argparse.BooleanOptionalAction, default=True,
-                    help="是否加主题贴纸（仅风格 1 生效，默认开，--no-stickers 关闭）")
-    ap.add_argument("--sticker-label", default="", help="风格 1 文字卡片贴纸主文案（不传则不渲染卡片；禁止沿用上一期文案）")
-    ap.add_argument("--sticker-sub", default="", help="风格 1 文字卡片贴纸副文案（配合 --sticker-label）")
+                    help="whether to add topic stickers (style 1 only, on by default, disable with --no-stickers)")
+    ap.add_argument("--sticker-label", default="", help="style 1 text-card sticker main copy (no card is rendered without it; do not reuse last episode's copy)")
+    ap.add_argument("--sticker-sub", default="", help="style 1 text-card sticker sub-copy (used together with --sticker-label)")
     opts = ap.parse_args()
 
-    # ---------- 依赖与参数校验 ----------
+    # ---------- Dependency and argument validation ----------
     if not Path(PW_CORE).exists():
-        fail(f"未找到 playwright-core：{PW_CORE}，请确认 tools/record 依赖已安装")
+        fail(f"playwright-core not found: {PW_CORE}; make sure tools/record dependencies are installed")
     if not Path(NODE_EXE).exists():
-        fail(f"未找到 node.exe：{NODE_EXE}，无法调用 Playwright 截图")
+        fail(f"node.exe not found: {NODE_EXE}; cannot invoke the Playwright screenshot")
     person = Path(opts.person)
     if opts.no_person:
         if opts.person:
-            print("[提示] 已指定 --no-person，忽略 --person。", file=sys.stderr)
+            print("[NOTE] --no-person was specified, ignoring --person.", file=sys.stderr)
         opts.has_person = False
         opts.person_uri = ""
     else:
         if not opts.person:
-            fail("--person 与 --no-person 必须二选一")
+            fail("--person and --no-person are mutually exclusive")
         if not person.is_absolute():
-            fail("--person 必须是绝对路径")
+            fail("--person must be an absolute path")
         if not person.exists():
-            fail(f"人物素材图不存在：{person}（本工具不生成人脸，请提供真实位图，或用 --no-person）")
+            fail(f"person asset not found: {person} (this tool does not generate faces; provide a real bitmap, or use --no-person)")
         opts.has_person = True
         opts.person_uri = person.resolve().as_uri()
     if opts.style not in (1, 4):
-        fail(f"风格 {opts.style} 尚未实现，当前仅支持 1（大字压顶风）和 4（教程清单风）")
+        fail(f"style {opts.style} is not implemented; currently only 1 (big headline on top) and 4 (tutorial checklist) are supported")
     if opts.style == 4 and not opts.items:
-        fail("风格 4 需要至少一条 --items 清单条目")
+        fail("style 4 requires at least one --items checklist entry")
     for name, val in (("accent", opts.accent), ("bg", opts.bg)):
         try:
             _hex_to_rgb(val)
         except Exception:
-            fail(f"--{name} 不是合法十六进制颜色：{val}")
+            fail(f"--{name} is not a valid hex color: {val}")
     out = Path(opts.out)
     if not out.is_absolute():
         out = out.resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     if not opts.title.strip():
-        fail("--title 不能为空")
+        fail("--title must not be empty")
 
     html_str = build_style1(opts) if opts.style == 1 else build_style4(opts)
 
-    # ---------- 临时目录渲染 + 截图，用后即删 ----------
+    # ---------- Render into a temp directory + screenshot, then delete ----------
     tmpdir = tempfile.mkdtemp(prefix="xhs_cover_")
     html_file = Path(tmpdir) / "cover.html"
     js_file = Path(tmpdir) / "shot.cjs"
@@ -365,7 +365,7 @@ def main():
         r = subprocess.run([NODE_EXE, str(js_file), html_file.as_uri(), str(out)],
                            capture_output=True, text=True, env=env, timeout=180)
         if r.returncode != 0:
-            fail(f"截图失败（node 退出码 {r.returncode}）：{(r.stderr or r.stdout).strip()[:500]}")
+            fail(f"screenshot failed (node exit code {r.returncode}): {(r.stderr or r.stdout).strip()[:500]}")
     finally:
         for f in (html_file, js_file):
             try:
@@ -378,8 +378,8 @@ def main():
             pass
 
     if not out.exists():
-        fail(f"截图流程结束但未生成输出文件：{out}")
-    print(f"[完成] 风格 {opts.style} 封面已输出：{out}（1080×1440）")
+        fail(f"screenshot finished but no output file was produced: {out}")
+    print(f"[DONE] style {opts.style} cover written: {out} (1080×1440)")
 
 if __name__ == "__main__":
     main()

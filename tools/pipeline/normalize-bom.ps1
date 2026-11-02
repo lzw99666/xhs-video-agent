@@ -1,13 +1,13 @@
 ﻿<#
-normalize-bom.ps1 —— 把项目里所有 PowerShell 脚本（.ps1）开头的 UTF-8 BOM 归一为「恰好 1 个」。
+normalize-bom.ps1 —— normalize the UTF-8 BOM at the start of every PowerShell script (.ps1) in the project to "exactly 1".
 
-背景：编辑工具每次保存会给 .ps1 追加一个 BOM，累积成多 BOM 会让 Windows PowerShell 5.1
-      解析失败（报 Unexpected token '...'）；反之完全没有 BOM 会让中文按 ANSI 读成乱码。
-      规范：**.ps1 必须恰好 1 个 BOM**。check.ps1 的 C12 断言会扫出不合规的文件。
+Background: the editor appends one BOM to .ps1 on every save, and stacked BOMs make Windows PowerShell 5.1
+      fail to parse (Unexpected token '...'); conversely no BOM at all makes text be read as ANSI garbage.
+      Rule: **.ps1 must have exactly 1 BOM**. The C12 assertion in check.ps1 flags non-compliant files.
 
-用法（在仓库根目录下运行）：
-  powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\normalize-bom.ps1           # 修复
-  powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\normalize-bom.ps1 -Check    # 只检查不修（有不合规则退出码 1）
+Usage (run from the repo root):
+  powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\normalize-bom.ps1           # fix
+  powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\normalize-bom.ps1 -Check    # check only, no fix (exit 1 if non-compliant)
 #>
 [CmdletBinding()]
 param(
@@ -31,5 +31,5 @@ foreach ($f in $files) {
   Write-Output ("[FIX] {0}  BOM {1} -> 1" -f $f.Name, $n)
   $bad++
 }
-Write-Output ("扫描 {0} 个 .ps1，需处理 {1} 个" -f $files.Count, $bad)
+Write-Output ("Scanned {0} .ps1 files, {1} need fixing" -f $files.Count, $bad)
 if ($Check -and $bad -gt 0) { exit 1 } else { exit 0 }

@@ -1,32 +1,32 @@
 # design-intent · reg-ep11-2min
 
-**选题**：为什么同一个问题，AI 每次给的答案都不一样（采样 / 温度 / top-p / 温度 0 仍不稳定）
+**Topic**: Why does AI give a different answer to the same question every time (sampling / temperature / top-p / temperature 0 is still unstable)
 
-## 一、这篇要动哪个指标，目标数字多少
+## 1. Which metric should this move, and what's the target number?
 
-动**人均观看秒数**。`data/metrics/latest.json`（2026-10-31T04:51Z 抓取）九篇的 `avg_watch_s` 排序是 4 / 4 / 4 / 8 / 9 / 12 / 18 / 30 / 87，中位 **9s**，上四分位 **18s**。本篇目标 **≥15s**，底线 **12s**（= 本号长片最好的 ep09）。
+Move **average watch seconds per viewer**. In `data/metrics/latest.json` (captured 2026-10-31T04:51Z), the `avg_watch_s` ranking across nine videos is 4 / 4 / 4 / 8 / 9 / 12 / 18 / 30 / 87 — median **9s**, upper quartile **18s**. This video targets **≥15s**, with a floor of **12s** (= ep09, this account's best long-form video).
 
-这个数字不是许愿：账号里人均 >15s 的两篇，曝光都在 1300 以上（1421 / 1416），而 <5s 的五篇全停在 139–674。留存是闸门，先把 15s 拿下来，曝光才有讨论价值。
+That number isn't a wish: the two videos on the account with average watch time >15s both have impressions above 1300 (1421 / 1416), while all five under 5s sit at 139–674. Retention is the gate; hit 15s first, then impressions are worth discussing.
 
-阅读端不设新目标，沿用命中桶 133–249、中枢 **150**（9 篇 `reads` 中位 134）。
+On the read side, no new target: keep the hit bucket 133–249 with a midpoint of **150** (median `reads` across 9 videos: 134).
 
-## 二、参照自己哪一篇，为什么可参照
+## 2. Which of my own videos to reference, and why it's comparable
 
-主要参照 **ep09「AI 替你干活，一次只成一半」**（2'58"，人均 12s，阅读 27，曝光 151）。可参照的理由是形态最近：同样是一条主线的机制解释，同样 2 分钟以上，同样的零前置观众。它做对的是**每拍都在回答上一拍留下的问题**（它为什么只成一半 → 因为它只做了规划 → 规划为什么不够 → 因为执行时没人校验），所以即便阅读只有 27，人均还是拉到了 12s —— 留下来的人是被因果链拽住的，不是被信息量砸住的。
+Main reference: **ep09, "AI does the work for you, but only gets half of it right"** (2'58", average 12s, reads 27, impressions 151). The reason it's comparable is that the form is the closest: also a mechanism explanation with one main thread, also over 2 minutes, also zero prior knowledge viewers. What it got right: **every beat answers the question the previous beat left behind** (why does it only get half right → because it only did planning → why isn't planning enough → because no one validates at execution time), so even with only 27 reads, average watch time still reached 12s — the people who stayed were pulled by the causal chain, not buried by information volume.
 
-它做错的是**结尾没给可带走的东西**：只说了"分三步做"这种原则，没给任何能当天照着敲的数字或命令。本篇补这一条——温度的两档具体值（0–0.2 / 0.8 以上）就是那个"可指向物件"。
+What it got wrong: **the ending gave nothing to take away** — it only offered a principle like "do it in three steps," no number or command you could type the same day. This video fills that gap — the two concrete temperature values (0–0.2 / 0.8 and above) are that "pointable object."
 
-次参照 **ep01「最不烧心 vibe coding skill」**（人均 30s，本号最高），只借它一件事：首句直接给结果，不做任何铺垫。
+Secondary reference: **ep01, "the least painful vibe coding skill"** (average 30s, the account's best). Borrow exactly one thing: the first sentence gives the result directly, with no setup.
 
-## 三、这次规避 cheat-lessons 里的哪一条
+## 3. Which cheat-lessons item does this avoid?
 
-规避**第 6 条**（60 秒电报体 = 听得见但听不懂，ep10 的教训：比喻早于事实、代号没有中文解释）。本篇的具体动作：
+Avoid **item 6** (the 60-second telegram style = audible but unintelligible; the ep10 lesson: metaphors before facts, code names with no explanation). Concrete actions in this video:
 
-- 每个术语**先给日常动作，再给名字**——先说"每说一个字掷一次骰子"，再说"这套动作叫采样"；先说"把这张表变尖或者压平"，再说"这个旋钮叫温度"；先说"把长尾巴砍掉"，再说"它叫 top-p"。顺序不反。
-- 画面同拍挂对应物件：概率条随温度变尖变平、批处理队列里挤进别人的请求、一千次实验的分叉点。**不许只靠口播点名**（ep10 假达标的根源）。
+- Every term **gets the everyday action first, the name second** — first "roll a die for every word it says," then "this operation is called sampling"; first "make this table sharp or flatten it," then "this knob is called temperature"; first "cut off the long tail," then "it's called top-p." The order never reverses.
+- Visuals hang the matching object on the same beat: probability bars sharpening and flattening with temperature, other people's requests crowding into the batching queue, the divergence point of the 1000-run experiment. **Never rely on the narration naming it alone** (the root of ep10's false pass).
 
-同时规避**第 4 条**（给清单拉不住留存）：全片只有一条主张——"它在每一步合法地选，所以你得把选择权拿回来"，结尾那两个温度档位不是并列清单，是同一主张的两个推论。
+At the same time, avoid **item 4** (lists don't hold retention): the whole video has only one claim — "it makes a legal choice at every step, so you have to take the choice back" — and the two temperature tiers at the end aren't a parallel list, they're two corollaries of the same claim.
 
-## 四、时长自述
+## 4. Duration rationale
 
-目标带 150–180s。按本号实测语速 4.48 字/秒（ep10：210 字 / 46.9s）反推，口播需 **670–800 字**，本篇 13 拍按 690 字左右写，出片后用 ffprobe 实测校准 GAP。不主动超 180s。
+Target band 150–180s. Back-calculating from this account's measured speaking rate of 4.48 characters/second (ep10: 210 characters / 46.9s), the narration needs **670–800 characters**; this video's 13 beats are written at around 690 characters, and GAP is calibrated with an actual ffprobe measurement after rendering. Don't deliberately exceed 180s.

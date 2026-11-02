@@ -1,61 +1,61 @@
-# script-selfcheck · <episode>（<拍数> 拍 / <字数> 字 / 预估 <秒>s）
+# script-selfcheck · <episode> (<beat-count> beats / <character-count> characters / estimated <seconds>s)
 
-> 按 `web-video-presentation/references/SCRIPT-STYLE.md` 四层自检逐条走完 → 按 fail 项改稿 → 再定稿。
-> 执行方式：隔离 sub-agent 盲读复述（第四层）+ 主控严格逐项核查（前三层）。
-> 定稿字数：`script.md` <N>（含标点）/ <M> 汉字 / <拍数> 拍；`article.md` <A> → 信息保留度 **<X>%**（≥60% 达标）。
+> Walk through the four-layer self-check in `web-video-presentation/references/SCRIPT-STYLE.md` item by item → revise per failing item → then finalize.
+> How it is executed: an isolated sub-agent blind-reads and restates (layer four) + the lead strictly checks each item (layers one to three).
+> Final character count: `script.md` <N> (including punctuation) / <M> characters / <beat-count> beats; `article.md` <A> → information retention **<X>%** (≥60% passes).
 
-## 一、形式层（8 条原则）
+## 1. Form layer (8 principles)
 
-| # | 原则 | 结论 | 证据 / 处理 |
+| # | Principle | Verdict | Evidence / action |
 |---|---|---|---|
-| 0 | 信息保留度 ≥60% | <PASS/FAIL> | <算式 + 关键事实逐项在稿> |
-| 1 | 口语化 | <...> | <...> |
-| 4 | 开头有钩子 | <...> | <首句原文> |
-| 5 | `---` 切分想法 | <...> | <拍数> |
-| 8 | 具体例子优先 | <...> | <三个具体物件> |
+| 0 | Information retention ≥60% | <PASS/FAIL> | <the arithmetic + each key fact present in the script> |
+| 1 | Colloquial | <...> | <...> |
+| 4 | Opening has a hook | <...> | <the first sentence, verbatim> |
+| 5 | `---` splits ideas | <...> | <beat count> |
+| 8 | Concrete examples first | <...> | <three concrete objects> |
 
-## 二、风骨层（去 AI 味五类）
+## 2. Substance layer (five anti-AI-feel categories)
 
-| 类别 | 结论 | 处理 |
+| Category | Verdict | Action |
 |---|---|---|
-| 假共情 / 假深刻 / 自我标榜 / 万能模板 / 排比堆砌 | <...> | <删了哪句，为什么> |
-| 结尾 CTA | <...> | <动作原文> |
+| Fake empathy / fake depth / self-promotion / universal template / piled-up parallelism | <...> | <which line was cut, and why> |
+| Closing CTA | <...> | <the action, verbatim> |
 
-## 三、念出来测试
+## 3. Read-aloud test
 
-<逐段念，列出"说不出口"的句子 → 改法。没有就写"无"。>
+<Read each paragraph aloud, list the sentences you cannot say out loud → how to fix. Write "none" if there are none.>
 
-## 四、结构层（分类树 / 术语 / 编号 / 回收 / 压缩 / 衔接 / 落题）
+## 4. Structure layer (classification tree / terminology / numbering / callback / compression / transitions / landing the topic)
 
-| # | 检查项 | 结论 | 证据 |
+| # | Check item | Verdict | Evidence |
 |---|---|---|---|
-| 1 | 分类树自洽 | <...> | <...> |
-| 2 | 术语台账 / 首现即解释 | <...> | <每个术语第几拍，先动作后名字> |
-| 3 | 编号必列项 | <...> | <...> |
-| 4 | 回收前置 | <...> | <埋在第几拍，收在第几拍> |
-| 6 | 章间衔接 | <...> | <每章承接理由> |
-| 7 | 开场落题 | <...> | <主体 / 什么事 / 为什么值得看，第几拍齐备> |
+| 1 | Classification tree is self-consistent | <...> | <...> |
+| 2 | Terminology ledger / explained at first occurrence | <...> | <each term's beat, action before name> |
+| 3 | Numbered items are listed | <...> | <...> |
+| 4 | Callback is set up in advance | <...> | <planted in which beat, collected in which beat> |
+| 6 | Transitions between chapters | <...> | <the reason each chapter follows> |
+| 7 | Opening lands the topic | <...> | <subject / what / why worth watching, which beat completes each> |
 
-### 盲读复述（隔离 sub-agent，仅读 `script.md`）
+### Blind-read restatement (isolated sub-agent, reads only `script.md`)
 
-- 分类树：<复述结果>
-- 术语表：<复述结果>
-- 逐章逻辑链：<复述结果>
-- 题目落位：<第几拍>
-- 主体点名：<第几拍出现>
+- Classification tree: <restatement>
+- Terminology list: <restatement>
+- Chapter-by-chapter logic chain: <restatement>
+- Where the topic lands: <which beat>
+- Subject named: <which beat it appears in>
 
-## 五、cheat 视线（v1-retention 五维自评）
+## 5. cheat view (v1-retention five-dimension self-score)
 
-> 打分纪律：不看 `data/metrics`，每维凭稿内证据给一个整数。
+> Scoring discipline: do not look at `data/metrics`; give one integer per dimension backed by evidence inside the script.
 
-| 维 | 分 | 稿内原句作证据 |
+| Dimension | Score | Original line from the script as evidence |
 |---|---|---|
-| **HO** Hook & Hold | <0–5> | <原句> |
-| **PE** Payoff Density | <0–5> | <原句> |
-| **TK** Transferability | <0–5> | <原句> |
-| **NA** One Line | <0–5> | <原句> |
-| **QL** Quotable | <0–5> | <原句> |
+| **HO** Hook & Hold | <0–5> | <original line> |
+| **PE** Payoff Density | <0–5> | <original line> |
+| **TK** Transferability | <0–5> | <original line> |
+| **NA** One Line | <0–5> | <original line> |
+| **QL** Quotable | <0–5> | <original line> |
 
-**自评 composite** = (HO×2 + PE×2 + TK×1.5 + NA×1 + QL×0.5) ÷ 7 × 2 = **<分数>**
+**Self-scored composite** = (HO×2 + PE×2 + TK×1.5 + NA×1 + QL×0.5) ÷ 7 × 2 = **<score>**
 
-盲预测由 `cheat-predict` 的隔离子 agent 单独落盘；两者差 ≥2 分时写进预测档案。
+The blind prediction is written separately by `cheat-predict`'s isolated sub-agent; when they differ by ≥2 points, note it in the prediction file.

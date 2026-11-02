@@ -5,7 +5,7 @@
     "step": 1,
     "start_ms": 0,
     "dur_ms": 8075,
-    "text": "你问 AI 同一个问题，问三遍，它能给你三份答案——标点不一样，第三遍连结论都换了。"
+    "text": "You ask AI the same question three times, and it can give you three answers — the punctuation differs, and by the third run even the conclusion has changed."
   },
   {
     "step_id": "hook:2",
@@ -13,7 +13,7 @@
     "step": 2,
     "start_ms": 8975,
     "dur_ms": 15800,
-    "text": "这不是 bug。它不是在“想”，是在掷骰子——每说一个字，掷一次，这套动作叫采样，就是从一张表里抽一个接上去。所以你用 AI 写文案、改代码、填表，结果稳不稳，全看这颗骰子怎么转。"
+    "text": "This isn't a bug. It isn't \"thinking\"; it's rolling a die — once for every word it says. This operation is called sampling: draw one from a table and append it. So when you use AI to write copy, edit code, or fill in forms, whether the result is stable all depends on how that die turns."
   },
   {
     "step_id": "mech:1",
@@ -21,7 +21,7 @@
     "step": 1,
     "start_ms": 25675,
     "dur_ms": 12626,
-    "text": "它每次只算一件事：下一个词，各有多大概率。你说\"今天天气真\"，它算出一张表——\"好\"六成，\"不错\"两成不到，\"热\"一成，剩下全加起来才一成。"
+    "text": "Each time it computes only one thing: how likely each next word is. You say \"The weather today is really,\" and it computes a table — \"good\" 60%, \"not bad\" just under 20%, \"hot\" 10%, and everything else combined only 10%."
   },
   {
     "step_id": "mech:2",
@@ -29,7 +29,7 @@
     "step": 2,
     "start_ms": 39201,
     "dur_ms": 9825,
-    "text": "挑一个，接上去，再把整句重读一遍，算下一个字。所以第一颗骰子偏一点，后面越走越远，一步偏，步步偏。"
+    "text": "Pick one, append it, reread the whole sentence, compute the next word. So if the first die leans a little, the path drifts further and further — one step off, every step off."
   },
   {
     "step_id": "knob:1",
@@ -37,7 +37,7 @@
     "step": 1,
     "start_ms": 49926,
     "dur_ms": 9150,
-    "text": "想让它听话一点，有旋钮可拧。第一个叫温度，它管的是这张表有多尖——字面意思，温度低，表就尖。"
+    "text": "If you want it to behave, there are knobs to turn. The first is called temperature; it controls how sharp this table is — literally: low temperature, sharp table."
   },
   {
     "step_id": "knob:2",
@@ -45,7 +45,7 @@
     "step": 2,
     "start_ms": 59976,
     "dur_ms": 13226,
-    "text": "温度低，\"好\"字九成五，几乎没悬念；温度高，表被压平，\"热\"也有一成机会，话就开始野。同一句夸奖，它这次说\"真不错\"，下次给你来个\"热得能煎蛋\"。"
+    "text": "At low temperature, \"good\" is 95%, almost no suspense; at high temperature the table is flattened, \"hot\" also gets a 10% chance, and the language starts to run wild. The same compliment: this time it says \"really nice,\" next time it gives you \"hot enough to fry an egg.\""
   },
   {
     "step_id": "knob:3",
@@ -53,7 +53,7 @@
     "step": 3,
     "start_ms": 74102,
     "dur_ms": 12600,
-    "text": "第二个旋钮更直接：只留累计概率到九成的那一小撮，后面那条长尾巴整个砍掉，不让它临场发挥。它叫 top-p，那个 p 就是那条概率线。"
+    "text": "The second knob is more direct: keep only the small set whose cumulative probability reaches 90%, and cut off the entire long tail behind it so it can't improvise. It's called top-p, and that p is the probability line."
   },
   {
     "step_id": "turn:1",
@@ -61,7 +61,7 @@
     "step": 1,
     "start_ms": 87602,
     "dur_ms": 6725,
-    "text": "听起来，把温度拧到零，永远选分最高的那个词，输出总该一模一样了吧。"
+    "text": "Sounds like if you turn temperature to zero and always pick the highest-scoring word, the output should be identical every time."
   },
   {
     "step_id": "turn:2",
@@ -69,7 +69,7 @@
     "step": 2,
     "start_ms": 95227,
     "dur_ms": 9100,
-    "text": "不稳。服务器把你的请求，和别人的请求拼成一批来算。这一批里多一个人，加法的顺序就变了。"
+    "text": "It isn't. The server batches your request together with other people's requests. With one more person in the batch, the order of addition changes."
   },
   {
     "step_id": "turn:3",
@@ -77,7 +77,7 @@
     "step": 3,
     "start_ms": 105227,
     "dur_ms": 10700,
-    "text": "数字末位差那么一点，本来该选\"好\"的词，一下滑到\"不错\"。从这一个字起，后面全跟着偏，最后走出两条完全不同的路。"
+    "text": "The last digit differs by a little, and the word that should have been \"good\" slips to \"not bad.\" From that one word on, everything after it drifts, and you end up on two completely different paths."
   },
   {
     "step_id": "turn:4",
@@ -85,7 +85,7 @@
     "step": 4,
     "start_ms": 116827,
     "dur_ms": 10950,
-    "text": "有人拿同一个问题、温度零，跑了一千次，收到八十个不一样的答案。前一百零二个词一模一样，第一百零三个词开始分叉。"
+    "text": "Someone took the same question, temperature zero, and ran it 1000 times, getting 80 different answers. The first 102 words were identical; divergence began at word 103."
   },
   {
     "step_id": "fix:1",
@@ -93,7 +93,7 @@
     "step": 1,
     "start_ms": 128677,
     "dur_ms": 13200,
-    "text": "所以要稳，不是调出来的，是验出来的。改代码、跑测试、填表，温度压到零到零点二，再加一道校验：让它写，让程序判对错，错了重跑，别指望一次就对。"
+    "text": "So stability isn't something you tune; it's something you verify. Editing code, running tests, filling in forms: push temperature to 0–0.2, then add a validation step — let it write, let the program judge correctness, rerun on failure, and don't expect one-shot correctness."
   },
   {
     "step_id": "fix:2",
@@ -101,6 +101,6 @@
     "step": 2,
     "start_ms": 142777,
     "dur_ms": 14950,
-    "text": "想标题、起名字，反过来，把温度调成零点八以上，一次要十个，你来挑。温度别和 top-p 一起拧。回到开头那三份答案——它每一步都在合法地选，选择权得留在你手里。"
+    "text": "Brainstorming titles, naming things: the opposite — set temperature to 0.8 or above, ask for ten at once, and you pick. Don't turn temperature and top-p together. Back to those three answers at the start — it makes a legal choice at every step; the choice has to stay in your hands."
   }
 ]

@@ -1,52 +1,52 @@
-# cover.py · 阿囤囤风格小红书封面渲染工具
+# cover.py · Atuntun-style Xiaohongshu cover image renderer
 
-把「文字方案（提示词）」直接渲染成成品封面图：HTML/CSS 按阿囤囤规范排版
-1080×1440（3:4）→ Playwright 无头 Chrome 截图出 PNG。中文大字全部走 CSS，
-不经文生图，杜绝错字。人物图只做圆形裁切 + 描边，不生成/不重绘人脸。
+Renders a "copy plan (prompt)" straight into a finished cover image: HTML/CSS laid out per the Atuntun spec at
+1080×1440 (3:4) → Playwright headless Chrome screenshot to PNG. All large text goes through CSS,
+never text-to-image, eliminating wrong characters. The person image only gets a circular crop + stroke; faces are never generated or redrawn.
 
-## 用法
+## Usage
 
 ```
-python tools\cover\cover.py --title "主标题" --person <人物图绝对路径> --out <输出png绝对路径> [可选参数]
+python tools\cover\cover.py --title "<main-title>" --person <absolute-path-to-person-image> --out <absolute-output-png-path> [optional args]
 ```
 
-## 参数
+## Parameters
 
-| 参数 | 必填 | 默认 | 说明 |
+| Parameter | Required | Default | Description |
 |---|---|---|---|
-| `--title` | 是 | — | 主标题，大字压顶（超粗黑体 + 浅黄填充 + 粗黑描边） |
-| `--person` | 二选一 | — | 人物素材图绝对路径（真人照/头像等真实位图）；与 `--no-person` 二选一 |
-| `--no-person` | 二选一 | — | 无人物版（无合适真人照时），版式自动垂直居中不留白 |
-| `--out` | 是 | — | 输出 PNG 绝对路径，严格 1080×1440 |
-| `--subtitle` | 否 | 空 | 副标题（风格 1 白色粗体；风格 4 底部浅黄横幅） |
-| `--style` | 否 | 1 | 风格：1=大字压顶风，4=教程清单风；其他编号报错 |
-| `--accent` | 否 | `#FDFFA7` | 主色（柔和浅黄），用于标题填充/描边/横幅 |
-| `--bg` | 否 | `#0d1117` | 背景色（GitHub 暗色），自动推导渐变与暗角 |
-| `--items` | 否 | — | 风格 4 的绿色 ✅ 清单条目，可重复传 |
-| `--caption` | 否 | 空 | 底部来源标注文字 |
-| `--stickers` | 否 | 开 | 风格 1 主题贴纸开关（emoji 装饰，主题中立），`--no-stickers` 关闭 |
-| `--sticker-label` | 否 | 空 | 风格 1 文字卡片贴纸主文案；**不传则无卡片**，禁止沿用上一期文案 |
-| `--sticker-sub` | 否 | 空 | 文字卡片贴纸副文案，配合 `--sticker-label` |
+| `--title` | Yes | — | Main title, large characters on top (extra-bold sans + light-yellow fill + thick black stroke) |
+| `--person` | One of two | — | Absolute path to the person asset (a real photo / avatar, a genuine bitmap); mutually exclusive with `--no-person` |
+| `--no-person` | One of two | — | No-person variant (when there is no suitable real photo); the layout auto-centers vertically with no gaps |
+| `--out` | Yes | — | Absolute output PNG path, strictly 1080×1440 |
+| `--subtitle` | No | empty | Subtitle (style 1: white bold; style 4: light-yellow banner at the bottom) |
+| `--style` | No | 1 | Style: 1 = large characters on top, 4 = tutorial checklist; other numbers error out |
+| `--accent` | No | `#FDFFA7` | Primary color (soft light yellow), used for title fill/stroke/banner |
+| `--bg` | No | `#0d1117` | Background color (GitHub dark); gradient and vignette are derived automatically |
+| `--items` | No | — | Green ✅ checklist items for style 4; pass repeatedly |
+| `--caption` | No | empty | Source attribution text at the bottom |
+| `--stickers` | No | on | Theme sticker switch for style 1 (emoji decoration, theme-neutral); `--no-stickers` turns it off |
+| `--sticker-label` | No | empty | Main copy for the style-1 text-card sticker; **not passing it means no card**; reusing the previous episode's copy is forbidden |
+| `--sticker-sub` | No | empty | Secondary copy for the text-card sticker, used with `--sticker-label` |
 
-## 示例
+## Examples
 
 ```powershell
-# 风格 1：大字压顶
-python tools\cover\cover.py --title "大佬开源压箱底" --subtitle "AI写代码不再翻车" `
-  --person "<头像图片路径>" --style 1 `
-  --caption "封面人物：某某 公开 GitHub 头像 · 仅作素材引用" --out $env:TEMP\c1.png
+# Style 1: large characters on top
+python tools\cover\cover.py --title "The toolkit an expert finally open-sourced" --subtitle "AI writes code without crashing" `
+  --person "<absolute-path-to-avatar-image>" --style 1 `
+  --caption "Cover person: name withheld, public GitHub avatar · used as material only" --out $env:TEMP\c1.png
 
-# 风格 4：教程清单（人物居右 + 左侧绿色勾选清单 + 底部横幅）
-python tools\cover\cover.py --title "一行命令装好 Skills" --subtitle "免费开源可组合" `
-  --person "<头像图片路径>" --style 4 `
-  --items "一行命令装，自更新不过期" --items "含 tdd / grill-me 技能" --items "免费开源" `
+# Style 4: tutorial checklist (person on the right + green checklist on the left + bottom banner)
+python tools\cover\cover.py --title "Install Skills with one command" --subtitle "Free, open source, composable" `
+  --person "<absolute-path-to-avatar-image>" --style 4 `
+  --items "One command to install, self-updating, never expires" --items "Includes tdd / grill-me skills" --items "Free and open source" `
   --out $env:TEMP\c4.png
 ```
 
-## 依赖
+## Dependencies
 
-- 本机 Chrome（Playwright channel "chrome"，headless）
-- `tools/record/node_modules/playwright-core`（在 `tools/record` 下执行 `npm install`）
-- node.exe 在 PATH 中，或用环境变量 `NODE_EXE` 指定绝对路径
+- Local Chrome (Playwright channel "chrome", headless)
+- `tools/record/node_modules/playwright-core` (run `npm install` under `tools/record`)
+- node.exe on PATH, or specify an absolute path with the `NODE_EXE` environment variable
 
-HTML 中间文件写到系统临时目录，截图后即删，项目目录不留垃圾。
+The intermediate HTML file is written to the system temp directory and deleted after the screenshot, so no junk is left in the project directory.

@@ -1,85 +1,85 @@
-# outline.md · 分镜大纲（ep11 · 5 章 13 步 · 2 分钟档）
+# outline.md · Shot Outline (ep11 · 5 chapters, 13 steps · 2-minute format)
 
-> 竖版 1080×1440（`--ratio=3:4`），主题 `warm-keynote`（暖米底 `#f5efe1` / 墨棕字 `#43302b` / teal 强调 `#14b8a6`）。
-> 结构：**钩子 2 拍 → 机制 2 拍 → 两个旋钮 3 拍 → 反转 4 拍 → 落地 2 拍**（13 拍 == script.md 拍数 == narrations.ts 总长）。
-> 版式统一走 `.stage-3band`：`band-top` 钩子行 / `band-main` 主视觉 ≥55% / `band-foot` 注释行（**带信源标注**）。
-> **首帧即封面**（本号 2026-10-27 起不设封面）：第 1 拍自带大标题「三份答案，三种说法」+ 三条不同的 AI 回答同屏。
-> 转场：同章内「同窗口内容重绘」（110ms 终态）；跨章「整体上移 20px + 淡入」。
-> `beats.json` 为排布计划版（估时按 4.4 字/秒），出片后以 `raw\marks.json` 为时间参考。
-> 每步必挂 ≥1 个 `components/viz` 具象元素；3:4 舞台横扁元素不单挂（`BarChart` / `TimelineRail` / `CardGrid` 均配一条自定义可视化填满中部）。
+> Portrait 1080×1440 (`--ratio=3:4`), theme `warm-keynote` (warm beige background `#f5efe1` / ink-brown text `#43302b` / teal accent `#14b8a6`).
+> Structure: **hook 2 beats → mechanism 2 beats → two knobs 3 beats → twist 4 beats → landing 2 beats** (13 beats == script.md beat count == narrations.ts total).
+> Layout uses `.stage-3band` throughout: `band-top` hook line / `band-main` key visual ≥55% / `band-foot` caption line (**with source annotation**).
+> **First frame is the cover** (this account stopped using separate covers from 2026-10-27): beat 1 carries the big title "Three answers, three versions" + three different AI answers on one screen.
+> Transitions: within a chapter, "redraw content in the same window" (110ms final state); across chapters, "shift everything up 20px + fade in."
+> `beats.json` is the layout-plan version (timing estimated at 4.4 characters/second); after rendering, use `raw\marks.json` as the time reference.
+> Every step must carry ≥1 concrete `components/viz` element; wide, flat elements don't stand alone on a 3:4 stage (`BarChart` / `TimelineRail` / `CardGrid` each pair with a custom visualization filling the middle).
 
-## 01 · 钩子：三份答案（hook）｜2 步
+## 01 · Hook: three answers (hook) | 2 steps
 
-**叙事衔接**：开场不给背景，直接给现象物证——同一句提问，三个回答，第三个连结论都反了。第 2 拍才给这件事命名（采样），把"模型坏了"的默认假设打破。
+**Narrative link**: The opening gives no background, just physical evidence of the symptom — same question, three answers, and the third even reverses the conclusion. Only beat 2 names the phenomenon (sampling), breaking the default assumption that "the model is broken."
 
-**信息池**
-- 现象：同一 prompt、同一模型，多次输出不同 —— facts §二 F4（S1）
-- 命名：每生成一个词抽一次 = 采样 —— facts §二 F1（S3 / S4）
-- 关键区分：不是"想岔了"，是每一步都在合法地选 —— facts §四.论证链
+**Information pool**
+- Symptom: same prompt, same model, different output across runs — facts §2 F4 (S1)
+- Naming: drawing once per generated word = sampling — facts §2 F1 (S3 / S4)
+- Key distinction: not "it thought wrong," but a legal choice at every step — facts §4 Argument chain
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Visual | Element | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
-| 1 | 顶部「你问 AI · 同一个问题 · 问三遍」小字 + 「三份答案，三种说法」大字；中部四个对话气泡：一句提问 + 三条不同回答，第三条压亮并挂「结论反了」角标；底部「同一句提示词 · 同一个模型」 | ChatBubbles | 气泡自上而下依次落位，第 4 条延迟 110ms 压亮 | 标题 → 提问 → 三条回答 | 1.2s |
-| 2 | 顶部「AI 不是在"想"，是在掷骰子」；中部环形箭头中心「掷骰子 / 每说一个字一次」，右下角贴「这套动作叫采样」+「你写的文案、代码都受影响」；底部「采样 = 从一张概率表里抽一个接上去」 | LoopArrow | 环先自绘，中心字放大弹入，角标延迟压亮 | 环 → 中心字 → 角标 | 1.2s |
+| 1 | Top small text "You ask AI · the same question · three times" + big text "Three answers, three versions"; middle four chat bubbles: one question + three different answers, the third highlighted with a "conclusion reversed" corner tag; bottom "Same prompt · same model" | ChatBubbles | Bubbles drop in top to bottom, the 4th delayed 110ms and highlighted | Title → question → three answers | 1.2s |
+| 2 | Top "AI isn't 'thinking'; it's rolling dice"; middle circular arrow center "Rolling dice / once per word"; bottom-right tag "This operation is called sampling" + "Your copy and code are both affected"; bottom "Sampling = draw one from a probability table and append it" | LoopArrow | Ring draws itself first, center text scales in, tags highlight after a delay | Ring → center text → tags | 1.2s |
 
-## 02 · 机制：一次只算一个词（mech）｜2 步
+## 02 · Mechanism: one word at a time (mech) | 2 steps
 
-**叙事衔接**：承接第 2 拍留下的"抽的是什么表"。先把表画出来（四根条），再解释"抽完接上去、重新读一遍"为什么会一步偏步步偏。
+**Narrative link**: Picks up the "what table is it drawing from" left by beat 2. First draw the table (four bars), then explain why "draw, append, reread" makes one off step lead to every step off.
 
-**信息池**
-- 机制：每步给词表里每个词打分 → softmax 归一成概率 → 抽一个 —— facts §二 F1（S3 / S4）
-- 示例分布：「好」六成 / 「不错」两成不到 / 「热」一成 / 其余一成 —— facts §四.例子 A
-- 累积效应：同一个 token 之后进入上下文，影响后续所有步 —— facts §二 F1（S3）
+**Information pool**
+- Mechanism: each step scores every word in the vocabulary → softmax normalizes into probabilities → draw one — facts §2 F1 (S3 / S4)
+- Example distribution: "good" 60% / "not bad" just under 20% / "hot" 10% / rest 10% — facts §4 Example A
+- Cumulative effect: the same token enters the context and affects all subsequent steps — facts §2 F1 (S3)
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Visual | Element | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
-| 3 | 顶部「下一个词，各有多大概率」；中部四根竖条 60/18/10/12，条顶挂百分数；条下三枚短标签「词表 5 万+ / 只画前四名 / 其余全加起来 12%」；底部「你说：今天天气真」 | BarChart | 四根条依次生长（`viz-grow`），最高条最后压亮 | 条 1 → 条 4 → 最高条 | 1.5s |
-| 4 | 顶部「挑一个，接上去，重读一遍」；中部上：生成顺序轨道 6 个词（今天/天气/真/好/，/…）；中部下：自绘分叉——同一根线在第 4 个词裂成两条，末端两句不同的句子；底部「第一颗骰子偏一点，后面越走越远」 | TimelineRail + 自绘分叉 | 轨道从左到右点亮，分叉线自绘 300ms，两条末端依次浮入 | 轨道 → 分叉点 → 两条结局 | 1.2s |
+| 3 | Top "How likely is each next word"; middle four vertical bars 60/18/10/12 with percentages on top; three short labels under the bars "vocabulary 50k+ / only the top four shown / the rest combined 12%"; bottom "You say: The weather today is really" | BarChart | Four bars grow in sequence (`viz-grow`), the tallest highlighted last | Bar 1 → bar 4 → tallest bar | 1.5s |
+| 4 | Top "Pick one, append it, reread"; middle top: generation-order rail with 6 words (The/weather/today/is/really/…); middle bottom: hand-drawn fork — the same line splits at the 4th word into two different sentences at the ends; bottom "If the first die leans a little, the path drifts further and further" | TimelineRail + hand-drawn fork | Rail lights up left to right, fork drawn over 300ms, the two endings fade in in sequence | Rail → fork point → two endings | 1.2s |
 
-## 03 · 两个旋钮（knob）｜3 步
+## 03 · Two knobs (knob) | 3 steps
 
-**叙事衔接**：承接"表"这个已建立的物件——既然是从表里抽，就有旋钮改这张表的形状。先讲温度（尖/平），再讲 top-p（砍尾巴），两个旋钮讲完才逼出下一章的"那拧到最紧呢"。
+**Narrative link**: Picks up the already-established "table" object — since it draws from a table, there are knobs that change the table's shape. Cover temperature first (sharp/flat), then top-p (cut the tail); only after both knobs does the next chapter's "so what if you turn it all the way tight?" become inevitable.
 
-**信息池**
-- 温度：softmax 前除 logits，<1 变尖、>1 压平、趋近 0 = 贪心 —— facts §二 F2（S4）
-- 尖表：最高分词 ~95% —— facts §四.例子 B
-- 平表：最高分掉到 ~30%，冷门词也有机会；口语例子「真不错 / 热得能煎蛋」 —— facts §四.例子 B
-- top-p：保留累计概率达 p 的最小词集，截断长尾 —— facts §二 F3（S2）
-- 别同时拧两个 —— facts §二 F8（S4）
+**Information pool**
+- Temperature: divides logits before softmax; <1 sharpens, >1 flattens, approaching 0 = greedy — facts §2 F2 (S4)
+- Sharp table: top word ~95% — facts §4 Example B
+- Flat table: top score drops to ~30%, fringe words get a chance; spoken examples "really nice / hot enough to fry an egg" — facts §4 Example B
+- top-p: keep the smallest word set whose cumulative probability reaches p, truncate the long tail — facts §2 F3 (S2)
+- Don't turn both at once — facts §2 F8 (S4)
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Visual | Element | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
-| 5 | 顶部「第一个旋钮：温度」；中部四根条变尖（95/3/1/1），右侧竖刻度轨指针压到「低」端；底部「温度低 → 表尖 → 几乎没悬念」 | BarChart + 自绘刻度轨 | 条从上一拍形态形变到尖表，指针自下滑到低端 | 条 → 指针 → 「尖」标签 | 1.2s |
-| 6 | 顶部「温度高，表被压平」；中部四根条摊平（30/28/22/20），下方两张小卡对照同一句夸奖的两种说法；底部「同一句夸奖，这次"真不错"，下次"热得能煎蛋"」 | BarChart + 自绘双卡 | 条形变到平表，两张卡依次浮入并压亮 | 条 → 卡 1 → 卡 2 | 1.2s |
-| 7 | 顶部「第二个旋钮：只留九成」；中部八根长尾条，一条竖直刀线扫过第 5 根，右侧长尾整体灰掉塌陷；底部「它叫 top-p：累计到九成，后面全砍」 | BarChart + 自绘刀线 | 刀线自右向左扫入，越线部分灰掉并下沉 | 刀线 → 灰掉的尾巴 | 1.2s |
+| 5 | Top "First knob: temperature"; middle four bars sharpen (95/3/1/1), the pointer on the vertical scale rail on the right pushed to the "low" end; bottom "Low temperature → sharp table → almost no suspense" | BarChart + hand-drawn scale rail | Bars morph from the previous beat's shape to the sharp table, pointer slides from below to the low end | Bars → pointer → "sharp" label | 1.2s |
+| 6 | Top "High temperature, the table is flattened"; middle four bars flatten (30/28/22/20), two small cards below compare the two versions of the same compliment; bottom "Same compliment: this time 'really nice,' next time 'hot enough to fry an egg'" | BarChart + hand-drawn two cards | Bars morph to the flat table, the two cards fade in and highlight in sequence | Bars → card 1 → card 2 | 1.2s |
+| 7 | Top "Second knob: keep only 90%"; middle eight long-tail bars, a vertical knife line sweeps past the 5th, the long tail on the right grays out and collapses; bottom "It's called top-p: cumulative to 90%, cut everything after" | BarChart + hand-drawn knife line | Knife line sweeps in from right to left, the part beyond the line grays out and sinks | Knife line → grayed tail | 1.2s |
 
-## 04 · 反转：拧到零也不稳（turn）｜4 步
+## 04 · Twist: tight to zero, still unstable (turn) | 4 steps
 
-**叙事衔接**：承接第 7 拍"不让它临场发挥"给人的松口气感，第 8 拍把温度拧到零（按 S1 的说法该稳了），第 9 拍立刻掀翻（批处理），第 10 拍给"翻盘"的微观机制，第 11 拍给量级证据。这是全片留存的转折段。
+**Narrative link**: Picks up the relief beat 7 gives with "so it can't improvise"; beat 8 turns temperature to zero (which, per S1, should be stable), beat 9 immediately overturns it (batching), beat 10 gives the micro-mechanism of the upset, beat 11 gives the scale of evidence. This is the retention turn of the whole video.
 
-**信息池**
-- 温度 0 的官方预期：一致、可重复 —— facts §二 F4（S1）
-- 真因：kernel 非 batch-invariant + 批大小随负载变化 → 归约顺序变 —— facts §二 F5（S3）
-- 微观后果：末位小数翻转近并列候选 —— facts §二 F5（S3 / S4）
-- 量级：1000 次贪心 → 80 个唯一结果，前 102 token 一致、第 103 分叉 —— facts §二 F6（S3）
+**Information pool**
+- Official expectation for temperature 0: consistent, repeatable — facts §2 F4 (S1)
+- Real cause: kernels are not batch-invariant + batch size varies with load → reduction order changes — facts §2 F5 (S3)
+- Micro consequence: the last decimal flips near-tied candidates — facts §2 F5 (S3 / S4)
+- Scale: 1000 greedy runs → 80 unique results, first 102 tokens identical, divergence at 103 — facts §2 F6 (S3)
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Visual | Element | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
-| 8 | 顶部「温度拧到零，总该一模一样了吧」；中部三张完全相同的卡「选最高分」竖排；底部「官方文档也这么说：要可重复，就用零」 | CardGrid（1 列 × 3） | 三张卡同速落位（刻意让"入场动画也一样"），末张压亮 | 三张同款卡 | 1.2s |
-| 9 | 顶部「不稳」；中部四段管道：你的请求 / 别人的请求 / 拼成一批 / 一起算，批框里挤进 3 个陌生请求；底部「多一个人，加法被拆开重排」 | PipelineFlow + 自绘批框 | 管道依次点亮，批框在第 3 段外扩并塞入三个方块 | 段 1 → 批框 → 挤入方块 | 1.2s |
-| 10 | 顶部「末位差一点，就翻盘」；中部两根几乎等高的条 0.5001 / 0.4991，指针从左边抖到右边；底部「本该选"好"的词，一下滑到"不错"」 | BarChart + 自绘指针 | 两根条同高生长（差 0.001 看不出来），指针抖动后滑向右侧 | 两根条 → 指针 → 落点 | 1.2s |
-| 11 | 顶部「一千次，八十个答案」；中部时间轨：前 102 个词同色、第 103 个节点裂成两条，轨道右侧标 1000 / 80；底部「前一百零二个词一模一样，第一百零三个词开始分叉」 | TimelineRail + 自绘分叉点 | 轨道点亮到分叉点停住，分叉线与 80 角标延迟浮入 | 轨道 → 分叉点 → 80 | 1.5s |
+| 8 | Top "Turn temperature to zero, this should be identical now"; middle three identical cards "pick the highest score" stacked vertically; bottom "The official docs say so too: for repeatability, use zero" | CardGrid (1 col × 3) | Three cards land at the same speed (deliberately "the entrance animation is identical too"), last card highlighted | Three identical cards | 1.2s |
+| 9 | Top "Unstable"; middle four pipeline stages: your request / other people's requests / batched together / computed together, with 3 unfamiliar requests squeezed into the batch frame; bottom "One more person, additions split and reordered" | PipelineFlow + hand-drawn batch frame | Pipeline lights up in sequence, batch frame expands at stage 3 and squeezes in three blocks | Stage 1 → batch frame → squeezed blocks | 1.2s |
+| 10 | Top "Last digit differs a little, and it flips"; middle two nearly equal bars 0.5001 / 0.4991, pointer wobbles from left to right; bottom "The word that should have been 'good' slips to 'not bad'" | BarChart + hand-drawn pointer | Two bars grow to equal height (a 0.001 difference is invisible), pointer wobbles then slides right | Two bars → pointer → landing point | 1.2s |
+| 11 | Top "One thousand runs, eighty answers"; middle timeline: first 102 words same color, node 103 splits into two, rail labeled 1000 / 80 on the right; bottom "The first 102 words identical, divergence at word 103" | TimelineRail + hand-drawn fork point | Rail lights up and stops at the fork, fork line and the 80 tag fade in after a delay | Rail → fork point → 80 | 1.5s |
 
-## 05 · 落地：两档温度，一条纪律（fix）｜2 步
+## 05 · Landing: two temperature tiers, one rule (fix) | 2 steps
 
-**叙事衔接**：承接"参数救不了你"，唯一出路是分场景设档 + 加校验。最后一步回收第 1 拍的三份答案，把结论抬到"选择权在谁手里"。
+**Narrative link**: Picks up "parameters can't save you"; the only way out is scenario-based tiers + validation. The last step callbacks the three answers from beat 1 and lifts the conclusion to "whose hands the choice is in."
 
-**信息池**
-- 要稳：温度 0–0.2 + 校验 + 重跑（低温度不保证正确） —— facts §二 F7 / F9（S4）
-- 要发散：0.8–1.0，一次要多个候选 —— facts §二 F7（S4）
-- 纪律：温度与 top-p 只调一个 —— facts §二 F8（S4）
+**Information pool**
+- For stability: temperature 0–0.2 + validation + rerun (low temperature doesn't guarantee correctness) — facts §2 F7 / F9 (S4)
+- For divergence: 0.8–1.0, several candidates per request — facts §2 F7 (S4)
+- Rule: tune only one of temperature and top-p — facts §2 F8 (S4)
 
-| step | 画面 | 元素 | 转场 | 视觉焦点 | 保护 |
+| step | Visual | Element | Transition | Visual focus | Protection |
 |---|---|---|---|---|---|
-| 12 | 顶部「要稳，不是调出来的，是验出来的」；中部四张卡 2×2：要稳 0–0.2 / 加一道校验 / 要发散 0.8+ / 一次要十个；底部「错了重跑，别指望一次就对」 | CardGrid（2 列 × 2） | 四张卡按 2×2 依次落位，第 2、4 张延迟 110ms | 卡 1 → 卡 2 → 卡 3 → 卡 4 | 1.2s |
-| 13 | 顶部大字「温度是它的，选择权是你的」；中部三行清单：别和 top-p 一起拧 / 每一步都在合法地选 / 把校验留在自己手里；底部回收「回到开头那三份答案」 | ListStack | 三行自上而下落位，第 3 行压亮，顶部大字延迟弹入 | 三行 → 第 3 行 → 顶部大字 | 1.5s |
+| 12 | Top "Stability isn't tuned; it's verified"; middle four cards 2×2: stability 0–0.2 / add a validation step / divergence 0.8+ / ask for ten at once; bottom "Rerun on failure, don't expect one-shot correctness" | CardGrid (2 cols × 2) | Four cards land 2×2 in sequence, cards 2 and 4 delayed 110ms | Card 1 → card 2 → card 3 → card 4 | 1.2s |
+| 13 | Top big text "The temperature is its, the choice is yours"; middle three-row list: don't turn it with top-p / a legal choice at every step / keep validation in your own hands; bottom callback "Back to those three answers at the start" | ListStack | Three rows land top to bottom, row 3 highlighted, top big text scales in after a delay | Three rows → row 3 → top big text | 1.5s |

@@ -1,32 +1,32 @@
-# script.md · <episode>（<N> 拍口播）
+# script.md · <episode> (<N> narration beats)
 
 <!--
-写作规则（详见 docs/VIDEO-GUIDE.md 与 web-video-presentation 的 SCRIPT-STYLE.md）：
-- 一拍 = 一个聚焦想法，用 --- 分隔；拍数 = 网页 step 数 = 音频段数。
-- 首拍不得是问候 / 背景 / "最近 AI 很火"；首句直接给结果、失败画面或反直觉数字，并点名"谁中招"。
-- 术语顺序：先给日常动作，再给名字。
-- 每 2–3 拍至少一个因果连接词；结尾给当天能做的动作，并回收开头钩子。
-- 目标时长 150–180s；按 4.4–4.8 字/秒反推，口播约 560–680 字。
+Writing rules (see docs/VIDEO-GUIDE.md and web-video-presentation's SCRIPT-STYLE.md for details):
+- One beat = one focused idea, separated by ---; beat count = web page step count = audio segment count.
+- The first beat must not be a greeting / background / "AI is hot lately"; the first sentence gives the result, a failure screen or a counter-intuitive number directly, and names "who gets hit".
+- Terminology order: give the everyday action first, then the name.
+- At least one causal connective every 2-3 beats; the ending gives an action the viewer can do today and calls back to the opening hook.
+- Target duration 150-180s; derived from 4.4-4.8 characters/second, so the narration is about 560-680 characters.
 -->
 
-<第一拍：钩子——具体结果 / 失败画面 / 反直觉数字，点名主体。>
+<Beat 1: hook — a concrete result / failure screen / counter-intuitive number, naming the subject.>
 
 ---
 
-<第二拍：补相关性——这件事和观众有什么关系；给出题目或命名。>
+<Beat 2: add relevance — how this relates to the viewer; give the topic or the name.>
 
 ---
 
-<第三拍：机制第一层——先给动作，再给术语。>
+<Beat 3: mechanism layer one — give the action first, then the term.>
 
 ---
 
-<第四拍：机制第二层——用具体例子 / 数字把机制落地。>
+<Beat 4: mechanism layer two — land the mechanism with a concrete example / number.>
 
 ---
 
-<第五拍：反转——"听起来该解决了，但其实不够"，给出反例。>
+<Beat 5: reversal — "sounds like it should be solved, but it is not enough", give a counter-example.>
 
 ---
 
-<第六拍：落地——当天能做的动作；回收开头的钩子。>
+<Beat 6: landing — the action the viewer can do today; call back to the opening hook.>

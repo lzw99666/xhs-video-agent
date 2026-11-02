@@ -1,28 +1,29 @@
 # -*- coding: utf-8 -*-
 """
-compress-audit.py —— 口播稿压缩审计（半自动）
+compress-audit.py — narration script compression audit (semi-automatic)
 ==============================================
-对比 article.md（素材长文）与同目录 script.md（口播稿），用 difflib 找出
-「article 里有、但 script 里没了（或相似度低于阈值）」的句子 = 被删句，
-并对每条被删句判定是否属于「必保项」（分类 / 过渡 / 限定 / 框架），
-提醒人工复核是否压缩过头。
+Compare article.md (the long source article) with script.md (the narration script) in
+the same directory, and use difflib to find sentences that "exist in article but are
+gone (or below the similarity threshold) in script" = deleted sentences, then judge
+whether each deleted sentence is a "must-keep item" (classification / transition /
+qualification / framework), warning that human review is needed in case compression went too far.
 
-背景：一次返工把 article 的 1007 字压到 script 的 646 字，删过头了 ——
-框架句（「第一种读结构化数据，里面又分两路」）、过渡句（「它们转起来是个很朴素的
-循环」）、关键举例句都被当成「重复解释」删掉，导致口播逻辑断裂。
-本工具让这类「删过头」肉眼可见。
+Background: one rework compressed the article from 1007 characters down to a 646-character
+script, cutting too much — the framework sentence ("the first kind reads structured data, and inside it splits into two routes"),
+transition sentences ("when they spin it is a very plain loop"), and key example sentences were all deleted as
+"repeated explanation", breaking the narration's logic. This tool makes such "cut too much" cases visible.
 
-用法（在仓库根目录下运行）：
+Usage (run from the repo root):
   python tools/pipeline/compress-audit.py --article <article.md> --script <script.md> [--out <report.md>]
 
-参数：
-  --article  素材长文路径（.md），必填
-  --script   口播稿路径（.md），必填
-  --out      报告输出路径（.md）；缺省打印到标准输出
+Arguments:
+  --article  long source article path (.md), required
+  --script   narration script path (.md), required
+  --out      report output path (.md); default prints to stdout
 
-退出码：0 = 正常（含两文件皆空）；2 = 参数/环境错误（文件不存在等）。
+Exit codes: 0 = OK (including both files empty); 2 = argument/environment error (file missing, etc.).
 
-零第三方依赖（difflib / re / argparse / pathlib）。
+Zero third-party dependencies (difflib / re / argparse / pathlib).
 """
 
 import argparse
@@ -31,37 +32,55 @@ import re
 import sys
 from pathlib import Path
 
-# 被删句判定阈值：article 句与 script 中最佳匹配句的相似度 < 该值时，
-# 视为「被删」。中文短句在 difflib 下的相似度天然偏高，故取 0.6。
+# Deleted-sentence threshold: when the similarity between an article sentence and its best match
+# in script is < this value, treat it as "deleted". Short sentences score naturally high
+# under difflib, so use 0.6.
 SIM_THRESHOLD = 0.6
 
-# ---- 必保项关键词启发式（大小写/全半角无关，经 norm_key 归一后再匹配）----
-# 分类句：分类 / 序号词
-KW_CLASSIFY = ["分", "两类", "两种", "三种", "第一", "第二", "第三",
-               "里面又", "一路", "二路", "一类", "二类"]
-# 过渡句：承接词（另含「句首疑问句」）
-KW_TRANSITION = ["转起来", "怎么", "那", "所以", "因此", "也就是说",
-                 "接下来", "回到", "先看", "再看", "换句话说", "这时候"]
-# 限定语：限定 / 免责词
-KW_LIMIT = ["不是", "只有", "一家", "以一个", "至少", "不低于", "不宣称",
-            "不一定", "可能", "并非"]
-# 框架句：定义句式（另需句长 ≥ 18）
-KW_FRAME = ["是", "叫", "就是", "指的是"]
+# ---- Must-keep keyword heuristics (case/full-width agnostic, matched after norm_key) ----
+# Keywords are matched against norm_key(), which lowercases and strips ALL whitespace, so
+# multi-word English keywords must be written space-free (e.g. "twokinds", not "two kinds").
+# Classification sentences: classification / ordinal words
+KW_CLASSIFY = ["classify", "classification", "category", "categories",
+               "twokinds", "twotypes", "threekinds", "threetypes",
+               "tworoutes", "routeone", "routetwo", "splitsinto", "splitsintotwo",
+               "subtype", "subcategory", "firstkind", "secondkind",
+               "firsttype", "secondtype", "firstroute", "secondroute",
+               "kindone", "kindtwo", "typeone", "typetwo",
+               "first", "second", "third"]
+# Transition sentences: linking words (also includes "question at sentence start")
+KW_TRANSITION = ["then", "so", "next", "therefore", "thus", "hence",
+                 "however", "but", "whichmeans", "thatmeans", "thatsaid",
+                 "inotherwords", "atthispoint", "backto", "backtothe",
+                 "lookat", "firstlook", "nowlook", "turnsout", "itturnsout"]
+# Qualifiers: limitation / disclaimer words
+KW_LIMIT = ["not", "only", "just", "atleast", "atmost", "upto", "nomorethan",
+            "maybe", "might", "possibly", "probably", "roughly", "cannot",
+            "dont", "doesnt", "isnt", "never"]
+# Framework sentences: definition patterns (also requires sentence length ≥ 18)
+KW_FRAME = ["iscalled", "isdefinedas", "isknownas", "definedas", "refersto",
+            "means", "istheprocessof", "isthepracticeof", "isatypeof",
+            "isakindof", "isamethodof", "whatwecall", "thatiswhat"]
 FRAME_MIN_LEN = 18
 
-# 句首疑问词（用于「过渡句」判定）
-Q_HEAD = ["哪", "怎么", "为什么", "为何", "如何", "吗", "谁", "什么",
-          "几", "多少", "是否", "难道"]
+# Sentence-initial question words (used for the "transition" judgment)
+# is_question() compares the raw sentence prefix case-sensitively, so the English entries are
+# listed in both lowercase and sentence-initial capitalized form.
+Q_HEAD = ["what", "What", "why", "Why", "how", "How", "who", "Who",
+          "which", "Which", "when", "When", "where", "Where",
+          "can", "Can", "could", "Could", "do", "Do", "does", "Does",
+          "did", "Did", "is", "Is", "are", "Are", "should", "Should",
+          "would", "Would", "have", "Have", "has", "Has"]
 
-# 必保类型 → 排序权重（必保项在前，普通在最后）
-TYPE_ORDER = {"分类": 0, "过渡": 1, "限定": 2, "框架": 3, "普通": 4}
+# Must-keep type → sort weight (must-keep first, normal last)
+TYPE_ORDER = {"classify": 0, "transition": 1, "qualifier": 2, "frame": 3, "normal": 4}
 
 
 # ---------------------------------------------------------------------------
-# 文本预处理
+# Text preprocessing
 # ---------------------------------------------------------------------------
 def strip_markdown(text):
-    """去掉 Markdown 标题（#…）/引用（>…）行与分隔线（--- / *** / ___），保留正文。"""
+    """Remove Markdown heading (#…)/quote (>…) lines and rules (--- / *** / ___), keep the body."""
     kept = []
     for line in text.splitlines():
         s = line.strip()
@@ -75,14 +94,14 @@ def strip_markdown(text):
     return "\n".join(kept)
 
 
-# 非终止标点 + 可选的一个终止标点，作为一句
+# Non-terminal punctuation + an optional terminal punctuation, as one sentence
 _SENT_RE = re.compile(r"[^。！？；\n]+[。！？；]?")
 
 
 def split_sentences(text):
-    """按中文标点（。！？；）与换行切句，返回原始句（含尾标点）列表。
+    """Split by Chinese punctuation (。！？；) and newlines, returning raw sentences (including trailing punctuation).
 
-    丢弃「无任何内容字符（纯标点 / 空白 / BOM）」的伪句。
+    Discard pseudo-sentences that have "no content characters (pure punctuation / whitespace / BOM)".
     """
     out = []
     for m in _SENT_RE.findall(text):
@@ -93,7 +112,7 @@ def split_sentences(text):
 
 
 def to_halfwidth(s):
-    """全角 → 半角（含全角空格），便于大小写/全半角无关地做匹配。"""
+    """Full width → half width (including full-width spaces), so matching can ignore case/full-width."""
     out = []
     for ch in s:
         o = ord(ch)
@@ -107,20 +126,20 @@ def to_halfwidth(s):
 
 
 def norm(s):
-    """相似度比较用的归一化：全角转半角 + 小写 + 只留字母数字与汉字。"""
+    """Normalization for similarity comparison: full-width to half-width + lowercase + keep only letters, digits and Chinese characters."""
     return re.sub(r"\W+", "", to_halfwidth(s).lower())
 
 
 def norm_key(s):
-    """关键词匹配用的归一化：全角转半角 + 小写 + 去空白。"""
+    """Normalization for keyword matching: full-width to half-width + lowercase + strip whitespace."""
     return re.sub(r"\s+", "", to_halfwidth(s).lower())
 
 
 # ---------------------------------------------------------------------------
-# 判定
+# Judgment
 # ---------------------------------------------------------------------------
 def find_deleted(article_sents, script_sents, threshold=SIM_THRESHOLD):
-    """返回被删句列表 [(句子, 最佳相似度), ...]（保持 article 原序）。"""
+    """Return the list of deleted sentences [(sentence, best similarity), ...] (keeping the original article order)."""
     script_norms = [norm(s) for s in script_sents]
     script_norms = [n for n in script_norms if n]
     deleted = []
@@ -142,7 +161,7 @@ def find_deleted(article_sents, script_sents, threshold=SIM_THRESHOLD):
 
 
 def is_question(sent):
-    """是否疑问句（以 ？ 结尾，或以疑问词开头）。"""
+    """Whether it is a question (ends with a question mark, or starts with a question word)."""
     t = sent.strip()
     if t.endswith("？") or t.endswith("?"):
         return True
@@ -150,66 +169,66 @@ def is_question(sent):
 
 
 def classify(sent):
-    """判定必保类型：分类 / 过渡 / 限定 / 框架 / 普通（按此优先级）。"""
+    """Determine the must-keep type: classify / transition / qualifier / frame / normal (in this priority order)."""
     key = norm_key(sent)
     if any(k in key for k in KW_CLASSIFY):
-        return "分类"
+        return "classify"
     if any(k in key for k in KW_TRANSITION) or is_question(sent):
-        return "过渡"
+        return "transition"
     if any(k in key for k in KW_LIMIT):
-        return "限定"
+        return "qualifier"
     if len(key) >= FRAME_MIN_LEN and any(k in key for k in KW_FRAME):
-        return "框架"
-    return "普通"
+        return "frame"
+    return "normal"
 
 
 # ---------------------------------------------------------------------------
-# 报告
+# Report
 # ---------------------------------------------------------------------------
 def build_report(art_path, scr_path, n_art, n_scr, rows):
-    """rows: [(句子, 类型, 是否必保bool), ...]（已排序）。返回 Markdown 文本。"""
+    """rows: [(sentence, type, must-keep bool), ...] (already sorted). Returns Markdown text."""
     m = sum(1 for _, _, must in rows if must)
     n = len(rows)
 
     lines = []
-    lines.append("# 压缩审计报告")
+    lines.append("# Compression audit report")
     lines.append("")
-    lines.append(f"- article：`{art_path}`（{n_art} 句）")
-    lines.append(f"- script：`{scr_path}`（{n_scr} 句）")
-    lines.append(f"- 相似度阈值：{SIM_THRESHOLD:.2f}（低于此值即视为被删句）")
+    lines.append(f"- article: `{art_path}` ({n_art} sentences)")
+    lines.append(f"- script: `{scr_path}` ({n_scr} sentences)")
+    lines.append(f"- Similarity threshold: {SIM_THRESHOLD:.2f} (a sentence below this value is treated as deleted)")
     lines.append("")
-    lines.append("## 被删句子")
+    lines.append("## Deleted sentences")
     lines.append("")
-    lines.append("| 序号 | 被删句 | 必保类型 | 是否必保 |")
+    lines.append("| # | Deleted sentence | Must-keep type | Must-keep |")
     lines.append("| --- | --- | --- | --- |")
     for i, (sent, typ, must) in enumerate(rows, 1):
         cell = sent.replace("|", "\\|").replace("\n", " ")
-        mark = "✅ 必保" if must else "—"
+        mark = "✅ must-keep" if must else "—"
         lines.append(f"| {i} | {cell} | {typ} | {mark} |")
     lines.append("")
-    lines.append("## 汇总")
+    lines.append("## Summary")
     lines.append("")
-    lines.append(f"共删 {n} 句，其中必保项 {m} 句 ⚠️")
+    lines.append(f"{n} sentences deleted, of which {m} are must-keep items ⚠️")
     lines.append("")
     if m > 0:
-        lines.append("⚠️ 压缩可能删掉了框架/过渡句，需人工确认。")
+        lines.append("⚠️ Compression may have deleted framework/transition sentences; human confirmation needed.")
     else:
-        lines.append("未发现必保项被删 ✅")
+        lines.append("No must-keep items were deleted ✅")
     lines.append("")
     return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
-# 主流程
+# Main flow
 # ---------------------------------------------------------------------------
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="compress-audit.py",
-        description="对比 article.md 与 script.md，列出被压缩删掉的句子并标出必保项。",
+        description="Compare article.md with script.md, list sentences removed by compression and mark must-keep items.",
     )
-    parser.add_argument("--article", required=True, help="素材长文 article.md 路径")
-    parser.add_argument("--script", required=True, help="口播稿 script.md 路径")
-    parser.add_argument("--out", default=None, help="报告输出路径（缺省打印到标准输出）")
+    parser.add_argument("--article", required=True, help="long source article article.md path")
+    parser.add_argument("--script", required=True, help="narration script script.md path")
+    parser.add_argument("--out", default=None, help="report output path (default prints to stdout)")
     args = parser.parse_args(argv)
 
     art_path = Path(args.article)
@@ -217,10 +236,10 @@ def main(argv=None):
 
     for path, name in ((art_path, "--article"), (scr_path, "--script")):
         if not path.exists():
-            sys.stderr.write(f"[错误] {name} 指定的文件不存在：{path}\n")
+            sys.stderr.write(f"[ERROR] the file specified by {name} does not exist: {path}\n")
             return 2
         if path.is_dir():
-            sys.stderr.write(f"[错误] {name} 指定的是目录而非文件：{path}\n")
+            sys.stderr.write(f"[ERROR] {name} points to a directory, not a file: {path}\n")
             return 2
 
     art_text = art_path.read_text(encoding="utf-8-sig", errors="replace")
@@ -230,7 +249,7 @@ def main(argv=None):
     script_sents = split_sentences(strip_markdown(scr_text))
 
     if not article_sents and not script_sents:
-        sys.stdout.write("两个文件均为空（或只有标题/引用行），无可审计内容，正常退出。\n")
+        sys.stdout.write("Both files are empty (or contain only heading/quote lines); nothing to audit, exiting normally.\n")
         return 0
 
     deleted = find_deleted(article_sents, script_sents)
@@ -238,9 +257,9 @@ def main(argv=None):
     rows = []
     for idx, (sent, _ratio) in enumerate(deleted):
         typ = classify(sent)
-        must = typ != "普通"
+        must = typ != "normal"
         rows.append((sent, typ, must, idx))
-    # 必保项在前，组内保持 article 原序
+    # Must-keep items first, preserving original article order within each group
     rows.sort(key=lambda r: (TYPE_ORDER[r[1]], r[3]))
     rows = [(s, t, m) for (s, t, m, _i) in rows]
 
@@ -253,11 +272,11 @@ def main(argv=None):
             out_path.parent.mkdir(parents=True, exist_ok=True)
             out_path.write_text(report, encoding="utf-8")
         except OSError as e:
-            sys.stderr.write(f"[错误] 写入报告失败：{out_path}（{e}）\n")
+            sys.stderr.write(f"[ERROR] failed to write report: {out_path} ({e})\n")
             return 2
-        sys.stdout.write(f"报告已写入：{out_path}\n")
-        # 汇总行同时打到 stdout，便于人一眼看到
-        sys.stdout.write(report.split("## 汇总")[-1].strip().splitlines()[0] + "\n")
+        sys.stdout.write(f"Report written to: {out_path}\n")
+        # Also print the summary line to stdout so a human sees it at a glance
+        sys.stdout.write(report.split("## Summary")[-1].strip().splitlines()[0] + "\n")
     else:
         sys.stdout.write(report + "\n")
 

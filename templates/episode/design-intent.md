@@ -1,20 +1,20 @@
 # design-intent · <episode>
 
-> 创作前三问。自由文本，不填表、不套模板；三问必须带本篇的具体数字和具体稿件说。
-> `check.ps1` 只检查"有没有真的写"（C13，WARN 不阻断），内容判断由你自己负责。
+> The three questions before authoring. Free text, no forms, no template; the three questions must be answered with this episode's concrete numbers and concrete script.
+> `check.ps1` only checks "was it actually written" (C13, WARN, not blocking); judging the content is your responsibility.
 
-## 一、这篇要动哪个指标，目标数字多少
+## 1. Which metric does this episode move, and to what target number
 
-<从 `data/metrics/latest.json` 的分布里取，不许许愿。写：目标指标 / 当前中位与四分位 / 本篇目标 / 底线 / 为什么是这个数。>
+<Take it from the distribution in `data/metrics/latest.json`, no wishful thinking. Write: target metric / current median and quartiles / this episode's target / floor / why this number.>
 
-## 二、参照自己哪一篇，为什么可参照
+## 2. Which of your own episodes is the reference, and why it is comparable
 
-<同形态 / 同时长 / 同受众。它做对了什么（用具体拍数或句子作证），它做错了什么，本篇补哪一条。>
+<Same format / same duration / same audience. What it got right (cite specific beats or lines), what it got wrong, and which one this episode fixes.>
 
-## 三、这次规避 `docs/LESSONS.md` 里的哪一条
+## 3. Which entry in `docs/LESSONS.md` this episode avoids
 
-<点名第几条，并写出本篇的具体动作（不是"我会注意"，而是"每个术语先给动作再给名字"这种可检查的动作）。>
+<Name the entry number and write this episode's concrete action (not "I will be careful", but a checkable action like "every term gets its action before its name").>
 
-## 四、时长自述
+## 4. Duration self-statement
 
-<目标带 150–180s；按实测语速反推口播字数；本篇预计多少拍、多少字。超过 180s 必须说明为什么值得。>
+<Target band 150–180s; derive the narration character count from the measured speaking rate; how many beats and characters this episode expects. Anything over 180s must justify why it is worth it.>

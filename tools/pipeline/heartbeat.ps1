@@ -1,16 +1,16 @@
-﻿# 小红书每日心跳启动器（2026-10-27）
-# 由 Trae Schedule 以「前台沙箱外 + WMI 派生」方式调用（避免进程随会话结束被回收）。
-# 本脚本负责：补全 PATH / 解析模型 / 注入 CODEBUDDY_CONFIG_DIR / 把 CLI 输出写入 cache\heartbeat\。
-# 注意：本文件必须以 UTF-8 BOM 保存，否则 PowerShell 5.1 会按 GBK 解析中文导致乱码。
-# 不能用 Stop：PowerShell 5.1 会把 CLI 写到 stderr 的普通日志当成错误记录并终止脚本
+﻿# Daily heartbeat launcher for Xiaohongshu (2026-10-27)
+# Invoked by Trae Schedule as "foreground, outside sandbox + spawned via WMI" (so the process is not reclaimed when the session ends).
+# This script: completes PATH / resolves the model / injects CODEBUDDY_CONFIG_DIR / writes CLI output into cache\heartbeat\.
+# Note: this file must be saved as UTF-8 with BOM, otherwise PowerShell 5.1 parses it as GBK and the text becomes garbled.
+# Do not use Stop: PowerShell 5.1 treats the CLI's ordinary log lines on stderr as errors and terminates the script
 $ErrorActionPreference = 'Continue'
 
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-# 可选：CodeBuddy CLI 的配置目录（未设置时沿用 CLI 自己的默认值）
+# Optional: the CodeBuddy CLI config directory (when unset the CLI keeps its own default)
 if (-not $env:CODEBUDDY_CONFIG_DIR -and (Test-Path (Join-Path $env:USERPROFILE '.codebuddy'))) {
     $env:CODEBUDDY_CONFIG_DIR = (Join-Path $env:USERPROFILE '.codebuddy')
 }
-# WMI 派生的进程只继承系统 PATH，拿不到用户级 npm 全局目录，必须显式补全
+# WMI-spawned processes only inherit the system PATH and cannot see the user-level npm global dir, so it must be added explicitly
 $env:PATH = "$env:APPDATA\npm;$env:PATH"
 Set-Location $Root
 
@@ -26,15 +26,15 @@ function Write-Log([string]$Text) {
 "=== heartbeat start $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ===" | Out-File -FilePath $Log -Encoding UTF8
 
 try {
-    if (-not (Test-Path $CodeBuddy)) { throw "找不到 codebuddy.ps1：$CodeBuddy（可设置 CODEBUDDY_CLI 指向你的 CLI）" }
+    if (-not (Test-Path $CodeBuddy)) { throw "codebuddy.ps1 not found: $CodeBuddy (set CODEBUDDY_CLI to point at your CLI)" }
 
-    # 模型可选：不设 HEARTBEAT_MODEL 时用 CLI 自己的默认模型
+    # Model is optional: when HEARTBEAT_MODEL is unset the CLI uses its own default model
     $Model = $env:HEARTBEAT_MODEL
     Write-Log ("model={0}" -f ($(if ($Model) { $Model } else { '(cli default)' })))
-    $Prompt = if ($env:HEARTBEAT_PROMPT) { $env:HEARTBEAT_PROMPT } else { '执行心跳' }
+    $Prompt = if ($env:HEARTBEAT_PROMPT) { $env:HEARTBEAT_PROMPT } else { 'Run the heartbeat check.' }
 
-    # 不用 `*>>` 重定向：PowerShell 5.1 会把 CLI 写到 stderr 的普通日志包成 NativeCommandError 并中断脚本。
-    # 改用 Start-Process 把 stdout/stderr 分别落盘，再合并（JSON 里不留空格，避免被拼参数时拆开）。
+    # Do not redirect with `*>>`: PowerShell 5.1 wraps the CLI's ordinary stderr logs into NativeCommandError and aborts the script.
+    # Instead use Start-Process to write stdout/stderr to separate files, then merge them (no spaces in the JSON so it is not split when joined into arguments).
     $OutFile = "$Log.out"
     $ErrFile = "$Log.err"
     $CliArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $CodeBuddy,
@@ -44,7 +44,7 @@ try {
     $Proc = Start-Process -FilePath 'powershell' `
         -ArgumentList $CliArgs `
         -NoNewWindow -PassThru -Wait -RedirectStandardOutput $OutFile -RedirectStandardError $ErrFile
-    # 注意：PS5.1 下 WaitForExit()+Refresh() 读不到 ExitCode，必须用 -Wait 等待
+    # Note: under PS5.1 WaitForExit()+Refresh() cannot read ExitCode, so wait with -Wait
     $Code = if ($null -ne $Proc.ExitCode) { $Proc.ExitCode } else { -1 }
 
     if (Test-Path $OutFile) { Get-Content $OutFile -Encoding UTF8 | Out-File -FilePath $Log -Append -Encoding UTF8 }

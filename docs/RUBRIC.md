@@ -1,138 +1,138 @@
-# 评分规则（RUBRIC.md）— v1-retention · 2026-10-27
+# RUBRIC.md — v1-retention · 2026-10-27
 
-> 本文件是 xhs-video-agent 的组成部分；示例数据来自作者账号，仅用于说明方法。
+> This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
-> **本版是"换轴"，不是"调权重"**：目标函数从"猜曝光"改成"猜人均观看秒数"。
-> 依据：9 篇后台全量数据（`data/metrics/latest.json`，2026-10-27 抓取）+ `cache/bump-20261024-draft.md` 的结构性结论
-> （v0 七维与排序反向，且存在 6 组支配违例——任何非负权重都修不好）。
-> v0 评分档案（ep01–ep09、exp10/11）保留为历史，**不可与本版分数互比**；`calibration_samples` 已归零，v1 从 0 开始攒。
+> **This version is a re-axis, not a re-weighting**: the objective function moved from "guess impressions" to "guess average watch seconds per viewer".
+> Basis: full backstage data for 9 notes (`data/metrics/latest.json`, pulled 2026-10-27) plus the structural conclusions in `cache/bump-20261024-draft.md`
+> (the seven v0 dimensions ranked in the opposite direction, and there were 6 dominance violations — no non-negative weighting can fix them).
+> The v0 scoring archive (ep01–ep09, exp10/11) is kept as history and **must not be compared with scores from this version**; `calibration_samples` was reset to zero, so v1 starts accumulating from 0.
 
 ---
 
-## 目标函数（先看这个）
+## Objective function (read this first)
 
-一篇稿子的价值按这个顺序评：
+A script's value is judged in this order:
 
-1. **人均观看秒数**（主）— 决定平台是否继续加推。账号当前中位 9s：>15s 的两篇曝光都在 1300 以上；<5s 的五篇全停在 139–674。
-2. **点击率**（次）— 标题 + 首帧的事（本号 2026-10-27 起不设封面，首帧即封面），已不是瓶颈（5.4%，高于同类账号常态）。
-3. **涨粉**（末）— 只有把"这人讲得有用"变成"想看他下一条"才发生。
+1. **Average watch seconds per viewer** (primary) — decides whether the platform keeps pushing it. The account's current median is 9s: the two notes above 15s both got 1300+ impressions; the five below 5s all stalled at 139–674.
+2. **Click-through rate** (secondary) — a matter of title + first frame (this account has not set a cover image since 2026-10-27; the first frame is the cover image), and it is no longer the bottleneck (5.4%, above the norm for accounts in this niche).
+3. **Follower growth** (last) — happens only when "this person is useful" turns into "I want to see the next one".
 
-曝光不是目标，是上面三者的结果。**不要为曝光改稿，为"看下去"改稿。**
+Impressions are not the goal, they are the result of the three above. **Do not edit the script for impressions; edit it so people keep watching.**
 
 ---
 
-## 公式
+## Formula
 
 ```
 composite = (HO×2 + PE×2 + TK×1.5 + NA×1 + QL×0.5) / 7 × 2.0
 ```
 
-五维 0–5 整数分；权重合计 7，composite 0–10。
+Five dimensions, integer scores 0–5; weights sum to 7, composite is 0–10.
 
-权重是**先验，不是拟合**：9 篇样本没有逐篇维度分，任何"回归拟合"都是自欺。每篇 retro 用一条偏差去修正它；连续 3 篇同向再改公式。
-
----
-
-## 五个维度
-
-### HO — Hook & Hold（钩子与扣留，×2）
-*前 3 秒能不能让人不划走，前 10 秒能不能给出"我得知道为什么"的缺口？*
-
-- **0** — 问候、背景铺垫、"最近 AI 很火"
-- **3** — 有明确承诺，但需要一句铺垫才进正文
-- **5** — 首句就是具体结果 / 失败画面 / 反直觉数字；3 秒内建立信息缺口
-
-锚点：5 分 = "AI 替我干活，一次只成一半"这种首句自带疑问；0 分 = "大家好，今天我们聊聊……"。
-
-### PE — Payoff Density（交付密度，×2）
-*单位时间给出多少能用的信息？本篇最硬的那个点，出现在第几秒？*
-
-- **0** — 一个点反复说，全程铺垫
-- **3** — 信息对，但有约三分之一时间在铺垫 / 转场
-- **5** — 平均每 8–10 秒一个新信息点，且第一个硬点在前 5 秒出现
-
-注意：PE 不是"信息多"，是"信息来得早且连续"。塞满术语但前 30 秒没结论，PE 只能给 2。
-
-### TK — Transferability（可搬运度，×1.5）
-*看完当天，观众能不能打开 / 复制 / 照着做一个具体东西？*
-
-- **0** — 纯概念，没有任何可指向的物件
-- **3** — 提到具体项目或工具名，但要自己再搜、再判断怎么用
-- **5** — 给出可直接打开的项目页、可直接跑的命令、或照着做就成的清单
-
-**不要求"稿子里有代码块"，要求"有可指向的物件"**——v0 的 QL 就是把这个搞混，才把工具盘点线判成最低分。
-
-### NA — One Line（单线，×1）
-*全片能不能压成一句可复述的话？章节之间是递进，还是并列？*
-
-- **0** — 要点罗列，顺序打乱也不影响
-- **3** — 有主线，但中途并列了 3 个以上点
-- **5** — 一句话能复述；每段都在回答上一段留下的问题
-
-### QL — Quotable（可截图句，×0.5）
-*有没有 1–2 句能脱离视频独立成立的话？*
-
-- **0** — 全是叙述
-- **3** — 只有结尾一句
-- **5** — 至少两句能独立成立，分布在头 / 中 / 尾
-
-权重低是因为证据弱（本号 9 篇里金句密度与排序不同向）。**禁止为金句牺牲 PE**。
+The weights are a **prior, not a fit**: the 9 samples have no per-note dimension scores, so any "regression fit" is self-deception. Each retro corrects it with one deviation; change the formula only after 3 consecutive notes deviate in the same direction.
 
 ---
 
-## 硬约束（不打分，命中就改或写明理由）
+## The five dimensions
 
-- **时长 120–180s，150–180s 为目标带**（2026-10-31 上调：120s 被判断为"还没讲透就用完了"，口播相应放宽到 560–680 字）；**>180s 必须在 `design-intent.md` 说明为什么值得**（完播代价自负）。<120s 视为未用足目标带，需说明为什么不再展开。
-- **首拍不得是问候 / 背景 / "最近 AI 很火"**。
-- **片尾给一个当天能做的动作，并回收开头钩子**。
+### HO — Hook & Hold (×2)
+*In the first 3 seconds, can you stop the scroll? In the first 10 seconds, can you open a gap of "I need to know why"?*
 
-> **本条不是内容规则**：怎么讲清楚（比喻先落地、因果衔接、术语分层）以 `skills\web-video-presentation\references\SCRIPT-STYLE.md` 的四层自检为准，本文件不设内容钩子与信息点密度的机械断言。2026-10-31 撤销 10-30 新增的两条（"首拍必须点名谁中招""每 12–15 秒一个信息点"）：它们催生了贴标签式的假达标（口播点名了、画面没点名），且越权替代了文案自检。
+- **0** — greeting, background setup, "AI is hot lately"
+- **3** — clear promise, but it takes one sentence of setup before the body starts
+- **5** — the first sentence is a concrete result / failure shot / counter-intuitive number; the information gap is built within 3 seconds
+
+Anchors: 5 = a first line like "AI does my work, and gets it half right once" that carries its own question; 0 = "Hi everyone, today we'll talk about…".
+
+### PE — Payoff Density (×2)
+*How much usable information per unit of time? At which second does the hardest point of this piece land?*
+
+- **0** — one point repeated, setup the whole way
+- **3** — the information is right, but about a third of the time is setup / transitions
+- **5** — a new information point every 8–10 seconds on average, and the first hard point arrives within the first 5 seconds
+
+Note: PE is not "a lot of information", it is "information arriving early and continuously". Stuff it with jargon but reach no conclusion in the first 30 seconds and PE can only be 2.
+
+### TK — Transferability (×1.5)
+*That same day, can a viewer open / copy / imitate one concrete thing?*
+
+- **0** — pure concepts, nothing pointable
+- **3** — names a concrete project or tool, but the viewer still has to search and decide how to use it
+- **5** — gives a project page you can open directly, a command you can run directly, or a checklist you can follow as-is
+
+**The requirement is not "the script contains a code block", it is "there is something pointable"** — v0's QL conflated the two, which is why tool roundups scored lowest.
+
+### NA — One Line (×1)
+*Can the whole piece be compressed into one repeatable sentence? Do the sections build on each other or just sit side by side?*
+
+- **0** — a list of points, order shuffled with no effect
+- **3** — there is a throughline, but 3+ points sit side by side in the middle
+- **5** — one sentence can restate it; every section answers the question the previous section left open
+
+### QL — Quotable (×0.5)
+*Are there 1–2 lines that stand on their own outside the video?*
+
+- **0** — all narration
+- **3** — only the closing line
+- **5** — at least two lines stand alone, spread across the head / middle / end
+
+The low weight is because the evidence is weak (across this account's 9 notes, quote density did not track ranking). **Never sacrifice PE for a quotable line.**
 
 ---
 
-## 预测桶（绝对口径：观看数，按本号当前分布）
+## Hard constraints (not scored; fix or explain in writing when hit)
 
-| Bucket | 范围 | 先验概率 |
+- **Duration 120–180s, with 150–180s as the target band** (raised on 2026-10-31: 120s was judged as "used up before the point lands", so the narration script was relaxed to 560–680 characters accordingly); **>180s must justify itself in `design-intent.md`** (you pay the completion-rate price). <120s counts as not using the target band, and needs a reason for not expanding.
+- **The first beat must not be a greeting / background / "AI is hot lately"**.
+- **The ending gives one action the viewer can do today, and calls back to the opening hook**.
+
+> **This paragraph is not a content rule**: how to explain clearly (land the metaphor first, causal connectives, layered terminology) is governed by the four-layer self-check in `skills\web-video-presentation\references\SCRIPT-STYLE.md`; this file makes no mechanical assertions about content hooks or information-point density. On 2026-10-31 the two rules added on 10-30 were withdrawn ("the first beat must name who gets hit" and "one information point every 12–15 seconds"): they produced label-style fake compliance (named in the narration, not on screen) and overrode the script self-check.
+
+---
+
+## Prediction buckets (absolute scale: views, against this account's current distribution)
+
+| Bucket | Range | Prior probability |
 |---|---|---|
-| 底部 | < 89 | 25% |
-| 基础盘 | 89 – 133 | 25% |
-| 命中 | 133 – 249 | 25% |
-| 爆款 | 249 – 500 | 20% |
-| 现象级 | > 500 | 5% |
+| Bottom | < 89 | 25% |
+| Base | 89 – 133 | 25% |
+| Hit | 133 – 249 | 25% |
+| Breakout | 249 – 500 | 20% |
+| Outlier | > 500 | 5% |
 
-边界来自 9 篇的 P25/P50/P75；**样本每 +3 篇重算一次**。预测必须给"最可能桶 + 中枢 + 全桶概率"，三者和为 100%。
-
----
-
-## 每篇开工前的三问（写在 `videos/<ep>/design-intent.md`）
-
-自由文本，不填表、不套模板。三问必须带着本篇的具体数字和具体稿件说，写不出来就停下问人：
-
-1. **这篇要动哪个指标，目标数字多少**（从 `latest.json` 的分布里取，不许许愿）。
-2. **参照自己哪一篇**，为什么可参照（同形态 / 同时长 / 同受众），它做对了什么。
-3. **这次规避 `LESSONS.md` 里的哪一条**，本篇的具体动作是什么。
+The boundaries come from P25/P50/P75 of the 9 notes; **recompute every +3 samples**. A prediction must give "most likely bucket + central value + probability of every bucket", summing to 100%.
 
 ---
 
-## 打分纪律
+## Three questions before starting any episode (write them in `videos/<ep>/design-intent.md`)
 
-- **盲打**：打分前不看锚点、不看 `data/metrics`、不看 `predictions` 的复盘段。
-- **每维 30 秒**，信第一个整数；3/4 反复横跳就写 3 + 备注。
-- 每个分数必须附**稿子里的一句具体话**作证据，否则该维降 confidence。
-- 自评分不替代 blind 子 agent 的分；两者差 ≥2 分时，在预测档案写明差在哪。
+Free text, no forms, no template. The three questions must be answered with this episode's concrete numbers and concrete script; if you can't write it, stop and ask a person:
 
----
-
-## 已知局限
-
-- 9 篇、无逐篇维度分、v1 权重未经检验；只有一篇有完整留存曲线。
-- 留存有一部分不由稿子决定（首帧、配音、节奏、平台分池人群）。
-- 点击率主要由**标题 + 首帧**决定，与稿子弱相关——**不要把点击率的波动记到稿子头上**。
+1. **Which metric does this episode move, and to what target number** (taken from the distribution in `latest.json`, no wishful thinking).
+2. **Which of your own episodes is the reference**, why it is comparable (same format / same duration / same audience), and what it got right.
+3. **Which entry in `LESSONS.md` this episode avoids**, and what the concrete action is.
 
 ---
 
-## 版本与回滚
+## Scoring discipline
 
-- v0（tutorial-builder 七维等权）已被本版取代；v0 原文即 init 时的复制源 `skills/cheat-on-content/starter-rubrics/tutorial-builder-zero.md`（本项目非 git 仓库，没有 commit 历史可回滚）。
-- 回滚：把该 starter 文件复制回 `RUBRIC.md`，并把 `.cheat-state.json` 的 `rubric_version` 改回 `v0`、`calibration_samples` 恢复 5。
-- 若 v1 跑满 3 篇后排序一致性仍 < 0.8：**不再调权重**，改为记录"哪种内容形态在本号有效"的形态笔记，rubric 降级为检查清单（check list），预测交给 `data/metrics` 的历史分布。
+- **Blind scoring**: before scoring, do not look at the anchors, `data/metrics`, or the retro section of `predictions`.
+- **30 seconds per dimension**, trust the first integer; if 3/4 keeps flipping, write 3 + a note.
+- Every score must be backed by **one concrete line from the script** as evidence, otherwise lower that dimension's confidence.
+- Self-scores do not replace the blind sub-agent's score; when they differ by ≥2 points, state where in the prediction file.
+
+---
+
+## Known limitations
+
+- 9 notes, no per-note dimension scores, v1 weights untested; only one note has a complete retention curve.
+- Retention is partly outside the script's control (first frame, voice, pacing, which audience pool the platform assigns).
+- Click-through rate is mainly decided by **title + first frame** and correlates weakly with the script — **do not attribute CTR swings to the script**.
+
+---
+
+## Version and rollback
+
+- v0 (tutorial-builder's seven equal-weighted dimensions) has been superseded by this version; the original v0 text is the copy source at init time, `skills/cheat-on-content/starter-rubrics/tutorial-builder-zero.md` (this project is not a git repo, so there is no commit history to roll back to).
+- Rollback: copy that starter file back to `RUBRIC.md`, set `rubric_version` in `.cheat-state.json` back to `v0`, and restore `calibration_samples` to 5.
+- If ranking agreement is still < 0.8 after v1 has run 3 episodes: **stop tuning weights**, switch to keeping format notes on "which content formats work on this account", downgrade the rubric to a check list, and leave prediction to the historical distribution in `data/metrics`.

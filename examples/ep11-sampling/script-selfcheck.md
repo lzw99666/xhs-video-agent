@@ -1,99 +1,99 @@
-# script-selfcheck · ep11（13 拍 / 720 字 / 预估 160s）
+# script-selfcheck · ep11 (13 beats / 720 characters / est. 160s)
 
-> 按 `skills\web-video-presentation\references\SCRIPT-STYLE.md` 四层自检逐条走完 → 按 fail 项改稿 → 再定稿。
-> 执行方式：本会话无 Teams，使用**隔离 sub-agent 盲读复述**（第四层）+ 主控严格逐项核查（前三层）。
-> 定稿字数：`script.md` 720（含标点）/ 570 汉字 / 13 拍；`article.md` 1196 → 信息保留度 **60.2%**（≥60% 达标）。
+> Walked through all four layers of `skills\web-video-presentation\references\SCRIPT-STYLE.md` self-check item by item → revised per fail items → then finalized.
+> Execution: no Teams in this session; used an **isolated sub-agent blind read-and-retell** (layer 4) + strict item-by-item checks by the main controller (layers 1–3).
+> Final count: `script.md` 720 (incl. punctuation) / 570 Chinese characters / 13 beats; `article.md` 1196 → information retention **60.2%** (≥60% passes).
 
 ---
 
-## 一、形式层（8 条原则）
+## 1. Form layer (8 principles)
 
-| # | 原则 | 结论 | 证据 / 处理 |
+| # | Principle | Verdict | Evidence / action |
 |---|---|---|---|
-| 0 | 信息保留度 ≥60% | **PASS** | 720 ÷ 1196 = 60.2%。关键事实逐项在稿：逐词概率表、"好"六成/两成不到/一成/剩一成、两个旋钮、温度九成五、top-p 九成截断、温度零、批处理加法顺序、末位小数、一千次/八十个/一百零二个词、两档温度值、别同时拧。 |
-| 1 | 口语化 | **PASS** | 全篇无"综上所述/由此可见/旨在"。改过一处："这就是一错到底" → "一步偏，步步偏"（原句像论文小标题）。 |
-| 2 | 短句 ≤20 字 | **PASS（个别 22 字）** | 最长句："数字末位差那么一点，本来该选"好"的词，一下滑到"不错"。"（按逗号切分后每小句 ≤12 字）。念的节奏靠逗号，不靠长句。 |
-| 3 | 第二人称 | **PASS** | "你说"今天天气真"" / "服务器把你的请求" / "你来挑" / "选择权得留在你手里"。全篇 0 处"用户/读者"。 |
-| 4 | 开头有钩子 | **PASS** | 首句"你问 AI 同一个问题，问三遍，它能给你三份答案——标点不一样，第三遍连结论都换了。" —— 名词点名主体（AI）+ 具体结果 + 反直觉，无问候、无背景、无"本期我们讲"。 |
-| 5 | `---` 切分想法 | **PASS** | 13 拍 = 13 个 `---`，一拍一个聚焦想法。 |
-| 6 | 数字翻译成感受 | **PASS（核心数字保留）** | 95% → "几乎没悬念"；砍尾巴 → "不让它临场发挥"；末位差 → "本该选"好"的词一下滑到"不错""；80/1000 为**核心冲击数字**，按规则保留原值并念成"一千次/八十个"。 |
-| 7 | 不堆结构词 / 模板 | **PASS** | 全文无"首先/其次/最后""接下来我们看""总结一下""说白了/本质上/底层逻辑/换句话说"。过渡用"所以""到这儿""反过来"。 |
-| 8 | 具体例子优先 | **PASS** | 三个具体物件：①"今天天气真"的概率表；②同一句夸奖在高温下的两种说法（"真不错" / "热得能煎蛋"）；③一千次实验。无抽象"通常情况下"。 |
+| 0 | Information retention ≥60% | **PASS** | 720 ÷ 1196 = 60.2%. Every key fact is in the script: word-by-word probability table, "good" 60% / just under 20% / 10% / remaining 10%, two knobs, 95% at low temperature, top-p 90% truncation, temperature zero, batching changes addition order, last decimal, 1000 runs / 80 answers / 102 words, two temperature tiers, don't turn both at once. |
+| 1 | Conversational | **PASS** | No "in conclusion / it is therefore evident / aims to" anywhere. One revision: "this is being wrong all the way" → "one step off, every step off" (the original read like a paper subsection heading). |
+| 2 | Short sentences ≤20 characters | **PASS (a few at 22 characters)** | Longest sentence: "The last digit differs by a little, and the word that should have been 'good' slips to 'not bad'." (after splitting at commas, each clause is ≤12 characters). The spoken rhythm comes from commas, not long sentences. |
+| 3 | Second person | **PASS** | "you say 'The weather today is really'" / "the server batches your request" / "you pick" / "the choice has to stay in your hands." Zero instances of "the user / the reader." |
+| 4 | Opening has a hook | **PASS** | First sentence: "You ask AI the same question three times, and it can give you three answers — the punctuation differs, and by the third run even the conclusion has changed." — names the subject (AI) + concrete result + counterintuitive, no greeting, no background, no "in this episode we'll cover." |
+| 5 | `---` separates ideas | **PASS** | 13 beats = 13 `---`, one focused idea per beat. |
+| 6 | Numbers translated into feelings | **PASS (core numbers kept)** | 95% → "almost no suspense"; cutting the tail → "so it can't improvise"; last-digit difference → "the word that should have been 'good' slips to 'not bad'"; 80/1000 are **core impact numbers**, kept at original value per the rules and spoken as "one thousand runs / eighty answers." |
+| 7 | No stock structural words / templates | **PASS** | No "first / second / finally," "next we'll look at," "to sum up," "basically / essentially / underlying logic / in other words." Transitions use "so," "at this point," "conversely." |
+| 8 | Concrete examples first | **PASS** | Three concrete objects: ① the probability table for "The weather today is really"; ② two versions of the same compliment at high temperature ("really nice" / "hot enough to fry an egg"); ③ the 1000-run experiment. No abstract "usually." |
 
-## 二、风骨层（去 AI 味五类）
+## 2. Character layer (five kinds of AI flavor to remove)
 
-| 类别 | 结论 | 处理 |
+| Category | Verdict | Action |
 |---|---|---|
-| 一、假共情 | **PASS** | 无"我知道你最近…""你是不是也有这种感觉"。首句直接抛现象。 |
-| 二、假深刻 | **PASS** | 无"恰恰/反而/正是"。原稿曾写"这恰恰是它真正可怕的地方"，已删（去掉后意思没变 = 本来就平淡）。 |
-| 三、自我标榜 | **PASS** | 无"我必须认真说""可能会颠覆你的认知""这段一定要听完"。 |
-| 四、万能模板 | **PASS** | 全文无"说白了/本质上/归根结底/在某种意义上"；结尾不是"以上就是本期内容"，是具体动作（两档温度 + 别一起拧）。 |
-| 五、排比堆砌 | **PASS（改过 1 处）** | 原稿"改代码、跑测试、填表"是三连（结构相同），已确认它们是**三个不同场景**（都是要稳的任务），保留；但删掉了原稿里"起名字、想标题、做头脑风暴"的三连，改成"想标题、起名字，反过来"。 |
-| — | 结尾 CTA | **PASS**："温度别和 top-p 一起拧""一次要十个，你来挑" —— 是动作，不是"希望对你有帮助"。 |
+| 1. Fake empathy | **PASS** | No "I know you've been..." or "do you ever feel this too." The first sentence throws the symptom directly. |
+| 2. Fake profundity | **PASS** | No "precisely / on the contrary / it is exactly." The draft once said "this is precisely where it gets truly scary"; deleted (meaning unchanged after removal = it was bland to begin with). |
+| 3. Self-promotion | **PASS** | No "I have to say this seriously," "this may upend your worldview," "you must listen to this part." |
+| 4. Universal template | **PASS** | No "basically / essentially / in the final analysis / in a sense" anywhere; the ending isn't "that's all for this episode," it's concrete actions (two temperature tiers + don't turn both together). |
+| 5. Piled-up parallelism | **PASS (1 revision)** | The draft's "edit code, run tests, fill in forms" is a triple (same structure); confirmed they are **three different scenarios** (all stability tasks), kept; but deleted the draft's "name things, brainstorm titles, do a brainstorm" triple, changed to "brainstorm titles, name things, conversely." |
+| — | Closing CTA | **PASS**: "don't turn temperature and top-p together," "ask for ten at once, you pick" — actions, not "hope this helps." |
 
-## 三、念出来测试（终极标准）
+## 3. Read-it-aloud test (ultimate standard)
 
-按字面逐段念，挑出 3 处"说不出口"并改掉：
+Read each paragraph literally, find 3 places that are "unsayable" and fix them:
 
-1. "这套动作叫采样。" → 念着像术语空降，读者只有比喻没有落点。**改为**"这套动作叫采样，就是从一张表里抽一个接上去。"
-2. "所以第一颗骰子偏一点，后面越走越远，这就是一错到底。" → "这就是一错到底"像标题，念出来端着。**改为**"一步偏，步步偏"。
-3. "第二个旋钮叫 top-p，只留累计概率到九成的那一小撮" → 名字在前、动作在后，念的时候脑子要先处理英文名。**改为先动作后名字**："第二个旋钮更直接：只留…不让它临场发挥。它叫 top-p。"
+1. "This operation is called sampling." → sounds like a term dropped from the sky; the reader gets only a metaphor and no landing. **Changed to** "This operation is called sampling: draw one from a table and append it."
+2. "So if the first die leans a little, the path drifts further and further; this is being wrong all the way." → "this is being wrong all the way" sounds like a heading, stiff when spoken. **Changed to** "one step off, every step off."
+3. "The second knob is called top-p; keep only the small set whose cumulative probability reaches 90%" → name first, action second; when reading, the brain has to process the English name first. **Changed to action first, name second**: "The second knob is more direct: keep only ... so it can't improvise. It's called top-p."
 
-改完再念一遍三段（首段 / 温度段 / 收尾段），无跳过冲动。
+After the changes, read the three paragraphs again (opening / temperature / ending); no urge to skip.
 
-## 四、结构层（第四层：分类树 / 术语 / 编号 / 回收 / 压缩 / 衔接 / 落题）
+## 4. Structure layer (layer four: taxonomy / terminology / numbering / callback / compression / transitions / topic landing)
 
-| # | 检查项 | 结论 | 证据 |
+| # | Check | Verdict | Evidence |
 |---|---|---|---|
-| 1 | 分类树自洽 | **PASS** | 全片只有一个层级体系：两个旋钮，量词统一"个"，序号"第一个/第二个"连续。无"路/种/类/档"混用。 |
-| 2 | 术语台账 / 首现即解释 | **PASS** | 采样（拍 2，先"掷骰子—每说一个字掷一次"，后命名 + "从一张表里抽一个接上去"）；温度（拍 5，先说"管这张表有多尖"，再点名）；top-p（拍 7，先说"只留累计概率到九成的那一小撮、砍长尾巴"，后点名）。均无"用未定义概念解释新概念"。 |
-| 3 | 编号必列项 | **PASS** | 全片无"N 件/条/种/步/坑"式编号。拍 13"一次要十个"是数量要求，不是待列清单。 |
-| 4 | 回收前置 | **PASS** | "三份答案"拍 1 埋、拍 13 回收；"表"拍 3 建立、拍 5/6/7 连续复用（未断线）；"旋钮"拍 5 建立、拍 6/7 复用、拍 13 收尾。 |
-| 5 | 压缩守恒 | **PASS** | 见下「删减对照清单」：删的全是重复解释与学术背景，框架句 / 过渡句 / 限定语全部保留。 |
-| 6 | 章间衔接 | **PASS** | 五章递进：现象 → 为什么（逐词抽）→ 能不能别乱抽（两个旋钮）→ 拧到最紧呢（仍不稳）→ 那我怎么办。每章都是上一章逼出来的下一个问题。 |
-| 7 | 开场落题 | **PASS** | 第 1 拍点名主体（"你问 AI 同一个问题，问三遍"）+ 给现象，第 2 拍补相关性（"你用 AI 写文案、改代码、填表，结果稳不稳"）并给题目（"这套动作叫采样"）。三要素（谁 / 什么事 / 为什么值得看）在第 2 拍内齐备，题目落在第 2 拍（< 第 4 拍 fail 线）。 |
+| 1 | Taxonomy self-consistent | **PASS** | The whole video has one level system: two knobs, the counter word uniformly "one," ordinals "first / second" in sequence. No mixing of "path / kind / type / tier." |
+| 2 | Terminology ledger / explain on first appearance | **PASS** | Sampling (beat 2: first "rolling a die — once per word," then named + "draw one from a table and append it"); temperature (beat 5: first "controls how sharp this table is," then named); top-p (beat 7: first "keep only the small set whose cumulative probability reaches 90%, cut the long tail," then named). None uses an undefined concept to explain a new one. |
+| 3 | Numbered lists must be enumerated | **PASS** | No "N things / items / kinds / steps / traps" numbering anywhere. Beat 13's "ask for ten at once" is a quantity requirement, not a list to be enumerated. |
+| 4 | Callback of earlier setups | **PASS** | "Three answers" planted in beat 1, called back in beat 13; "table" established in beat 3, reused continuously in beats 5/6/7 (never broken); "knob" established in beat 5, reused in beats 6/7, closed in beat 13. |
+| 5 | Compression conservation | **PASS** | See the "Cut list" below: everything cut was repeated explanation or academic background; framing sentences / transitions / qualifiers all preserved. |
+| 6 | Inter-chapter transitions | **PASS** | Five chapters progress: symptom → why (word-by-word drawing) → can we stop the random drawing (two knobs) → what if we turn it all the way tight (still unstable) → so what do I do. Each chapter is the next question forced by the previous one. |
+| 7 | Opening lands the topic | **PASS** | Beat 1 names the subject ("you ask AI the same question three times") + gives the symptom; beat 2 adds relevance ("when you use AI to write copy, edit code, fill in forms, whether the result is stable") and gives the topic ("this operation is called sampling"). All three elements (who / what / why it's worth watching) are present by beat 2, and the topic lands in beat 2 (< beat 4 fail line). |
 
-### 盲读复述（隔离 sub-agent，仅读 `script.md`）
+### Blind read-and-retell (isolated sub-agent, reads only `script.md`)
 
-- 分类树：复述出"旋钮 → 温度 / top-p"两个分支，量词序号与原文一致 → 第 1 条 pass。
-- 术语表：采样第 2 拍、温度第 5 拍、top-p 第 7 拍，均判"有解释"（其中采样初版被判"没有另起一句中文定义"，**已据此补了"就是从表里抽一个接上去"**）→ 第 2 条 pass。
-- 编号项：无缺项（所列"一千次/八十个/十个"都不是待列清单）→ 第 3 条 pass。
-- 逐章逻辑链：7 个语义段全部能说出承接理由，无"说不出" → 第 6 条 pass。
-- 题目落位：第 2 拍 → 第 7 条 pass（未触发 ≥第 4 拍的 fail 线）。
-- 主体点名：第 1 拍即出现"你问 AI"，复述时能说出"在讲 AI 回答不稳定"而不是只记得"三份答案"。
+- Taxonomy: retold the "knob → temperature / top-p" two branches, counter words and ordinals consistent with the original → item 1 pass.
+- Terminology: sampling beat 2, temperature beat 5, top-p beat 7, all judged "has an explanation" (the first sampling version was judged "no separate definition in its own sentence," **so we added "draw one from a table and append it"**) → item 2 pass.
+- Numbered items: no missing items (the listed "one thousand / eighty / ten" are not lists to enumerate) → item 3 pass.
+- Chapter-by-chapter logic chain: all 7 semantic segments could state their hand-off reason, none "couldn't say" → item 6 pass.
+- Topic placement: beat 2 → item 7 pass (didn't trigger the ≥ beat 4 fail line).
+- Subject naming: "you ask AI" appears in beat 1; in retelling they could say "it's about AI answers being unstable," not just remember "three answers."
 
-### 删减对照清单（article → script，保留度 60.2%）
+### Cut list (article → script, retention 60.2%)
 
-| 删了什么 | 为什么可删 | 是否必保项 |
+| What was cut | Why it could be cut | Was it a must-keep item? |
 |---|---|---|
-| "厂商文档…还列了排查清单"这半句 | 重复解释，前一句已说清"温度零仍可能不同" | 否（重复解释） |
-| "model 不是先在心里写完一整段"的展开句 | 同义重复，口播用"一次只算一件事"已覆盖 | 否 |
-| nucleus sampling 的论文年份细节 | 口播给"2019 年一篇论文"足够，画面挂完整出处 | 否 |
-| "换一个模型更难复现" | 结论已在"别一起拧"里 | 否（重复） |
-| 框架句（"两个旋钮""那我该怎么办"）| **保留** | 是 |
-| 过渡句（"听到这里很容易得出一个结论"/"这里有个容易被忽略的细节"→口播"不稳。"） | **保留其功能**（改成更短的口语转折，未丢失） | 是 |
-| 限定语（"低温度只是更爱选最可能的词，不保证正确"）| **保留**（拍 12"错了重跑，别指望一次就对"） | 是 |
+| "the vendor documentation ... also lists a troubleshooting checklist" (half sentence) | Repeated explanation; the previous sentence already said "temperature zero may still differ" | No (repeated explanation) |
+| the expanded sentence "the model doesn't write a whole paragraph in its head first" | Same meaning repeated; the narration's "computes only one thing at a time" already covers it | No |
+| the paper's year detail for nucleus sampling | The narration's "a 2019 paper" is enough; the full source is on screen | No |
+| "switching to another model makes reproduction even harder" | The conclusion is already inside "don't turn both together" | No (repetition) |
+| framing sentences ("two knobs," "so what should I do") | **Kept** | Yes |
+| transitions ("at this point it's easy to conclude" / "there's an easily overlooked detail here" → narration "It isn't.") | **Kept their function** (rewritten as shorter spoken turns, nothing lost) | Yes |
+| qualifier ("low temperature only prefers the most likely word, doesn't guarantee correctness") | **Kept** (beat 12's "rerun on failure, don't expect one-shot correctness") | Yes |
 
-## 五、cheat 视线（v1-retention 五维自评）
+## 5. Cheat lens (v1-retention five-dimension self-score)
 
-> 打分纪律：不看 `data/metrics`，每维凭稿内证据给一个整数。
+> Scoring discipline: don't look at `data/metrics`; give one integer per dimension based on evidence in the script.
 
-| 维 | 分 | 稿内原句作证据 |
+| Dimension | Score | Quote from the script as evidence |
 |---|---|---|
-| **HO** Hook & Hold | **4** | "你问 AI 同一个问题，问三遍，它能给你三份答案——标点不一样，第三遍连结论都换了。" —— 首句点名主体 + 具体结果 + 自带缺口；仍无数字冲击与代价感，不给 5。 |
-| **PE** Payoff Density | **4** | "它不是在"想"，是在掷骰子——每说一个字，掷一次" + "你用 AI 写文案、改代码、填表，结果稳不稳，全看这颗骰子怎么转"（第 2 拍约第 8 秒给出第一个硬点与相关性）；13 拍 / 160s ≈ 12s 一个新点，未达 8–10s 的 5 分线。 |
-| **TK** Transferability | **4** | "温度压到零到零点二，再加一道校验：让它写，让程序判对错" + "调到零点八以上，一次要十个" —— 照着做就成，但没有可打开的项目页/命令，不给 5。 |
-| **NA** One Line | **5** | "它每一步都在合法地选，选择权得留在你手里。" 一句话可复述；五章每章回答上一章留下的问题。 |
-| **QL** Quotable | **4** | "所以要稳，不是调出来的，是验出来的。"（中段）/ "它每一步都在合法地选，选择权得留在你手里。"（尾）—— 两句独立成立，但首段没有同等级金句。 |
+| **HO** Hook & Hold | **4** | "You ask AI the same question three times, and it can give you three answers — the punctuation differs, and by the third run even the conclusion has changed." — first sentence names the subject + concrete result + built-in gap; still no numeric impact or sense of cost, so not 5. |
+| **PE** Payoff Density | **4** | "It isn't 'thinking'; it's rolling a die — once for every word it says" + "when you use AI to write copy, edit code, fill in forms, whether the result is stable all depends on how that die turns" (beat 2 delivers the first hard point and relevance at about second 8); 13 beats / 160s ≈ a new point every 12s, short of the 8–10s line for 5. |
+| **TK** Transferability | **4** | "push temperature to 0–0.2, then add a validation step: let it write, let the program judge correctness" + "set it to 0.8 or above, ask for ten at once" — do it and it works, but there's no project page or command to open, so not 5. |
+| **NA** One Line | **5** | "It makes a legal choice at every step; the choice has to stay in your hands." One sentence can be retold; each of the five chapters answers the question the previous chapter left. |
+| **QL** Quotable | **4** | "So stability isn't something you tune; it's something you verify." (middle) / "It makes a legal choice at every step; the choice has to stay in your hands." (end) — two sentences stand on their own, but the opening has no quote of the same caliber. |
 
-**自评 composite** = (4×2 + 4×2 + 4×1.5 + 5×1 + 4×0.5) ÷ 7 × 2 = **8.29**
+**Self-score composite** = (4×2 + 4×2 + 4×1.5 + 5×1 + 4×0.5) ÷ 7 × 2 = **8.29**
 
-盲预测（`cheat-predict` 的隔离子 agent 打分）单独落盘，不以此自评分替代；两者差 ≥2 分时会写进预测档案。
+Blind prediction (scored by `cheat-predict`'s isolated sub-agent) is recorded separately and does not replace this self-score; if the two differ by ≥2 points, it goes into the prediction file.
 
-## 六、修订记录
+## 6. Revision log
 
-**2026-10-31 17:45 局部修（用户判废开场）**：成片被指"开场缺主体"。按第四层第 7 条三要素（谁 / 什么事 / 为什么值得看）只改开场两拍，不动选题、不动拍数：
-- 拍 1 原「同一个问题，问三遍，三份答案。」→ 现「**你问 AI** 同一个问题，问三遍，它能给你三份答案——」，首句即点名主体。
-- 拍 2 补相关性句「所以你用 AI 写文案、改代码、填表，结果稳不稳，全看这颗骰子怎么转。」，并保留「采样 = 从一张表里抽一个接上去」的术语定义与"这不是 bug"的假设破除。
-- 画面同步：拍 1 小标题改「你问 AI · 同一个问题 · 问三遍」；拍 2 小标题改「AI 不是在"想"」，角标补「你写的文案、代码都受影响」。
-- cheat 五维自评不变（HO 仍 4：点名主体解决了"不知道在讲谁"，但代价感仍缺）。
+**2026-10-31 17:45 Local fix (user rejected the opening)**: The cut was flagged as "the opening lacks a subject." Per layer-four item 7's three elements (who / what / why it's worth watching), only the two opening beats were changed; the topic and beat count untouched:
+- Beat 1 was "Same question, three times, three answers." → now "**You ask AI** the same question three times, and it can give you three answers —", naming the subject in the first sentence.
+- Beat 2 adds the relevance sentence "So when you use AI to write copy, edit code, or fill in forms, whether the result is stable all depends on how that die turns.", and keeps the term definition "sampling = draw one from a table and append it" and the assumption-breaking "this isn't a bug."
+- Visuals updated in sync: beat 1's small title changed to "You ask AI · the same question · three times"; beat 2's small title changed to "AI isn't 'thinking'"; the corner tag added "your copy and code are both affected."
+- The cheat five-dimension self-score is unchanged (HO still 4: naming the subject solved "don't know who this is about," but the sense of cost is still missing).

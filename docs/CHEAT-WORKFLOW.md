@@ -1,213 +1,213 @@
-# 工作流速查（cheat-on-content）
+# Workflow quick reference (cheat-on-content)
 
-> 本文件是 xhs-video-agent 的组成部分；示例数据来自作者账号，仅用于说明方法。
+> This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
-> 这是 `/cheat-init` 在你的项目根创建的速查文档。完整规范在 cheat-on-content 的 `SKILL.md` 和 `shared-references/`。
-> 本文件给"忘了下次该说什么"的时候用——不需要从头读完。
+> This is the quick-reference doc `/cheat-init` creates at your project root. The full spec lives in cheat-on-content's `SKILL.md` and `shared-references/`.
+> Use this file when you "forgot what to say next" — you do not need to read it from top to bottom.
 
 ---
 
-## 一句话流程
+## The process in one line
 
 ```
-找选题
-  ├─ 没发过历史的 → /cheat-seed brainstorm（兴趣 × 热点）
-  └─ 发过历史的    → /cheat-seed brainstorm（兴趣 × 热点 × 你过去做过什么）
-                    （都跑 cheat-seed，区别是发过的 brainstorm 时多一份历史 context）
+Find a topic
+  ├─ No publishing history → /cheat-seed brainstorm (interest × trending)
+  └─ Has history          → /cheat-seed brainstorm (interest × trending × what you have done before)
+                            (both run cheat-seed; the difference is the extra history context when you have published)
   ↓
-cheat-seed 写 5 个草稿到 → scripts/<日期>_<id>_<short>.md
+cheat-seed writes 5 drafts to → scripts/<date>_<id>_<short>.md
   ↓
-用户改写 scripts/<日期>_<id>_<short>.md（同一文件覆盖）
+The user rewrites scripts/<date>_<id>_<short>.md (overwriting the same file)
   ↓
-/cheat-score scripts/<日期>_<id>_<short>.md → 看 rubric 评分（探索）
+/cheat-score scripts/<date>_<id>_<short>.md → see the rubric score (exploration)
   ↓
-/cheat-predict scripts/<日期>_<id>_<short>.md → 写 immutable 预测 v1 到 predictions/
+/cheat-predict scripts/<date>_<id>_<short>.md → write immutable prediction v1 to predictions/
   ↓
-拍摄完 → /cheat-shoot scripts/<日期>_<id>_<short>.md
-   ├─ 建 videos/<日期>_<id>_<short>/ 目录
-   ├─ 询问用户："拍时实际用的稿子和 scripts/<id>.md 一致吗？"
-   │   ├─ 一致 → cp → videos/<id>/script.md，沿用 v1 预测
-   │   ├─ 改了 → 要最终稿 → 算 diff
-   │   │   ├─ diff ≥30% → 自动 /cheat-predict — mode: v2 → predictions/<id>.md append `## 预测 v2` 段
-   │   │   └─ diff <30% → 询问是否 v2，默认沿用 v1
-   │   └─ 大改 → 走 _redo 流程（新 scripts/<id>_redo.md + 重 cheat-predict）
+After shooting → /cheat-shoot scripts/<date>_<id>_<short>.md
+   ├─ Create the videos/<date>_<id>_<short>/ directory
+   ├─ Ask the user: "Is the script you actually used when shooting the same as scripts/<id>.md?"
+   │   ├─ Same → cp → videos/<id>/script.md, keep prediction v1
+   │   ├─ Changed → ask for the final script → compute the diff
+   │   │   ├─ diff ≥30% → auto /cheat-predict — mode: v2 → predictions/<id>.md append a `## Prediction v2` section
+   │   │   └─ diff <30% → ask whether to write v2; default is to keep v1
+   │   └─ Major rewrite → go through the _redo flow (new scripts/<id>_redo.md + re-run cheat-predict)
    └─ buffer +1
   ↓
-发布 → /cheat-publish + URL → buffer -1
+Publish → /cheat-publish + URL → buffer -1
   ↓
-T+3 天 → /cheat-retro videos/<日期>_<id>_<short>/
-   ├─ 抓数据 / 用户粘 → 写 videos/<id>/report.md
-   ├─ 追加 ## 复盘 段到 predictions/<id>.md
-   ├─ diff scripts/<id>.md vs videos/<id>/script.md → 学用户改稿 pattern
-   └─ 把新观察写入 rubric-memo.md / SCRIPT-PATTERNS.md（实绩只进 rubric-memo，不进 RUBRIC.md）
+T+3 days → /cheat-retro videos/<date>_<id>_<short>/
+   ├─ Pull data / user pastes it → write videos/<id>/report.md
+   ├─ Append a ## Retro section to predictions/<id>.md
+   ├─ diff scripts/<id>.md vs videos/<id>/script.md → learn the user's editing patterns
+   └─ Write new observations into rubric-memo.md / SCRIPT-PATTERNS.md (actual results go only into rubric-memo, never into RUBRIC.md)
   ↓
-累计 ≥3 同向偏差 → /cheat-bump（升级 rubric）
+≥3 deviations in the same direction → /cheat-bump (upgrade the rubric)
 ```
 
 ---
 
-## 五个阶段对应触发词
+## Five stages and their trigger phrases
 
-### ① 选题阶段
+### ① Topic stage
 
-| 想做什么 | 触发词 |
+| What you want to do | Trigger phrase |
 |---|---|
-| 看 candidates.md 排序后的推荐 | "推荐选题" / "下一篇做什么" |
-| 抓今天的热点拓展 candidates | "抓热点" / "今天有什么可做的" |
-| 看当前状态 | "状态" |
+| See the ranked recommendations in candidates.md | "recommend topics" / "what's next" |
+| Pull today's trending topics to extend candidates | "pull trends" / "what can I make today" |
+| See the current state | "status" |
 
-> Cold-start 期没 candidates.md 是默认状态——不要因为这个就觉得工具坏了。
+> Having no candidates.md during cold-start is the default state — do not conclude the tool is broken because of it.
 
-### ② 打分 + 预测
+### ② Scoring + prediction
 
-| 想做什么 | 触发词 | 写文件吗 |
+| What you want to do | Trigger phrase | Writes files? |
 |---|---|---|
-| 看一份稿子的 rubric 分（探索） | "打分这篇 path/to/draft.md" | 否 |
-| 给最终稿写正式 immutable 预测日志 | "启动预测" 或 "给这稿子启动预测 path/to/draft.md" | 是（`predictions/...md`） |
+| See a script's rubric score (exploration) | "score this path/to/draft.md" | No |
+| Write a formal immutable prediction log for the final script | "start prediction" or "start prediction for this script path/to/draft.md" | Yes (`predictions/...md`) |
 
-> **score 与 predict 的核心区别**：
-> - score 是探索，无副作用，可反复跑
-> - predict 是承诺，写完文件 `## 预测 v1`（或 `## 预测 v2`）段被 hook 锁死
+> **Core difference between score and predict**:
+> - score is exploration, side-effect free, safe to run repeatedly
+> - predict is a commitment: once written, the `## Prediction v1` (or `## Prediction v2`) section is locked by the hook
 
-> **v2 重判触发**：cheat-shoot 检测拍摄稿与原 scripts 的 line-diff ≥30% 时自动调用 cheat-predict 写 `## 预测 v2` 段（append，不覆盖 v1）。详见 [shared-references/prediction-anatomy.md](../shared-references/prediction-anatomy.md) 的 v1/v2 段约定。
+> **v2 re-prediction trigger**: when cheat-shoot detects a line-diff ≥30% between the shooting script and the original scripts, it calls cheat-predict automatically to write a `## Prediction v2` section (append, does not overwrite v1). See the v1/v2 section convention in [shared-references/prediction-anatomy.md](../shared-references/prediction-anatomy.md).
 
-### ③ 发布登记
+### ③ Publish registration
 
-发完后立刻：
-
-```
-"已发布 https://..."
-```
-
-或：
+Right after publishing:
 
 ```
-"已发布 predictions/2026-05-04_xxx.md 链接是 https://..."
+"published https://..."
 ```
 
-会更新预测文件 header 的 `published_at` / `Platform` / `URL`，并把文件加入 `pending_retros` 队列。
-
-### ④ 复盘
-
-T+3 天后（默认）：
+or:
 
 ```
-"复盘 predictions/2026-05-04_xxx.md"
+"published predictions/2026-05-04_xxx.md link is https://..."
 ```
 
-或干脆：
+This updates `published_at` / `Platform` / `URL` in the prediction file header and adds the file to the `pending_retros` queue.
+
+### ④ Retro
+
+T+3 days (default):
 
 ```
-"复盘"
+"retro predictions/2026-05-04_xxx.md"
 ```
 
-后者会从 `pending_retros` 取最早的一条。
-
-> 复盘需要你提供数据。默认是手动粘——粘"播放 / 点赞 / 评论 / 转发"和 top 20 评论到对话里。
-> 配了 adapter 的可以让 cheat-retro 自动抓。
-
-### ⑤ Rubric 升级（罕见）
-
-**满足条件才提议**：
-- 校准池 ≥ 5 篇
-- 上次 bump 后又有 ≥ 3 篇新校准
-- 检测到连续 ≥ 3 次同向偏差
-
-满足就跑：
+or simply:
 
 ```
-"升级 rubric --propose 'ER 权重 1.5→2.0，加 MS 维度'"
+"retro"
 ```
 
-bump 是高风险操作——会做 5 步验证（含跨模型独立审）。详见 `cheat-on-content/shared-references/bump-validation-protocol.md`。
+The latter takes the earliest entry from `pending_retros`.
+
+> A retro needs data from you. The default is manual paste — paste "plays / likes / comments / shares" and the top 20 comments into the conversation.
+> With an adapter configured, cheat-retro can pull them automatically.
+
+### ⑤ Rubric upgrade (rare)
+
+**Only propose when the conditions are met**:
+- Calibration pool ≥ 5 posts
+- ≥ 3 new calibrations since the last bump
+- ≥ 3 consecutive deviations in the same direction detected
+
+If met, run:
+
+```
+"upgrade rubric --propose 'ER weight 1.5→2.0, add an MS dimension'"
+```
+
+bump is a high-risk operation — it runs 5 validation steps (including an independent cross-model review). See `cheat-on-content/shared-references/bump-validation-protocol.md`.
 
 ---
 
-## 三条不可妥协的原则
+## Three non-negotiable principles
 
-> 这三条违反任一条 → 整个校准循环退化为占星。
+> Violate any one of these and the whole calibration loop degenerates into astrology.
 
-1. **盲预测**：预测段写在看到任何数据之前，写完不可改。hook 在 harness 层强制。
-2. **升级 = 全量重打**：bump 必须校准池全量重打分 + 跨模型独立审。
-3. **rubric 是工作台不是博物馆**：被吸收 / 被推翻的观察都删掉。git history 是档案。
+1. **Blind prediction**: the prediction section is written before seeing any data and cannot be changed afterwards. The hook enforces this at the harness layer.
+2. **Upgrade = full rescore**: a bump must rescore the entire calibration pool + get an independent cross-model review.
+3. **The rubric is a workbench, not a museum**: observations that were absorbed or overturned get deleted. git history is the archive.
 
 ---
 
-## 默认配置
+## Default configuration
 
-`/cheat-init` 创建的项目默认值：
+Defaults for a project created by `/cheat-init`:
 
-| 设置 | 默认 | 何时改 |
+| Setting | Default | When to change |
 |---|---|---|
-| `RETRO_WINDOW_DAYS` | 3 | 长文 / 慢平台改 7 |
-| `BLIND_CHECK` | strict | 演练 / 测试时临时改 lenient |
-| `MIN_SAMPLES_FOR_BUMP` | 5 | 不要降 |
-| `CROSS_MODEL_AUDIT` | true（如 mcp__llm-chat__chat 已配） | 仅离线时 false |
-| `TREND_SOURCES` | ["manual-paste"] | 用 `enabled_trend_sources` 字段加新源 |
-| `POOL_PATH` | candidates.md | 用 Notion 时改字段 |
+| `RETRO_WINDOW_DAYS` | 3 | Set 7 for long-form / slow platforms |
+| `BLIND_CHECK` | strict | Temporarily lenient for drills / tests |
+| `MIN_SAMPLES_FOR_BUMP` | 5 | Do not lower it |
+| `CROSS_MODEL_AUDIT` | true (if mcp__llm-chat__chat is configured) | false only when offline |
+| `TREND_SOURCES` | ["manual-paste"] | Add new sources via `enabled_trend_sources` |
+| `POOL_PATH` | candidates.md | Change the field when using Notion |
 
 ---
 
-## 看板（status 命令）
+## Dashboard (status command)
 
-任何时候说 "状态"，会输出：
-- 当前 mode / rubric 版本 / 校准样本数
-- 待办（pending retros + 同向偏差警告 + 陈旧 in-progress）
-- 候选池规模 + 上次抓热点的天数
-- 健康度（RUBRIC.md 行数 / hooks 是否安装 / 是否配跨模型审）
-- 下一步建议（按推荐优先级）
+Say "status" at any time and it outputs:
+- Current mode / rubric version / calibration sample count
+- To-dos (pending retros + same-direction deviation warnings + stale in-progress)
+- Candidate pool size + days since the last trend pull
+- Health (RUBRIC.md line count / whether hooks are installed / whether cross-model review is configured)
+- Suggested next steps (in recommended priority order)
 
 ---
 
-## 文件结构（你的项目根）
+## File structure (your project root)
 
 ```
 <your-content-project>/
-├── docs/RUBRIC.md           # 评分规则真实来源（当前 v1-retention 五维）
-├── docs/LESSONS.md          # 每篇 retro 追加的硬教训（每篇开工前必读）
-├── docs/SCRIPT-PATTERNS.md  # 写作 pattern 沉淀
-├── WORKFLOW.md              # 本文件
-├── STATUS.md                # 看板（cheat-status 维护）
-├── candidates.md            # 候选池（可选；cheat-seed / cheat-trends 写）
-├── .cheat-state.json        # 状态文件（git track）
-├── .cheat-cache/            # 本地缓存（gitignore）
+├── docs/RUBRIC.md           # Single source of truth for scoring rules (currently v1-retention, five dimensions)
+├── docs/LESSONS.md          # Hard lessons appended at every retro (must-read before each episode)
+├── docs/SCRIPT-PATTERNS.md  # Writing pattern library
+├── WORKFLOW.md              # This file
+├── STATUS.md                # Dashboard (maintained by cheat-status)
+├── candidates.md            # Candidate pool (optional; written by cheat-seed / cheat-trends)
+├── .cheat-state.json        # State file (git tracked)
+├── .cheat-cache/            # Local cache (gitignored)
 │   ├── usage.jsonl
 │   └── trends-history.jsonl
-├── .cheat-secrets.json      # API key / cookie（gitignore）
-├── .cheat-hooks/            # hook 脚本副本
+├── .cheat-secrets.json      # API key / cookie (gitignored)
+├── .cheat-hooks/            # Copies of hook scripts
 │   ├── prediction-immutability.sh
 │   ├── session-start.sh
 │   └── log-event.sh
-├── .claude/settings.json    # 含 cheat-on-content hooks
+├── .claude/settings.json    # Contains cheat-on-content hooks
 │
-├── scripts/                 # **拍前的所有草稿**
-│   └── YYYY-MM-DD_<id>_<short>.md   # cheat-seed 写或用户写
+├── scripts/                 # **All drafts before shooting**
+│   └── YYYY-MM-DD_<id>_<short>.md   # written by cheat-seed or by the user
 │
-├── predictions/             # **immutable 预测日志**（hook 保护）
-│   └── YYYY-MM-DD_<id>_<short>.md   # cheat-predict 写
+├── predictions/             # **Immutable prediction log** (hook-protected)
+│   └── YYYY-MM-DD_<id>_<short>.md   # written by cheat-predict
 │
-└── videos/                  # **拍后才建**（cheat-shoot 创建）
+└── videos/                  # **Created only after shooting** (by cheat-shoot)
     └── YYYY-MM-DD_<id>_<short>/
-        ├── script.md        # 你提供的最终拍摄稿
-        └── report.md        # T+3d 数据（cheat-retro 写）
+        ├── script.md        # The final shooting script you provide
+        └── report.md        # T+3d data (written by cheat-retro)
 ```
 
-### 三个目录的关系
+### How the three directories relate
 
-| 目录 | 阶段 | 内容 | 谁写 |
+| Directory | Stage | Content | Written by |
 |---|---|---|---|
-| `scripts/` | 拍前草稿 | Claude AI 草稿或用户原创 | cheat-seed 写初版；用户改写也在原文件 |
-| `predictions/` | 预测锁定 | 7 组件 immutable 日志 | cheat-predict 写 |
-| `videos/<id>/` | 拍后产物 | 最终拍摄稿 + T+3d 数据 | cheat-shoot 建目录；cheat-retro 写 report.md |
+| `scripts/` | Drafts before shooting | Claude AI draft or user original | cheat-seed writes the first version; user edits stay in the same file |
+| `predictions/` | Prediction locked | 7-component immutable log | cheat-predict |
+| `videos/<id>/` | Post-shoot artifacts | Final shooting script + T+3d data | cheat-shoot creates the directory; cheat-retro writes report.md |
 
-三处用同一组 `<date>_<id>_<short>` 命名，`<id>` 是 `scripts/<id>.md` 首次落盘内容的 sha256 前 12 位，**草稿改写不变**。
+All three use the same `<date>_<id>_<short>` naming; `<id>` is the first 12 characters of the sha256 of the first content written to `scripts/<id>.md` and **does not change when the draft is rewritten**.
 
-`/cheat-init` 自动创建以上骨架（不覆盖已存在的）。
+`/cheat-init` creates the skeleton above automatically (without overwriting anything that exists).
 
 ---
 
-## 卡住了？
+## Stuck?
 
-- 看 `cheat-on-content/SKILL.md` 的"必须拒绝的请求"段——你想做的事可能正好是被设计拒绝的
-- 看对应子 skill 的 `cheat-on-content/skills/cheat-X/SKILL.md`
-- 跑 "状态" 看 cheat-status 的"下一步建议"
+- Read the "requests you must refuse" section of `cheat-on-content/SKILL.md` — what you want to do may be exactly what it is designed to refuse
+- Read the matching sub-skill's `cheat-on-content/skills/cheat-X/SKILL.md`
+- Run "status" and look at cheat-status's "suggested next steps"

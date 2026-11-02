@@ -1,87 +1,87 @@
 # facts · reg-ep11-2min
 
-**选题**：同一个问题，AI 为什么每次答得不一样
-**调研日期**：2026-10-31
-**一句话结论**：模型每吐一个词都是从一张概率表里抽一次，两个旋钮（温度 / top-p）决定这张表多野；而把旋钮拧到最紧（温度 0），输出**仍然**不保证一模一样——原因不在随机数，在服务器把不同请求拼批计算，浮点加法顺序变了。
+**Topic**: Why does AI answer the same question differently every time?
+**Research date**: 2026-10-31
+**One-line conclusion**: Every word a model emits is one draw from a probability table, and two knobs (temperature / top-p) determine how wild that table is. But turning the knobs to their tightest (temperature 0) **still** doesn't guarantee identical output — the reason isn't the random number generator, it's that servers batch different requests together and the order of floating-point additions changes.
 
 ---
 
-## 一、信源清单（多源交叉）
+## 1. Source list (multi-source cross-check)
 
-| 编号 | 来源 | 类型 | 用来支持 | 抓取 |
+| ID | Source | Type | Supports | Checked |
 |---|---|---|---|---|
-| S1 | OpenAI Help Center《Why am I getting different completions on Playground vs the API》 | 厂商官方帮助文档（公网） | 「温度 >0 输出带随机性、不同结果是预期的」「要一致用温度 0」「温度 0 仍不同时的排查清单」 | 2026-10-31 原文核对 |
-| S2 | Holtzman et al.《The Curious Case of Neural Text Degeneration》arXiv:1904.09751（ICLR 2020） | 同行评议论文（公网） | nucleus sampling（top-p）的定义与动机：砍掉不可靠的长尾，保住流畅与多样 | 2026-10-31 摘要核对 |
-| S3 | Thinking Machines《Defeating Nondeterminism in LLM Inference》（2025-09） | 一线实验室技术报告（公网） | 温度 0 仍不确定的真正原因：kernel 非 batch-invariant + 批大小随负载变化；1000 次贪心解码出 80 个唯一结果、第 103 个 token 分叉 | 2026-10-31 全文核对 |
-| S4 | inferbase《LLM Sampling Parameters Explained》/ technologyonthe.net《Sampling Settings and Reproducibility…》（2026-10） | 二手技术整理（公网，两篇独立同向） | 机制链条：logit → softmax → 温度除 logit → top-p 截断；温度分场景建议档位；「temperature 与 top_p 只调一个」的厂商通行建议 | 2026-10-31 核对 |
+| S1 | OpenAI Help Center, "Why am I getting different completions on Playground vs the API" | Vendor official help doc (public web) | "temperature > 0 means random output; different results are expected"; "use temperature 0 for consistency"; "the troubleshooting checklist when temperature 0 still differs" | Original text checked 2026-10-31 |
+| S2 | Holtzman et al., "The Curious Case of Neural Text Degeneration," arXiv:1904.09751 (ICLR 2020) | Peer-reviewed paper (public web) | Definition and motivation of nucleus sampling (top-p): cut off the unreliable long tail while preserving fluency and diversity | Abstract checked 2026-10-31 |
+| S3 | Thinking Machines, "Defeating Nondeterminism in LLM Inference" (2025-09) | Technical report from a frontier lab (public web) | The real reason temperature 0 is still nondeterministic: kernels are not batch-invariant + batch size varies with load; 1000 greedy decodes produced 80 unique results, diverging at token 103 | Full text checked 2026-10-31 |
+| S4 | inferbase, "LLM Sampling Parameters Explained" / technologyonthe.net, "Sampling Settings and Reproducibility…" (2026-10) | Secondary technical write-ups (public web; two independent pieces pointing the same way) | Mechanism chain: logit → softmax → divide logits by temperature → top-p truncation; recommended temperature tiers by scenario; the common vendor advice "tune only one of temperature and top_p" | Checked 2026-10-31 |
 
-交叉关系：**机制链条（S2 + S4）**、**温度 0 的预期（S1）与实际不达标的原因（S3）** 各自至少两源；「温度 0 仍不稳定」这条同时有 S1（承认温度 0 下仍有差异）与 S3（给出根因与量化实验）支撑。无单源复述。
+Cross-relations: **mechanism chain (S2 + S4)** and **what temperature 0 is supposed to do (S1) versus why it falls short (S3)** each have at least two sources; "temperature 0 is still unstable" is supported by both S1 (admits differences remain at temperature 0) and S3 (gives the root cause and a quantified experiment). No single-source restatement.
 
-> 口径边界（写进稿子时必须守住）：各家温度**量程不同**（有 0–2 也有 0–1），所以口播只说"低 / 高 / 0 / 0.8 以上"这类相对说法，不报"最大是 2"这种具体量程。S3 的 80/1000 是**他们在自家推理栈上对 Qwen3-235B 做的实验**，口播说"有人做过实验"，不说"所有模型都这样"。
+> Scope boundaries (must hold when writing the script): temperature **ranges differ** across vendors (some 0–2, some 0–1), so the narration only uses relative phrasing such as "low / high / 0 / 0.8 and above," never a concrete range like "the maximum is 2." S3's 80/1000 is **their experiment on Qwen3-235B on their own inference stack**; the narration says "someone ran an experiment," not "all models behave this way."
 
 ---
 
-## 二、关键数据与出处
+## 2. Key data and sources
 
-| 编号 | 数据 | 出处 | 口播用法 |
+| ID | Data | Source | Narration usage |
 |---|---|---|---|
-| F1 | 模型每一步对词表里每个词打一个分（logit），softmax 转成概率，再从这个分布里选下一个词 | S3、S4 | 机制底座，全片拍 3–4 |
-| F2 | 温度在 softmax **之前**除 logits：<1 变尖（高分词更独占），>1 压平（冷门词也有机会），趋近 0 等价于贪心（永远取最高分） | S4（两篇同向）、S3 | 拍 5–6 |
-| F3 | top-p（nucleus）只保留「累计概率达到 p」的最小词集，其余长尾直接截断 | S2（原始论文）、S4 | 拍 7 |
-| F4 | 温度 >0 → 输出带随机性，"看到不同结果是预期之内的"；要一致可重复 → 温度 0 | S1（原文） | 拍 8 的"听起来该稳了" |
-| F5 | 即使温度 0，生产推理服务也不保证 bit 级一致：kernel 对**批大小**不不变（同一行在不同 batch size 下算出的最大差可达 ~1669 量级），而批大小随服务器负载变化 → 归约（加法）顺序变 → 末位不同 | S3 | 拍 9 |
-| F6 | 同一 prompt、贪心解码、跑 **1000** 次 → **80** 个唯一结果；前 **102** 个 token 完全一致，从第 **103** 个 token 开始分叉 | S3（原文实验，Qwen3-235B） | 拍 10（口播说"词"，即 token） |
-| F7 | 场景档位建议：抽取 / 分类 / 代码 / 工具参数 → 温度 0（或最低）；基于检索的问答 → 0–0.3；写作 / 摘要 → 0.5–0.8；头脑风暴 / 多方案 → 0.8–1.0 并一次要多个候选 | S4 | 拍 12–13 |
-| F8 | 厂商文档的通行建议：温度与 top-p **只调一个**，两个同时调难归因、难复现 | S4（二手整理，标注为通行建议） | 拍 13 一句提醒 |
-| F9 | 低温度只是"更爱选最可能的词"，**不保证正确**——自信地答错仍然是答错 | S4 | 拍 12 的"加一道校验"的前提 |
+| F1 | At each step the model scores every word in the vocabulary (logit), softmax turns the scores into probabilities, and the next word is drawn from this distribution | S3, S4 | Mechanism foundation, beats 3–4 |
+| F2 | Temperature divides logits **before** softmax: <1 sharpens (top words dominate), >1 flattens (fringe words get a chance), approaching 0 is equivalent to greedy decoding (always take the highest score) | S4 (two pieces agree), S3 | Beats 5–6 |
+| F3 | top-p (nucleus) keeps only the smallest word set whose cumulative probability reaches p, truncating the rest of the long tail | S2 (original paper), S4 | Beat 7 |
+| F4 | Temperature >0 → random output, "different results are expected"; for consistent, repeatable output → temperature 0 | S1 (original text) | Beat 8's "this should be stable now" |
+| F5 | Even at temperature 0, production inference services don't guarantee bit-level consistency: kernels are not invariant to **batch size** (the same row computed at different batch sizes can differ by as much as ~1669 in magnitude), and batch size varies with server load → reduction (addition) order changes → the last digits differ | S3 | Beat 9 |
+| F6 | Same prompt, greedy decoding, **1000** runs → **80** unique results; the first **102** tokens are identical, divergence starts at token **103** | S3 (original experiment, Qwen3-235B) | Beat 10 (the narration says "word," meaning token) |
+| F7 | Scenario tiers: extraction / classification / code / tool arguments → temperature 0 (or the lowest); retrieval-based Q&A → 0–0.3; writing / summarization → 0.5–0.8; brainstorming / multiple options → 0.8–1.0 with several candidates per request | S4 | Beats 12–13 |
+| F8 | Common vendor advice: tune **only one** of temperature and top-p; adjusting both makes attribution and reproduction hard | S4 (secondary write-ups, marked as common advice) | One reminder in beat 13 |
+| F9 | Low temperature only means "prefers the most likely word," **not** "guaranteed correct" — confidently wrong is still wrong | S4 | The premise of beat 12's "add a validation step" |
 
 ---
 
-## 三、抽象概念 → 视觉比喻映射
+## 3. Abstract concepts → visual metaphors
 
-| 抽象概念 | 视觉物件（viz 元素） | 说明 |
+| Abstract concept | Visual object (viz element) | Notes |
 |---|---|---|
-| 三份不一样的答案 | 三个对话气泡（`ChatBubbles`）同屏，文字各不相同 | 首帧即封面，必须一眼看出"同一个问题" |
-| 下一个词的概率表 | 横条（`BarChart`），条长 = 概率 | 只画前四个，剩下一成用一条灰条"其他"表示 |
-| 逐词选择、越走越远 | 分叉路径（`PipelineFlow` 的连线 / 两条自绘折线） | 第一个岔口在"好 / 不错"之间 |
-| 温度把表变尖 / 压平 | 同一组横条在两组数值间形变 + 一条温度刻度轨（低端标"尖"、高端标"平"） | 数字同步变：95% → 30% |
-| top-p 砍尾巴 | 刀线（一条竖直虚线）扫过，右侧长尾灰掉并塌陷 | "只留累计九成" |
-| 服务器拼批 | 队列里挤进三个"别人的请求"方块（`CardGrid` / 自绘队列） | 批里人数变 → 加法顺序变 |
-| 末位小数翻盘 | 两个候选条几乎等高，差一位小数，指针抖一下滑向另一条 | 强调"就差一点点" |
-| 1000 次实验 | 100 个格子的点阵（`CardGrid` 缩略），只有几个重复、多数不同 | 数字 1000 / 80 / 103 大字压在角上 |
-| 两个旋钮 | 两个旋钮图标 + 档位数字（0–0.2 / 0.8 以上） | 收尾的"可带走"物件 |
+| Three different answers | Three chat bubbles (`ChatBubbles`) on one screen, each with different text | The first frame is the cover; the "same question" must be obvious at a glance |
+| Probability table for the next word | Horizontal bars (`BarChart`), bar length = probability | Draw only the top four; represent the remaining 10% with one gray "other" bar |
+| Word-by-word choices drifting apart | Forking path (connectors in `PipelineFlow` / two hand-drawn polylines) | The first fork is between "good / not bad" |
+| Temperature sharpening / flattening the table | The same set of bars morphing between two sets of values + a temperature scale rail (low end labeled "sharp," high end labeled "flat") | Numbers change in sync: 95% → 30% |
+| top-p cutting the tail | A knife line (a vertical dashed line) sweeps across; the long tail on the right grays out and collapses | "Keep only the cumulative 90%" |
+| Server batching | Three "other people's requests" blocks crowd into a queue (`CardGrid` / hand-drawn queue) | More people in the batch → addition order changes |
+| Last-decimal upset | Two candidate bars almost equal in height, differing by one decimal place; a pointer wobbles and slides to the other bar | Emphasize "just a tiny difference" |
+| The 1000-run experiment | A dot matrix of 100 cells (`CardGrid` thumbnails), only a few repeats, most different | Big numbers 1000 / 80 / 103 pinned in the corner |
+| Two knobs | Two knob icons + tier numbers (0–0.2 / 0.8 and above) | The takeaway object for the ending |
 
 ---
 
-## 四、教学设计
+## 4. Teaching design
 
-**教学目标**
-看完，一个没碰过参数的人能：① 用一句话解释"为什么同一个问题答案会变"（每吐一个词都从概率表里抽一次）；② 说出两个旋钮的名字和作用方向；③ 在自己的场景里选一个温度档（要稳 0–0.2，要发散 0.8 以上）并且知道**要稳还得加校验**。
+**Learning objectives**
+After watching, someone who has never touched a parameter can: ① explain in one sentence "why the answer to the same question changes" (every word emitted is one draw from a probability table); ② name the two knobs and the direction each pushes; ③ pick a temperature tier for their own scenario (0–0.2 for stability, 0.8 and above for divergence) and know that **stability also requires validation**.
 
-**观众前置假设**
-用过 ChatGPT / Claude / 豆包，遇到过"重问一遍答案就变了"，但不知道 `temperature` / `top-p` 是什么，不知道 token 是什么，也不需要看公式。全片零数学符号，只保留"表"和"条"两个可视物。
+**Assumed audience background**
+Has used ChatGPT / Claude / Doubao and has seen "ask again and the answer changes," but doesn't know what `temperature` / `top-p` are, doesn't know what a token is, and doesn't need to see formulas. No mathematical notation anywhere in the video; only two visual objects are kept: the "table" and the "bars."
 
-**每个例子的完整上下文**
+**Full context for each example**
 
-- **例子 A：下一个词的概率表**（拍 3）。问题：模型凭什么叫"下一个词"？候选从哪来？——候选是**整个词表**（几万到十几万词），模型给每个词打分，softmax 归一成概率。口播只念前四个（好 / 不错 / 热 / 其他），因为前四个已经占了九成，剩下的词加起来才一成；画面上的灰条"其他"就是那剩下的九成之外的一成。为什么是这句"今天天气真"：它足够日常、没有歧义，观众能自己预判答案，从而"看见"模型和人的差别。
-- **例子 B：同一张表的两组温度**（拍 5–6）。问题：温度到底动了什么？候选为什么是 0.2 和 1.5？——0.2 代表"几乎确定"（最高分词被推到九五成），1.5 代表"明显发散"（最高分掉到三成，冷门词也有一成）。这两个值不是论文推荐值，是**同一张表在两个方向上的极端演示**，目的让"尖 / 平"这个形状变化看得见；画面上的具体百分数是演示值，不是某家厂商的实测。
-- **例子 C：1000 次贪心实验**（拍 10）。问题：温度 0 到底稳不稳？候选为什么是 1000 次？——S3 原文就跑了 1000 次同一 prompt 的贪心解码，得到 80 个唯一结果；样本太少（比如 5 次）看不出分布，太多观众记不住，1000 是原文规模且"80/1000"这个比值本身有冲击力。分叉点第 103 个 token 也是原文数字，口播说"一百零二个词之后开始分叉"。
+- **Example A: probability table for the next word** (beat 3). Question: on what basis can the model call "the next word"? Where do the candidates come from? — The candidates are the **entire vocabulary** (tens of thousands to hundreds of thousands of words); the model scores every word and softmax normalizes the scores into probabilities. The narration reads only the top four (good / not bad / hot / other), because the top four already account for 90%, and all remaining words combined are only 10%; the gray "other" bar on screen is that remaining 10%. Why this sentence "The weather today is really": it's everyday enough, unambiguous, and viewers can predict the answer themselves, so they can "see" the difference between the model and a human.
+- **Example B: the same table at two temperatures** (beats 5–6). Question: what exactly does temperature change? Why are the candidates 0.2 and 1.5? — 0.2 represents "almost certain" (the top word is pushed to 95%), 1.5 represents "clearly divergent" (the top score drops to 30%, and fringe words still get 10%). These two values are not paper-recommended values; they are **extreme demonstrations of the same table in two directions**, meant to make the "sharp / flat" shape change visible; the specific percentages on screen are demonstration values, not measurements from any vendor.
+- **Example C: the 1000-run greedy experiment** (beat 10). Question: is temperature 0 actually stable? Why 1000 runs? — S3 ran exactly 1000 greedy decodes of the same prompt and got 80 unique results; too few samples (say 5) wouldn't reveal the distribution, too many and viewers can't remember, so 1000 is the original scale, and the ratio "80/1000" is striking in itself. The divergence point at token 103 is also from the original; the narration says "divergence starts after the 102nd word."
 
-**体验翻译**
-- 95% → "几乎没悬念"（不是念"百分之九十五"，是让人感到"没得选"）
-- 砍掉尾巴 → "不让它临场发挥"
-- 末位小数翻盘 → "本来该选'好'的，一下滑到'不错'"
-- 80 / 1000 → "你以为的确定，其实是一堆结果里的一种"
-- 温度 0 仍不稳 → "把骰子冻住，桌子还在晃"
+**Experience translation**
+- 95% → "almost no suspense" (not reading "95 percent," but making people feel "there's no choice")
+- Cutting the tail → "so it can't improvise"
+- Last-decimal upset → "the word that should have been 'good' slips to 'not bad'"
+- 80 / 1000 → "what you thought was certainty is just one of a pile of outcomes"
+- Temperature 0 is still unstable → "freeze the dice, and the table is still shaking"
 
-**结尾落点（可执行建议 + 钩子回收句）**
-两个当天能用的档位（要稳 0–0.2 + 加校验；要发散 0.8 以上 + 一次要十个）+ 一条纪律（温度和 top-p 别一起拧）+ 回收首拍（"回到开头那三份答案"）+ 一句可独立成立的落点（"它每一步都在合法地选，选择权得留在你手里"）。
+**Ending (actionable advice + hook callback)**
+Two tiers usable the same day (0–0.2 for stability + validation; 0.8 and above for divergence + ask for ten at a time) + one rule (don't turn temperature and top-p together) + callback to the first beat ("back to those three answers at the start") + one standalone landing line ("it makes a legal choice at every step; the choice has to stay in your hands").
 
-**论证链 · 叙事弧**
-一句话锁死全片顺序：**它每说一个字都在掷骰子 → 骰子有两个旋钮 → 把旋钮拧到最紧它仍然不稳 → 所以稳定得靠校验，不靠参数。**
+**Argument chain · narrative arc**
+One sentence locks the order of the whole video: **every word it says is a dice roll → the dice have two knobs → turn the knobs as tight as they go and it's still unstable → so stability comes from validation, not parameters.**
 
-- 第 1 章（拍 1–2）抛现象与题目：三份答案不是 bug，是"采样"。承接：无（开场）。
-- 第 2 章（拍 3–4）回答"为什么会不一样"：因为它逐词从概率表里抽，第一个岔口就把后面全带偏。承接上一章的"为什么"。
-- 第 3 章（拍 5–7）回答"那能不能让它别乱抽"：能，两个旋钮，温度管表的胖瘦，top-p 管尾巴留不留。承接第 2 章留下的"表"这个物件。
-- 第 4 章（拍 8–10）回答"拧到最紧总该稳了吧"：不稳，因为批处理让加法顺序变，末位小数翻盘；1000 次实验给出量级。承接第 3 章"温度 0"这个具体档位。
-- 第 5 章（拍 11–13）回答"那我该怎么办"：分场景给档位 + 加校验 + 一条纪律 + 回收开头。承接第 4 章"参数救不了你"。
+- Chapter 1 (beats 1–2) presents the symptom and the topic: three answers aren't a bug, they're "sampling." Hand-off: none (opening).
+- Chapter 2 (beats 3–4) answers "why are they different": because it draws word by word from a probability table, and the first fork skews everything after it. Picks up Chapter 1's "why."
+- Chapter 3 (beats 5–7) answers "can we stop it from drawing randomly": yes, two knobs; temperature controls how fat or thin the table is, top-p controls whether the tail stays. Picks up the "table" object left by Chapter 2.
+- Chapter 4 (beats 8–10) answers "turning it all the way tight should be stable, right": it isn't, because batching changes the order of additions and the last decimal upsets the result; the 1000-run experiment gives the scale. Picks up Chapter 3's concrete "temperature 0" setting.
+- Chapter 5 (beats 11–13) answers "so what should I do": per-scenario tiers + validation + one rule + callback to the opening. Picks up Chapter 4's "parameters can't save you."

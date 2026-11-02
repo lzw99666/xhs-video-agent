@@ -19,22 +19,22 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Chrome 可执行文件：优先环境变量，其次 Windows 默认安装路径
+// Chrome executable: prefer the env var, then the default Windows install path
 const CHROME =
   process.env.CHROME_PATH ||
   "C:/Program Files/Google/Chrome/Application/chrome.exe";
 
 /**
- * 两种画幅共用这一份脚本，用环境变量切换：
- *   VARIANT=wide      16:9  1920x1080  B站    → <project>/raw/
- *   VARIANT=vertical   3:4  1080x1440  小红书 → <project>/raw-vertical/
+ * Both aspect ratios share this one script, switched by env vars:
+ *   VARIANT=wide      16:9  1920x1080  Bilibili → <project>/raw/
+ *   VARIANT=vertical   3:4  1080x1440  Xiaohongshu → <project>/raw-vertical/
  *
- * 其他环境变量：
- *   VIDEO_PROJECT      视频项目目录（默认 <repo>/videos/personal-agent-deep-dive）
- *   PRESENTATION_DIR   网页工程目录（默认 <project>/presentation[-vertical]）
- *   PORT               开发服务器端口（wide 默认 5174 / vertical 默认 5175）
- *   TOTAL_STEPS        总步数（默认读 <PRESENTATION_DIR>/audio-segments.json 的长度）
- *   STORAGE_KEY        浏览器本地游标 key（默认 presentation-cursor-v8）
+ * Other env vars:
+ *   VIDEO_PROJECT      video project dir (default <repo>/videos/personal-agent-deep-dive)
+ *   PRESENTATION_DIR   web project dir (default <project>/presentation[-vertical])
+ *   PORT               dev-server port (wide default 5174 / vertical default 5175)
+ *   TOTAL_STEPS        total steps (default: length of <PRESENTATION_DIR>/audio-segments.json)
+ *   STORAGE_KEY        browser local cursor key (default presentation-cursor-v8)
  */
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const VARIANT = process.env.VARIANT === "vertical" ? "vertical" : "wide";
@@ -60,7 +60,7 @@ const CFG = {
   },
 }[VARIANT];
 
-// 阅读保护时间：不传 TRAIL_MS 时用页面默认 1500ms；TRAIL_MS=800 可整片调短。
+// Reading-protection time: the page default is 1500ms when TRAIL_MS is not passed; TRAIL_MS=800 shortens the whole video.
 const TRAIL = process.env.TRAIL_MS ? `&trail=${process.env.TRAIL_MS}` : "";
 const URL = `http://localhost:${CFG.port}/?auto=1${TRAIL}`;
 const OUT_DIR = CFG.out;
@@ -130,8 +130,8 @@ await page.evaluate(() => document.fonts.ready);
 await sleep(1200);
 log("fonts ready");
 
-// 成片里不要出现编辑态的 UI：章节进度条 / 模式切换按钮。
-// （AutoStartGate 必须在，因为录制靠它接住 Space 才起步。）
+// Do not show any editing-mode UI in the final video: chapter progress bar / mode toggle button.
+// (AutoStartGate must stay, because recording relies on it to catch Space and start.)
 await page.addStyleTag({
   content: ".pb-hover, .at-hover { display: none !important; }",
 });

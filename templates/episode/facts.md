@@ -1,49 +1,49 @@
 # facts · <episode>
 
-**选题**：<一句话描述>
-**调研日期**：<YYYY-MM-DD>
-**一句话结论**：<看完这篇，观众应该能复述的那句话>
+**Topic**: <one-sentence description>
+**Research date**: <YYYY-MM-DD>
+**One-sentence conclusion**: <the sentence the viewer should be able to restate after watching>
 
-> 规则：调研不实不动笔。至少 2 个独立域；每个关键数据都要有出处；抽象概念必须落到一个可画的物件。
+> Rule: no writing until the research is solid. At least 2 independent domains; every key data point needs a source; an abstract concept must land on a drawable object.
 
 ---
 
-## 一、信源清单（多源交叉）
+## 1. Source list (multi-source cross-check)
 
-| 编号 | 来源 | 类型 | 用来支持 | 抓取 |
+| ID | Source | Type | Used to support | Fetched |
 |---|---|---|---|---|
-| S1 | <标题 / 链接> | 官方文档 / 论文 / 技术报告 / 二手整理 | <哪一条结论> | <YYYY-MM-DD> |
-| S2 | <标题 / 链接> | 同上 | <交叉验证哪一条> | <YYYY-MM-DD> |
+| S1 | <title / link> | Official docs / paper / technical report / secondary summary | <which conclusion> | <YYYY-MM-DD> |
+| S2 | <title / link> | Same as above | <which conclusion it cross-checks> | <YYYY-MM-DD> |
 
-交叉关系：<哪两条结论各有 ≥2 源；哪些只有单源，口播必须降级为"有人说">
+Cross relations: <which conclusions each have ≥2 sources; which have only one, so the narration must be downgraded to "some people say">
 
-口径边界：<量程 / 版本 / 实验条件，口播不能越界的地方>
+Scope boundaries: <range / version / experimental conditions — where the narration must not go beyond>
 
 ---
 
-## 二、关键数据与出处
+## 2. Key data and sources
 
-| 编号 | 数据 | 出处 | 口播用法 |
+| ID | Data | Source | How to use in the narration |
 |---|---|---|---|
-| F1 | <数字 / 机制 / 结论> | S1 | <第几拍，怎么说> |
+| F1 | <number / mechanism / conclusion> | S1 | <which beat, said how> |
 | F2 | <...> | S2 | <...> |
 
 ---
 
-## 三、抽象概念 → 视觉比喻映射
+## 3. Abstract concept → visual metaphor mapping
 
-| 抽象概念 | 视觉物件（viz 元素） | 说明 |
+| Abstract concept | Visual object (viz element) | Notes |
 |---|---|---|
-| <概念 1> | <柱状图 / 时间轨 / 队列 / 分叉线> | <观众一眼要看出什么> |
-| <概念 2> | <...> | <...> |
+| <concept 1> | <bar chart / timeline rail / queue / branching line> | <what the viewer must see at a glance> |
+| <concept 2> | <...> | <...> |
 
 ---
 
-## 四、教学设计
+## 4. Teaching design
 
-**教学目标**：看完，一个零前置的观众能——
-1. <说出一个机制>
-2. <说出一个可执行动作>
-3. <避免一个常见误解>
+**Teaching goal**: after watching, a viewer with zero prior knowledge can —
+1. <explain one mechanism>
+2. <perform one executable action>
+3. <avoid one common misunderstanding>
 
-**信息顺序**：现象 → 为什么 → 能不能改 → 改了也不够 → 那我怎么办
+**Information order**: phenomenon → why → can it be fixed → fixing it is not enough → so what do I do

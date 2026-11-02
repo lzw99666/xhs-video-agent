@@ -1,5 +1,5 @@
-// 一次性登录：打开创作者中心，等用户扫码/短信登录，成功后保存 storageState。
-// 产物：tools/metrics/session.json（含登录凭证，勿提交/勿外传）
+// One-off login: opens the creator center, waits for the user to log in via QR code / SMS, then saves storageState.
+// Output: tools/metrics/session.json (contains login credentials; never commit or share it)
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
@@ -22,7 +22,7 @@ const say = (s) => { out.push(s); console.log(s); };
   const ctx = await browser.newContext({ viewport: null });
   const page = await ctx.newPage();
   await page.goto('https://creator.xiaohongshu.com/login', { waitUntil: 'domcontentloaded' });
-  say('浏览器已打开，请在窗口内完成登录（扫码或短信），最多等待 8 分钟。');
+  say('Browser opened. Please log in in the window (QR code or SMS); waiting up to 8 minutes.');
 
   const deadline = Date.now() + 8 * 60 * 1000;
   let logged = false;
@@ -31,7 +31,7 @@ const say = (s) => { out.push(s); console.log(s); };
     if (!page.url().includes('/login')) { logged = true; break; }
   }
   if (!logged) {
-    say('TIMEOUT: 8 分钟内未检测到登录完成。');
+    say('TIMEOUT: login not detected within 8 minutes.');
     fs.writeFileSync(RESULT, out.join('\n'), 'utf8');
     await browser.close();
     process.exit(3);

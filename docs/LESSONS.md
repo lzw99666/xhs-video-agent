@@ -1,62 +1,62 @@
-# LESSONS.md — 已发样本的硬教训
+# LESSONS.md — hard lessons from published samples
 
-> 本文件是 xhs-video-agent 的组成部分；示例数据来自作者账号，仅用于说明方法。
+> This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
-> 每次 retro 在末尾追加一行；**每次开工前必读**。
-> 只写"下篇能改的动作"，不写感想。单篇支持的放"待验证"，≥2 篇同向才升"已验证"。
-> 最后更新：2026-10-30（n=11，含实验线 exp10/exp11；数据源 `data/metrics/latest.json` 2026-10-30T12:32Z 抓取）
+> Append one line at the end of every retro; **read this before starting any episode**.
+> Write only "what the next episode can change", not reflections. A single-episode observation goes under "To verify"; only ≥2 notes in the same direction get promoted to "Verified".
+> Last updated: 2026-10-30 (n=11, including the experimental line exp10/exp11; data source `data/metrics/latest.json` pulled 2026-10-30T12:32Z)
 
 ---
 
-## 已验证（≥2 篇同向，可直接当约束用）
+## Verified (≥2 notes in the same direction, usable as constraints)
 
-1. **人均观看 <5s 的五篇，曝光全停在 139–674；>15s 的两篇，曝光都在 1300+。**
-   留存是闸门，不是结果。改稿先问"这句能不能留住人"。
-2. **点击率与曝光反向**：曝光越高点击率越低（2.9% 对 7.3%）。
-   封面已取消（首帧即封面，2026-10-27 起），点击率只剩标题 + 首帧两个变量——别再指望"改封面"救数据。
-3. **同日两条差 2.5x 曝光、6x 留存**（10-10，1350 对 526，18s 对 3s）。
-   同时段、同时长，差在开头和讲法，不在账号状态。
-4. **"给清单"能拉点击，拉不住留存**：三篇工具清单型点击率 5.9% / 7.3% / 5.4%，留存仍 3–4s。
-   有物可拿 ≠ 愿意看完；清单必须配一条"为什么你该听我说完"的主线。
+1. **The five notes under 5s average watch all stalled at 139–674 impressions; the two over 15s both got 1300+.**
+   Retention is the gate, not the result. Before editing, ask "can this line hold someone".
+2. **CTR runs opposite to impressions**: the higher the impressions, the lower the CTR (2.9% vs 7.3%).
+   The cover image is gone (first frame is the cover image since 2026-10-27), so CTR now has only two variables — title + first frame. Stop hoping that "changing the cover" will rescue the numbers.
+3. **Two posts on the same day differed by 2.5x impressions and 6x retention** (10-10, 1350 vs 526, 18s vs 3s).
+   Same time slot, same duration; the difference was in the opening and the delivery, not in account status.
+4. **"Giving a checklist" pulls clicks but does not hold retention**: three tool-checklist posts had CTR 5.9% / 7.3% / 5.4% and still 3–4s retention.
+   Something to take ≠ willing to watch to the end; a checklist needs a throughline of "why you should hear me out".
 
-## 待验证（单篇，别当规律）
+## To verify (single note, do not treat as a pattern)
 
-5. 改开头确实有效但幅度不够：2 秒退出 81.8% → 66.3%，5 秒完播 12.9% → 16%（ep09 → exp11）。
-   下一步要测"首帧给结果 vs 首帧给提问"，只比 2 秒退出率。
-6. **60 秒电报体 = 听得见但听不懂**（ep10，2026-10-30）：8 拍 8 条结论句、比喻早于事实、代号（svc-telemetry / 2.1.313）无中文解释；盲预测 composite 9.29 却用户复述不出。
-   下篇动作：首拍先落"谁中招"，比喻必须在名词之后；每 2–3 拍至少一个因果连接词。
+5. Changing the opening does work, but not enough: 2-second exits 81.8% → 66.3%, 5-second completion 12.9% → 16% (ep09 → exp11).
+   Next test: "first frame gives the result vs first frame gives the question", comparing only the 2-second exit rate.
+6. **A 60-second telegraphic style is audible but not understandable** (ep10, 2026-10-30): 8 beats, 8 concluding sentences, metaphors ahead of facts, code names (svc-telemetry / 2.1.313) with no explanation; blind prediction composite 9.29 but the user could not restate it.
+   Next episode: the first beat lands "who gets hit" first, metaphors must come after the noun, and at least one causal connective every 2–3 beats.
 
-## 已否决（不要再拿它当解释）
+## Rejected (stop using these as explanations)
 
-7. **"新号有冷启动流量包"** — 同日两条差 2.5x；10-25 单条把账号曝光拉回 292，账号没有降权。
-8. **"标签 / 封面缺失导致分发崩"** — ep09 带标签带封面，曝光 127；反向不成立。
-
----
-
-## 下篇三条动作（滚动，最多 3 条）
-
-1. 首拍给结果：数字 / 成品 / 故障画面，不给背景；但**首拍内必须点名「谁中招」**（如"装了 Claude Code 扩展的 Cursor 用户"），不能只给比喻。
-2. 2 分钟内讲完（120–150s 最佳）；每 12–15 秒一个信息点，拍与拍之间要有"因为/所以"。
-3. 结尾给当天能做的动作，并回收开头；动作要**可指向**（具体仓库 / 项目页 / 命令行），不是泛工具名——`exp10/11` 两篇证明「给清单但带不走」只换点击不换收藏。
+7. **"A new account gets a cold-start traffic package"** — two posts on the same day differed by 2.5x; a single post on 10-25 pulled account impressions back to 292, so the account was not de-weighted.
+8. **"Missing tags / cover image broke distribution"** — ep09 had tags and a cover image and got 127 impressions; the reverse does not hold.
 
 ---
 
-## retro 追加（2026-10-30）
+## Three actions for the next episode (rolling, max 3)
 
-- 2026-10-30 · exp11 · 预测准的是「曝光 > A 组」（1.41x，落押区间）与「赞藏 ≥3」（4），错的是「藏 ≥ 赞」（1 < 3）→ 下篇动作：给"可指向、可带走"的具体仓库/项目页（不是泛工具名），收藏才会动；给清单但读者带不走，就只换点击不换收藏
-- 2026-10-30 · exp10 · 预测准的是「曝光 < B 组」与「赞藏 ≤2」（实绩 0），错的是把 QL 当收藏主因（QL2 与 QL4 两篇收藏同为 0）→ 下篇动作：判断「值不值得存」只看有没有可指向的物件，不看金句多少
-
----
-
-## 口径修正（2026-10-30，retro 后收紧）
-
-- 待验证第 5 条只能读作**「前 5 秒」的局部结论**，不可外推为留存改善：exp11 的 2 秒退出 66.3%、5 秒完播 16% 都优于 ep09（81.8% / 12.9%），但人均观看只有 **4s**（ep09 为 12.1s）——越过 5 秒之后仍在快速流失。
-- 「24h 封顶」只对**阅读与互动**成立，**曝光不算**：B′ 阅读 133→134（+1）同期曝光 259→433（+67%）。后 3 天的曝光增量不能当热度信号。
+1. First beat gives the result: a number / a finished artifact / a failure screen, no background; but **inside the first beat you must name "who gets hit"** (e.g. "Cursor users who installed the Claude Code extension"), not just a metaphor.
+2. Finish within 2 minutes (120–150s is best); one information point every 12–15 seconds, and "because / so" between beats.
+3. The ending gives an action the viewer can do today and calls back to the opening; the action must be **pointable** (a specific repo / project page / command line), not a generic tool name — `exp10/11` proved that "a checklist you cannot take away" only buys clicks, not saves.
 
 ---
 
-## retro 追加格式（一行 + 一条动作）
+## Retro append (2026-10-30)
+
+- 2026-10-30 · exp11 · what the prediction got right is "impressions > group A" (1.41x, inside the bet range) and "likes+saves ≥3" (4); what it got wrong is "saves ≥ likes" (1 < 3) → next episode: give "pointable, take-away" specific repos / project pages (not generic tool names), then saves will move; a checklist the reader cannot take away only buys clicks, not saves
+- 2026-10-30 · exp10 · what the prediction got right is "impressions < group B" and "likes+saves ≤2" (actual 0); what it got wrong is treating QL as the main driver of saves (the QL2 and QL4 posts both had 0 saves) → next episode: judge "worth saving" only by whether there is a pointable artifact, not by how many quotable lines there are
+
+---
+
+## Measurement corrections (2026-10-30, tightened after the retro)
+
+- To-verify item 5 can only be read as a **local conclusion about "the first 5 seconds"** and must not be extrapolated to retention improvement: exp11's 2-second exits at 66.3% and 5-second completion at 16% are both better than ep09 (81.8% / 12.9%), yet average watch was only **4s** (ep09 was 12.1s) — viewers kept dropping off fast after the 5-second mark.
+- "24h cap" holds only for **reads and engagement**, **not impressions**: B′ reads went 133→134 (+1) while impressions went 259→433 (+67%) over the same period. Impression growth in the following 3 days is not a heat signal.
+
+---
+
+## Retro append format (one line + one action)
 
 ```
-- 2026-10-27 · <ep> · 预测准的是 <维度>（因为…），错的是 <维度>（因为…）→ 下篇动作：<一句可执行的话>
+- 2026-10-27 · <ep> · prediction got right <dimension> (because…), got wrong <dimension> (because…) → next episode action: <one executable sentence>
 ```
