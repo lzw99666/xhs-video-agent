@@ -1,0 +1,50 @@
+# 依赖
+node_modules/
+tools/*/node_modules/
+
+# 运行时产物
+videos/
+raw/
+raw-vertical/
+*.webm
+*.mkv
+*.mp4
+*.mp3
+*.wav
+
+# 私有账号档案与发布记录（从 templates/ 复制，留在本地）
+/account.md
+/log.md
+/backlog.json
+/STATUS.md
+
+# cheat 校准数据（属于个人账号）
+.cheat-state.json
+/.cheat-cache/
+/predictions/
+/data/
+/cache/
+rubric-memo.md
+
+# 登录态与 cookies
+session.json
+cookies.json
+*.cookie
+
+# 日志
+*.log
+tools/record/record.log
+tools/record/_shots/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
