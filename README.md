@@ -465,7 +465,7 @@ Python's `Scripts` directory is not on PATH. Use `python -m site --user-base` to
 Three sources in priority order: `$env:FFMPEG` → `tools/record/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe` (available after `npm install`) → `ffmpeg` on PATH. If none exist, run `winget install Gyan.FFmpeg` or download from ffmpeg.org.
 
 **Q6. The video runs over 180 seconds — what now?**
-Check the C14 duration estimate in `check.ps1` (`Chinese characters / 4 + beats × 1.5`). Trim beats rather than speeding up narration: delete beats that repeat explanations, merge adjacent parallel concepts. In practice the 60-second format is hard to follow; only use it when `design-intent.md` explicitly says there is a single point.
+Check the C14 duration estimate in `check.ps1` (`Chinese characters / 4 + beats × 1.5`, or `English words / 2.8 + beats × 1.5` for English scripts). Trim beats rather than speeding up narration: delete beats that repeat explanations, merge adjacent parallel concepts. In practice the 60-second format is hard to follow; only use it when `design-intent.md` explicitly says there is a single point.
 
 **Q7. What is a blind prediction, and why can't I change it?**
 Before publishing you write down "how far this will go", then hash-lock it. Editing the prediction after publishing contaminates the calibration sample, making every later retro untrustworthy. `validate.ps1` verifies the hash and blocks publishing if it changed.

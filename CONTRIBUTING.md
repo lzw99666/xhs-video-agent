@@ -75,7 +75,8 @@ node --check tools\metrics\pull.js
 # The example must still pass the gate
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\check.ps1 `
   -ProjectDir examples\ep11-sampling -Gate pre-code
-# expected: pass=19 fail=0, EXIT=0
+# expected: pass=19 warn=1 fail=0, EXIT=0
+# the single WARN is C14: the English sample script estimates 185s, 5s over the 180s cap
 
 # Documentation must stay bilingual
 # (every English doc has a sibling *.zh-CN.md and a language switcher line)

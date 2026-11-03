@@ -465,7 +465,7 @@ Python 的 `Scripts` 目录不在 PATH。用 `python -m site --user-base` 找到
 三种来源按优先级：`$env:FFMPEG` → `tools/record/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe`（`npm install` 后就有）→ PATH 里的 `ffmpeg`。都没有就 `winget install Gyan.FFmpeg` 或去 ffmpeg.org 下载。
 
 **Q6. 成片超过 180 秒怎么办？**
-先看 `check.ps1` 的 C14 时长估算（`汉字数/4 + 拍数×1.5`）。压缩优先砍拍数而不是加快语速：删掉重复解释的拍、合并相邻的并列概念。60 秒档在实测里容易"听不懂"，除非 `design-intent.md` 明确只讲一个信息点。
+先看 `check.ps1` 的 C14 时长估算（中文稿 `汉字数/4 + 拍数×1.5`，英文稿 `词数/2.8 + 拍数×1.5`）。压缩优先砍拍数而不是加快语速：删掉重复解释的拍、合并相邻的并列概念。60 秒档在实测里容易"听不懂"，除非 `design-intent.md` 明确只讲一个信息点。
 
 **Q7. 盲预测是什么？为什么不能改？**
 发布前先写下"这条会跑到什么水平"，写完用哈希锁固定。发布后再改预测，就等于把校准样本污染了，之后所有复盘都不可信。`validate.ps1` 会校验哈希，改过就禁发。

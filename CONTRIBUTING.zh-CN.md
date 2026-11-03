@@ -75,7 +75,8 @@ node --check tools\metrics\pull.js
 # 示例必须仍然通过闸门
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\pipeline\check.ps1 `
   -ProjectDir examples\ep11-sampling -Gate pre-code
-# 预期：pass=19 fail=0，EXIT=0
+# 预期：pass=19 warn=1 fail=0，EXIT=0
+# 唯一的 WARN 来自 C14：英文示例稿估算 185s，比 180s 硬上限多 5s
 
 # 文档必须保持双语
 # （每个英文文档都有对应的 *.zh-CN.md，且顶部有语言切换行）
