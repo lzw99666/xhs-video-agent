@@ -1,0 +1,60 @@
+name: Bug report
+description: A step in the pipeline does not behave as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing, please read `README.md` and `docs/WORKFLOW.md` — most failures are missing prerequisites (Git Bash vs WSL, Chrome path, ffmpeg, edge-tts).
+  - type: input
+    id: step
+    attributes:
+      label: Which step fails
+      description: Phase / section in docs/WORKFLOW.md, or the script path
+      placeholder: "e.g. Phase 4 recording — tools/record/record.mjs"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and error output
+      description: Paste the command, the full error, and the exit code
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: Commands to reproduce, and whether `examples/ep11-sampling` also fails
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Windows version, PowerShell version, node -v, python --version, Chrome version, ffmpeg -version
+      placeholder: |
+        Windows 11 23H2
+        PowerShell 5.1
+        node v20.11.0
+        Python 3.12.2
+        Chrome 130
+        ffmpeg 6.1
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues
+          required: true
+        - label: I removed private data (account.md, cookies, session.json, metrics) from the report
+          required: true

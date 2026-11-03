@@ -7,6 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/platform-Windows-0078d4.svg)](#11-known-limitations)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](#41-prerequisites)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for the fork/PR workflow, local verification commands, and the long-lived `feature` branch.
 
 ---
 

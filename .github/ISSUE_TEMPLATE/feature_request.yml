@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a new capability for the pipeline
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve
+      description: Describe the step where you are stuck today, not the solution you have in mind
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Which file(s) would change — gate, tool, doc, template, dependency?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing workarounds, or why part of the flow already covers this
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Research / facts
+        - Script / outline
+        - Web presentation
+        - Audio / TTS
+        - Recording / final cut
+        - Gates / validation
+        - Publishing / metrics
+        - Docs / translation
+        - Examples
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I read docs/WORKFLOW.md and this is not already supported
+          required: true
+        - label: I am willing to open a PR for this
+          required: false
