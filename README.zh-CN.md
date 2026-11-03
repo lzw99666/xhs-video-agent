@@ -7,6 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/platform-Windows-0078d4.svg)](#已知限制)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](#环境依赖)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.zh-CN.md)
+
+欢迎参与贡献——Fork / PR 流程、本地验证命令、长期集成分支 `feature` 的用法见 [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)。
 
 ---
 
