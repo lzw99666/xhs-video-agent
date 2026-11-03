@@ -1,5 +1,7 @@
 # outline.md · shot outline (<episode> · <chapter-count> chapters, <step-count> steps)
 
+**English** | [中文版](outline.zh-CN.md)
+
 > Frame: 3:4 vertical 1080×1440; theme: <blueprint / chalk-garden / terminal-green / warm-keynote>.
 > Structure: <hook x beats → mechanism x beats → reversal x beats → landing x beats>.
 > **The first frame is the cover image**: step 1 carries a large title + hook + one concrete object.

@@ -1,5 +1,7 @@
 # script-selfcheck · ep11 (13 beats / 720 characters / est. 160s)
 
+**English** | [中文版](script-selfcheck.zh-CN.md)
+
 > Walked through all four layers of `skills\web-video-presentation\references\SCRIPT-STYLE.md` self-check item by item → revised per fail items → then finalized.
 > Execution: no Teams in this session; used an **isolated sub-agent blind read-and-retell** (layer 4) + strict item-by-item checks by the main controller (layers 1–3).
 > Final count: `script.md` 720 (incl. punctuation) / 570 Chinese characters / 13 beats; `article.md` 1196 → information retention **60.2%** (≥60% passes).

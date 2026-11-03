@@ -1,5 +1,7 @@
 # facts · reg-ep11-2min
 
+**English** | [中文版](facts.zh-CN.md)
+
 **Topic**: Why does AI answer the same question differently every time?
 **Research date**: 2026-10-31
 **One-line conclusion**: Every word a model emits is one draw from a probability table, and two knobs (temperature / top-p) determine how wild that table is. But turning the knobs to their tightest (temperature 0) **still** doesn't guarantee identical output — the reason isn't the random number generator, it's that servers batch different requests together and the order of floating-point additions changes.

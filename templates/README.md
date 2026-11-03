@@ -1,5 +1,7 @@
 # templates — where to copy them
 
+**English** | [中文版](README.zh-CN.md)
+
 These files are **skeletons**, not ready-to-publish output. Replace the content after copying.
 
 | Template | Copy to | Notes |

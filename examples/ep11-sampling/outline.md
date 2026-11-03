@@ -1,5 +1,7 @@
 # outline.md · Shot Outline (ep11 · 5 chapters, 13 steps · 2-minute format)
 
+**English** | [中文版](outline.zh-CN.md)
+
 > Portrait 1080×1440 (`--ratio=3:4`), theme `warm-keynote` (warm beige background `#f5efe1` / ink-brown text `#43302b` / teal accent `#14b8a6`).
 > Structure: **hook 2 beats → mechanism 2 beats → two knobs 3 beats → twist 4 beats → landing 2 beats** (13 beats == script.md beat count == narrations.ts total).
 > Layout uses `.stage-3band` throughout: `band-top` hook line / `band-main` key visual ≥55% / `band-foot` caption line (**with source annotation**).

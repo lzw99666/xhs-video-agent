@@ -1,5 +1,7 @@
 # Operations log (single source of truth for publishing records)
 
+**English** | [中文版](log.zh-CN.md)
+
 > Append one entry immediately after every publish. `validate.ps1`'s "posts today / 2h gap" follows this file.
 > The entry format is fixed for mechanical reading: `## YYYY-MM-DD · post N · <episode>`
 

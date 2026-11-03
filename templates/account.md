@@ -1,5 +1,7 @@
 # Account settings (single source of truth)
 
+**English** | [中文版](account.zh-CN.md)
+
 > Read this before every episode; this file and `log.md` are the process's "external memory".
 > Think before changing the persona / red lines: downstream titles, scripts and publishing checks all follow this.
 

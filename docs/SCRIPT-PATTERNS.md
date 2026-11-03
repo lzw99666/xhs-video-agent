@@ -1,5 +1,7 @@
 # Writing pattern library
 
+**English** | [中文版](SCRIPT-PATTERNS.zh-CN.md)
+
 > This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
 > **cheat-seed must read this before writing a draft; cheat-retro suggests new patterns to append after a retro**.

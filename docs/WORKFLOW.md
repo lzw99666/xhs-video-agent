@@ -1,5 +1,7 @@
 # Xiaohongshu Operations Workflow (Consolidated)
 
+**English** | [中文版](WORKFLOW.zh-CN.md)
+
 > This file is part of xhs-video-agent; the sample data comes from the author's account and is only used to illustrate the method.
 >
 > This file connects the two Xiaohongshu content lines (image posts / video) + publishing + retro into one end-to-end, executable description.

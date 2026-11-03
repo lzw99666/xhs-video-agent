@@ -1,5 +1,7 @@
 # Workflow quick reference (cheat-on-content)
 
+**English** | [中文版](CHEAT-WORKFLOW.zh-CN.md)
+
 > This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
 > This is the quick-reference doc `/cheat-init` creates at your project root. The full spec lives in cheat-on-content's `SKILL.md` and `shared-references/`.

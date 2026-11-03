@@ -1,5 +1,7 @@
 # design-intent · reg-ep11-2min
 
+**English** | [中文版](design-intent.zh-CN.md)
+
 **Topic**: Why does AI give a different answer to the same question every time (sampling / temperature / top-p / temperature 0 is still unstable)
 
 ## 1. Which metric should this move, and what's the target number?

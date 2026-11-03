@@ -1,5 +1,7 @@
 # script.md · ep11 (2-minute narration, 13 beats)
 
+**English** | [中文版](script.zh-CN.md)
+
 You ask AI the same question three times, and it can give you three answers — the punctuation differs, and by the third run even the conclusion has changed.
 
 ---

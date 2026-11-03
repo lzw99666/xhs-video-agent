@@ -1,5 +1,7 @@
 # Web Video Presentation · usage notes and pitfalls (Windows / WorkBuddy)
 
+**English** | [中文版](VIDEO-GUIDE.zh-CN.md)
+
 > This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
 > This file is the project-side supplement, recording this machine's environment conventions, the standard process and real-world pitfalls.

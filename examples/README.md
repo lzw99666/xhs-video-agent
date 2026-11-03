@@ -1,5 +1,7 @@
 # Examples walkthrough
 
+**English** | [中文版](README.zh-CN.md)
+
 This is the complete text asset set of one **actually published** Xiaohongshu video, "Same question, why does AI answer differently every time" (`ep11-sampling/`), plus 5 frames sampled from the finished video (`shots/`).
 
 It exists not so you can copy the copy, but so you can see clearly **what each step should produce and what it should check**.

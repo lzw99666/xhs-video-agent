@@ -1,5 +1,7 @@
 # LESSONS.md — hard lessons from published samples
 
+**English** | [中文版](LESSONS.zh-CN.md)
+
 > This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
 > Append one line at the end of every retro; **read this before starting any episode**.

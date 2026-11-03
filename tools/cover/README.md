@@ -1,5 +1,7 @@
 # cover.py · Atuntun-style Xiaohongshu cover image renderer
 
+**English** | [中文版](README.zh-CN.md)
+
 Renders a "copy plan (prompt)" straight into a finished cover image: HTML/CSS laid out per the Atuntun spec at
 1080×1440 (3:4) → Playwright headless Chrome screenshot to PNG. All large text goes through CSS,
 never text-to-image, eliminating wrong characters. The person image only gets a circular crop + stroke; faces are never generated or redrawn.

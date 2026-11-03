@@ -1,5 +1,7 @@
 # RUBRIC.md — v1-retention · 2026-10-27
 
+**English** | [中文版](RUBRIC.zh-CN.md)
+
 > This file is part of xhs-video-agent; sample data comes from the author's account and is used only to illustrate the method.
 >
 > **This version is a re-axis, not a re-weighting**: the objective function moved from "guess impressions" to "guess average watch seconds per viewer".

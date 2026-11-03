@@ -1,5 +1,7 @@
 # script.md · <episode> (<N> narration beats)
 
+**English** | [中文版](script.zh-CN.md)
+
 <!--
 Writing rules (see docs/VIDEO-GUIDE.md and web-video-presentation's SCRIPT-STYLE.md for details):
 - One beat = one focused idea, separated by ---; beat count = web page step count = audio segment count.

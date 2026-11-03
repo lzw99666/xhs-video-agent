@@ -1,5 +1,7 @@
 # script-selfcheck · <episode> (<beat-count> beats / <character-count> characters / estimated <seconds>s)
 
+**English** | [中文版](script-selfcheck.zh-CN.md)
+
 > Walk through the four-layer self-check in `web-video-presentation/references/SCRIPT-STYLE.md` item by item → revise per failing item → then finalize.
 > How it is executed: an isolated sub-agent blind-reads and restates (layer four) + the lead strictly checks each item (layers one to three).
 > Final character count: `script.md` <N> (including punctuation) / <M> characters / <beat-count> beats; `article.md` <A> → information retention **<X>%** (≥60% passes).

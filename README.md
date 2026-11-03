@@ -1,5 +1,7 @@
 # xhs-video-agent
 
+**English** | [中文版](README.zh-CN.md)
+
 **Turn an article into a publishable 3:4 Xiaohongshu short video: research → narration script → web presentation → voice-over → screen recording → three gates → publish → T+3 day retro.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)

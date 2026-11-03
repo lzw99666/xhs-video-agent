@@ -1,4 +1,6 @@
 # article.md · ep11
+
+**English** | [中文版](article.zh-CN.md)
 ## Why does AI answer the same question differently every time?
 
 ### The symptom: three answers

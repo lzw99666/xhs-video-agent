@@ -1,5 +1,7 @@
 # facts · <episode>
 
+**English** | [中文版](facts.zh-CN.md)
+
 **Topic**: <one-sentence description>
 **Research date**: <YYYY-MM-DD>
 **One-sentence conclusion**: <the sentence the viewer should be able to restate after watching>

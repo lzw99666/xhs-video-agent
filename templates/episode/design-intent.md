@@ -1,5 +1,7 @@
 # design-intent · <episode>
 
+**English** | [中文版](design-intent.zh-CN.md)
+
 > The three questions before authoring. Free text, no forms, no template; the three questions must be answered with this episode's concrete numbers and concrete script.
 > `check.ps1` only checks "was it actually written" (C13, WARN, not blocking); judging the content is your responsibility.
 
