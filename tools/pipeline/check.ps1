@@ -459,13 +459,25 @@ if ($Gate -in @('pre-code', 'pre-render', 'delivery')) {
         $t = $_.Trim(); ($t -ne '') -and (-not $t.StartsWith('#')) -and (-not $t.StartsWith('>'))
       }) -join "`n"
     $cjk = ([regex]::Matches($body, '[\u4e00-\u9fff]')).Count
+    $words = ([regex]::Matches($body, "[A-Za-z][A-Za-z'-]*")).Count
     $beats = ([regex]::Matches($body, '(?m)^---$')).Count + 1
-    if ($cjk -gt 0) {
+    # A script is "Chinese" when CJK characters outnumber Latin words; a few stray CJK
+    # characters inside an English script must not flip the estimator.
+    # English fallback: 2.8 words/s ≈ 168 wpm, close to the default rate of neural TTS.
+    $est = 0; $basis = ''
+    if ($cjk -gt $words) {
       $est = [math]::Round($cjk / 4.0 + $beats * 1.5, 0)
+      $basis = "${cjk} chars / ${beats} beats; formula = chars/4 + beats×1.5"
+    }
+    elseif ($words -gt 0) {
+      $est = [math]::Round($words / 2.8 + $beats * 1.5, 0)
+      $basis = "${words} words / ${beats} beats; formula = words/2.8 + beats×1.5 (English)"
+    }
+    if ($est -gt 0) {
       if (($est -lt 120) -or ($est -gt 180)) {
-        Add-Result 'WARN' 'C14-duration' ("estimated $est s (${cjk} chars / ${beats} beats) outside the 120–180s target band; formula = chars/4 + beats×1.5")
+        Add-Result 'WARN' 'C14-duration' ("estimated $est s ($basis) outside the 120–180s target band")
       }
-      else { Add-Result 'PASS' 'C14-duration' "estimated $est s (${cjk} chars / ${beats} beats) within the target band" }
+      else { Add-Result 'PASS' 'C14-duration' "estimated $est s ($basis) within the target band" }
     }
   }
 }

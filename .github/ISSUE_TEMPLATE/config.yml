@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup and prerequisites
+    url: https://github.com/lzw99666/xhs-video-agent/blob/main/README.md
+    about: Most "it does not work" reports are covered by the prerequisites and FAQ sections.
+  - name: Contributing guide
+    url: https://github.com/lzw99666/xhs-video-agent/blob/main/CONTRIBUTING.md
+    about: Fork / branch / PR workflow, local verification commands, and commit style.
